@@ -11,6 +11,7 @@ const requiredEnvVars = [
   'JWT_SECRET',
   'JWT_EXPIRES_IN',
   'EMBEDDING_SERVICE_URL',
+  'OLLAMA_BASE_URL',
 ];
 
 requiredEnvVars.forEach((key) => {
@@ -39,4 +40,6 @@ module.exports = {
   jwtSecret: process.env.JWT_SECRET,
   jwtExpiresIn: process.env.JWT_EXPIRES_IN,
   embeddingServiceUrl: process.env.EMBEDDING_SERVICE_URL.trim(),
+  ollamaBaseUrl: process.env.OLLAMA_BASE_URL.trim(),
+  ollamaModel: (process.env.OLLAMA_MODEL || 'llama3').trim(),
 };
