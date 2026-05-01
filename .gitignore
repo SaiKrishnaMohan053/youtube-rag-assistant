@@ -13,3 +13,5 @@ services/embedding-service/vector_store/*.index
 services/embedding-service/vector_store/*.metadata.json
 __pycache__/
 *.py[cod]
+/node_modules
+.env
