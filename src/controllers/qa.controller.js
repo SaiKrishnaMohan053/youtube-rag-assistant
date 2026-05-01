@@ -64,8 +64,6 @@ Answer:`;
   return res.status(200).json(
     new ApiResponse(200, 'Answer generated successfully', {
       chatMessageId: chatMessage._id,
-  return res.status(200).json(
-    new ApiResponse(200, 'Answer generated successfully', {
       answer,
       supportingChunks,
     })
@@ -83,6 +81,4 @@ const getVideoChats = asyncHandler(async (req, res) => {
 module.exports = {
   askVideo,
   getVideoChats,
-module.exports = {
-  askVideo,
 };

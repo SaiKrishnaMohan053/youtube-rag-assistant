@@ -4,7 +4,13 @@
   "description": "",
   "main": "src/server.js",
   "scripts": {
+<<<<<<< codex/create-backend-foundation-for-youtube-rag-assistant-cve0ba
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:embedding\"",
+    "dev:api": "nodemon src/server.js",
+    "dev:embedding": "cd services/embedding-service && .venv/Scripts/python.exe -m uvicorn app:app --reload --port 8001",
+=======
     "dev": "nodemon src/server.js",
+>>>>>>> main
     "start": "node src/server.js"
   },
   "keywords": [],
@@ -24,6 +30,11 @@
     "axios": "^1.7.7"
   },
   "devDependencies": {
+<<<<<<< codex/create-backend-foundation-for-youtube-rag-assistant-cve0ba
+    "nodemon": "^3.1.4",
+    "concurrently": "^9.0.1"
+=======
     "nodemon": "^3.1.4"
+>>>>>>> main
   }
 }
