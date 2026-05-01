@@ -5,6 +5,7 @@ const ApiResponse = require('../utils/apiResponse');
 const ApiError = require('../utils/apiError');
 const { searchVideoEmbeddings } = require('../services/embeddingClient.service');
 const { generateAnswer } = require('../services/llm.service');
+const ChatMessage = require('../models/chatMessage.model');
 
 const findOwnedVideo = async (videoIdParam, userId) => {
   if (!mongoose.Types.ObjectId.isValid(videoIdParam)) {
@@ -51,6 +52,18 @@ Answer:`;
 
   const answer = await generateAnswer(prompt);
 
+  const chatMessage = await ChatMessage.create({
+    user: req.user._id,
+    video: video._id,
+    videoId: video.videoId,
+    question: query.trim(),
+    answer,
+    supportingChunks,
+  });
+
+  return res.status(200).json(
+    new ApiResponse(200, 'Answer generated successfully', {
+      chatMessageId: chatMessage._id,
   return res.status(200).json(
     new ApiResponse(200, 'Answer generated successfully', {
       answer,
@@ -59,6 +72,17 @@ Answer:`;
   );
 });
 
+const getVideoChats = asyncHandler(async (req, res) => {
+  const video = await findOwnedVideo(req.params.id, req.user._id);
+
+  const chats = await ChatMessage.find({ user: req.user._id, video: video._id }).sort({ createdAt: 1 });
+
+  return res.status(200).json(new ApiResponse(200, 'Chat history fetched successfully', { chats }));
+});
+
+module.exports = {
+  askVideo,
+  getVideoChats,
 module.exports = {
   askVideo,
 };
