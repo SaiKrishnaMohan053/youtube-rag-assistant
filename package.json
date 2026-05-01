@@ -4,14 +4,14 @@
   "description": "",
   "main": "src/server.js",
   "scripts": {
-<<<<<<< codex/create-backend-foundation-for-youtube-rag-assistant-cve0ba
     "dev": "concurrently \"npm run dev:api\" \"npm run dev:embedding\"",
     "dev:api": "nodemon src/server.js",
     "dev:embedding": "cd services/embedding-service && .venv/Scripts/python.exe -m uvicorn app:app --reload --port 8001",
-=======
-    "dev": "nodemon src/server.js",
->>>>>>> main
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "test": "jest --runInBand",
+    "test:watch": "jest --watch",
+    "check": "node -e \"const {execSync}=require('child_process');const files=execSync('find src -name \\\"*.js\\\"').toString().trim().split('\\n').filter(Boolean);for(const f of files){execSync('node --check '+f,{stdio:'inherit'})}\"",
+    "audit": "npm audit --audit-level=high"
   },
   "keywords": [],
   "author": "",
@@ -30,11 +30,9 @@
     "axios": "^1.7.7"
   },
   "devDependencies": {
-<<<<<<< codex/create-backend-foundation-for-youtube-rag-assistant-cve0ba
     "nodemon": "^3.1.4",
-    "concurrently": "^9.0.1"
-=======
-    "nodemon": "^3.1.4"
->>>>>>> main
+    "concurrently": "^9.0.1",
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
   }
 }

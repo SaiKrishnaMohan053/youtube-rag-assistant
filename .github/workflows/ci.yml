@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  node:
+    runs-on: ubuntu-latest
+    env:
+      PORT: 5001
+      NODE_ENV: test
+      MONGODB_URI: mongodb://127.0.0.1:27017/youtube_rag_assistant_test
+      JWT_SECRET: test_secret
+      JWT_EXPIRES_IN: 1d
+      EMBEDDING_SERVICE_URL: http://localhost:8001
+      OLLAMA_BASE_URL: http://localhost:11434
+      OLLAMA_MODEL: llama3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm test
+
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r services/embedding-service/requirements.txt
+      - run: pip install pytest httpx
+      - run: pytest services/embedding-service/tests
