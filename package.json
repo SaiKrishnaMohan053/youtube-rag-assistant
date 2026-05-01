@@ -20,7 +20,8 @@
     "morgan": "^1.10.0",
     "bcryptjs": "^2.4.3",
     "jsonwebtoken": "^9.0.2",
-    "youtube-transcript": "^1.2.1"
+    "youtube-transcript": "^1.2.1",
+    "axios": "^1.7.7"
   },
   "devDependencies": {
     "nodemon": "^3.1.4"

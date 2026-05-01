@@ -4,7 +4,14 @@ const dotenv = require('dotenv');
 const envFile = process.env.NODE_ENV === 'test' ? '.env.test' : '.env';
 dotenv.config({ path: path.resolve(process.cwd(), envFile) });
 
-const requiredEnvVars = ['PORT', 'MONGODB_URI', 'NODE_ENV', 'JWT_SECRET', 'JWT_EXPIRES_IN'];
+const requiredEnvVars = [
+  'PORT',
+  'MONGODB_URI',
+  'NODE_ENV',
+  'JWT_SECRET',
+  'JWT_EXPIRES_IN',
+  'EMBEDDING_SERVICE_URL',
+];
 
 requiredEnvVars.forEach((key) => {
   const value = process.env[key];
@@ -31,4 +38,5 @@ module.exports = {
   nodeEnv: process.env.NODE_ENV,
   jwtSecret: process.env.JWT_SECRET,
   jwtExpiresIn: process.env.JWT_EXPIRES_IN,
+  embeddingServiceUrl: process.env.EMBEDDING_SERVICE_URL.trim(),
 };
