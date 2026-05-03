@@ -150,6 +150,7 @@ def index_video(request: IndexVideoRequest) -> Dict[str, Any]:
         raise HTTPException(
             status_code=500, detail=f"Failed to save video index: {error}"
         ) from error
+
     return {
         "videoId": request.videoId,
         "indexed": len(valid_chunks),
