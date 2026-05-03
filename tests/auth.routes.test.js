@@ -38,7 +38,9 @@ describe('auth routes', () => {
 
   it('login validates invalid credentials', async () => {
     User.findOne.mockResolvedValue(null);
-    const res = await request(app).post('/api/auth/login').send({ email: 'x@y.com', password: 'bad' });
+    const res = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'x@y.com', password: 'bad' });
     expect(res.status).toBe(401);
   });
 

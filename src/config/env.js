@@ -42,4 +42,5 @@ module.exports = {
   embeddingServiceUrl: process.env.EMBEDDING_SERVICE_URL.trim(),
   ollamaBaseUrl: process.env.OLLAMA_BASE_URL.trim(),
   ollamaModel: (process.env.OLLAMA_MODEL || 'llama3').trim(),
+  ollamaTimeoutMs: Number.parseInt(process.env.OLLAMA_TIMEOUT_MS || '120000', 10),
 };

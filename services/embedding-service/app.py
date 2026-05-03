@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -14,6 +15,7 @@ MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 BASE_DIR = Path(__file__).resolve().parent
 VECTOR_STORE_DIR = BASE_DIR / "vector_store"
 VECTOR_STORE_DIR.mkdir(parents=True, exist_ok=True)
+VIDEO_ID_REGEX = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
 
 app = FastAPI(title="Local Embedding Service", version="1.0.0")
 model = SentenceTransformer(MODEL_NAME)
@@ -45,7 +47,9 @@ class SearchRequest(BaseModel):
 def _validate_texts(texts: List[str]) -> List[str]:
     cleaned = [text.strip() for text in texts if isinstance(text, str) and text.strip()]
     if not cleaned:
-        raise HTTPException(status_code=400, detail="texts must contain at least one non-empty string")
+        raise HTTPException(
+            status_code=400, detail="texts must contain at least one non-empty string"
+        )
     return cleaned
 
 
@@ -60,6 +64,11 @@ def _video_paths(video_id: str) -> tuple[Path, Path, Path]:
     safe_video_id = video_id.strip()
     if not safe_video_id:
         raise HTTPException(status_code=400, detail="videoId is required")
+    if not VIDEO_ID_REGEX.fullmatch(safe_video_id):
+        raise HTTPException(
+            status_code=400,
+            detail="videoId must be 1-64 chars: letters, numbers, underscore, hyphen",
+        )
 
     index_path = VECTOR_STORE_DIR / f"{safe_video_id}.index"
     metadata_path = VECTOR_STORE_DIR / f"{safe_video_id}.metadata.json"
@@ -126,7 +135,9 @@ def index_video(request: IndexVideoRequest) -> Dict[str, Any]:
 
     valid_chunks = [chunk for chunk in request.chunks if chunk.text and chunk.text.strip()]
     if not valid_chunks:
-        raise HTTPException(status_code=400, detail="chunks must include at least one non-empty text")
+        raise HTTPException(
+            status_code=400, detail="chunks must include at least one non-empty text"
+        )
 
     texts = [chunk.text.strip() for chunk in valid_chunks]
     embeddings = _embed_texts(texts)
@@ -136,8 +147,9 @@ def index_video(request: IndexVideoRequest) -> Dict[str, Any]:
     except HTTPException:
         raise
     except Exception as error:
-        raise HTTPException(status_code=500, detail=f"Failed to save video index: {error}") from error
-
+        raise HTTPException(
+            status_code=500, detail=f"Failed to save video index: {error}"
+        ) from error
     return {
         "videoId": request.videoId,
         "indexed": len(valid_chunks),
@@ -166,19 +178,19 @@ def search(request: SearchRequest) -> Dict[str, Any]:
     matches: List[Dict[str, Any]] = []
 
     for score, idx in zip(scores[0], indices[0]):
-      if idx < 0 or idx >= len(chunks):
-          continue
-      chunk_meta = chunks[idx]
-      matches.append(
-          {
-              "score": float(score),
-              "chunkId": chunk_meta.get("chunkId"),
-              "chunkIndex": chunk_meta.get("chunkIndex"),
-              "startTime": chunk_meta.get("startTime"),
-              "endTime": chunk_meta.get("endTime"),
-              "text": chunk_meta.get("text"),
-          }
-      )
+        if idx < 0 or idx >= len(chunks):
+            continue
+        chunk_meta = chunks[idx]
+        matches.append(
+            {
+                "score": float(score),
+                "chunkId": chunk_meta.get("chunkId"),
+                "chunkIndex": chunk_meta.get("chunkIndex"),
+                "startTime": chunk_meta.get("startTime"),
+                "endTime": chunk_meta.get("endTime"),
+                "text": chunk_meta.get("text"),
+            }
+        )
 
     return {
         "videoId": request.videoId,

@@ -27,6 +27,7 @@ jobs:
       - run: npm ci
       - run: npm run check
       - run: npm test
+      - run: npm run format:check
 
   python:
     runs-on: ubuntu-latest
@@ -37,4 +38,5 @@ jobs:
           python-version: '3.11'
       - run: pip install -r services/embedding-service/requirements.txt
       - run: pip install pytest httpx
+      - run: black --check services/embedding-service
       - run: pytest services/embedding-service/tests

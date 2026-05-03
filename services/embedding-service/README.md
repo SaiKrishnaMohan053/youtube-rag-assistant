@@ -3,6 +3,7 @@
 This service provides local-only embedding and vector search for video transcript chunks.
 
 ## Stack
+
 - Python
 - FastAPI
 - sentence-transformers (`sentence-transformers/all-MiniLM-L6-v2`)
@@ -11,6 +12,7 @@ This service provides local-only embedding and vector search for video transcrip
 - uvicorn
 
 ## Setup (Windows PowerShell)
+
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
@@ -21,6 +23,13 @@ uvicorn app:app --reload --port 8001
 ## Endpoints
 
 ### `GET /health`
+
+Returns service health and loaded model name.
+
+### `POST /embed`
+
+Body:
+
 Returns service health and loaded model name.
 
 ### `POST /embed`
@@ -30,6 +39,11 @@ Body:
   "texts": ["text one", "text two"]
 }
 ```
+
+### `POST /index-video`
+
+Body:
+
 Returns normalized embeddings as numeric arrays.
 
 ### `POST /index-video`
@@ -48,6 +62,11 @@ Body:
   ]
 }
 ```
+
+### `POST /search`
+
+Body:
+
 Creates/overwrites a FAISS index file and sidecar metadata JSON under `vector_store/` for that `videoId`.
 
 ### `POST /search`
@@ -59,6 +78,9 @@ Body:
   "topK": 5
 }
 ```
+
+## Notes
+
 Loads index + metadata for `videoId`, embeds query, and returns top matches with score and chunk metadata.
 
 ## Notes

@@ -15,7 +15,12 @@ const toTimestamp = (seconds) => {
 
 const buildTranscriptText = (segments) =>
   segments
-    .map((segment) => `[${toTimestamp(segment.offset / 1000)}] ${String(segment.text || '').replace(/\s+/g, ' ').trim()}`)
+    .map(
+      (segment) =>
+        `[${toTimestamp(segment.offset / 1000)}] ${String(segment.text || '')
+          .replace(/\s+/g, ' ')
+          .trim()}`
+    )
     .filter((line) => !line.endsWith(']'))
     .join('\n');
 

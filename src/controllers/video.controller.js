@@ -43,7 +43,9 @@ const processVideo = asyncHandler(async (req, res) => {
     throw error;
   }
 
-  return res.status(201).json(new ApiResponse(201, 'Video transcript processed successfully', { video }));
+  return res
+    .status(201)
+    .json(new ApiResponse(201, 'Video transcript processed successfully', { video }));
 });
 
 const getMyVideos = asyncHandler(async (req, res) => {

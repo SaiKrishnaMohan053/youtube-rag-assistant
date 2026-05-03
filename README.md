@@ -3,6 +3,7 @@
 ## Local development (Node API + Python Embedding Service)
 
 ### First-time Python setup (PowerShell)
+
 ```powershell
 cd services/embedding-service
 python -m venv .venv
@@ -11,11 +12,13 @@ pip install -r requirements.txt
 ```
 
 ### Start both services from project root
+
 ```powershell
 npm run dev
 ```
 
 ## Useful scripts
+
 - `npm run dev` - start Node API and embedding service together.
 - `npm run dev:api` - start only Node API (`nodemon src/server.js`).
 - `npm run dev:embedding` - start only embedding service from `services/embedding-service` using `.venv/Scripts/python.exe` on port `8001`.
@@ -25,6 +28,7 @@ npm run dev
 - `npm run audit` - run npm vulnerability audit.
 
 ## Local test commands
+
 ```powershell
 npm install
 npm run check
@@ -33,11 +37,13 @@ pytest services/embedding-service/tests
 ```
 
 ## CI
+
 GitHub Actions runs on pushes and pull requests to `main`:
 - Node job: `npm ci`, `npm run check`, `npm test`
 - Python job: installs embedding-service deps and runs `pytest services/embedding-service/tests`
 
 ## Full manual testing prerequisites
+
 For end-to-end local manual testing you should run:
 - MongoDB
 - Python embedding service (FastAPI)

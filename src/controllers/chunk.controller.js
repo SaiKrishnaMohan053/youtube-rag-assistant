@@ -53,7 +53,9 @@ const createVideoChunks = asyncHandler(async (req, res) => {
 
   return res
     .status(201)
-    .json(new ApiResponse(201, 'Transcript chunks created successfully', { chunkCount: docs.length }));
+    .json(
+      new ApiResponse(201, 'Transcript chunks created successfully', { chunkCount: docs.length })
+    );
 });
 
 const getVideoChunks = asyncHandler(async (req, res) => {
@@ -61,7 +63,9 @@ const getVideoChunks = asyncHandler(async (req, res) => {
 
   const chunks = await TranscriptChunk.find({ video: video._id }).sort({ chunkIndex: 1 });
 
-  return res.status(200).json(new ApiResponse(200, 'Transcript chunks fetched successfully', { chunks }));
+  return res
+    .status(200)
+    .json(new ApiResponse(200, 'Transcript chunks fetched successfully', { chunks }));
 });
 
 module.exports = {

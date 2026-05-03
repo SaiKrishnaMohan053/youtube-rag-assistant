@@ -84,20 +84,24 @@ const indexVideo = asyncHandler(async (req, res) => {
 const searchVideo = asyncHandler(async (req, res) => {
   const video = await findOwnedVideo(req.params.id, req.user._id);
 
-  const { query, topK = 5 } = req.body;
+  const { query, topK = 3 } = req.body;
   if (!query || typeof query !== 'string' || !query.trim()) {
     throw new ApiError(400, 'Query is required');
   }
 
+  const normalizedTopK = Math.min(5, Math.max(1, Number.parseInt(topK, 10) || 3));
+
   const serviceResponse = await searchVideoEmbeddings({
     videoId: video.videoId,
     query: query.trim(),
-    topK,
+    topK: normalizedTopK,
   });
 
-  return res
-    .status(200)
-    .json(new ApiResponse(200, 'Retrieved relevant chunks successfully', { matches: serviceResponse.matches || [] }));
+  return res.status(200).json(
+    new ApiResponse(200, 'Retrieved relevant chunks successfully', {
+      matches: serviceResponse.matches || [],
+    })
+  );
 });
 
 module.exports = {
