@@ -186,3 +186,8 @@ def search(request: SearchRequest) -> Dict[str, Any]:
         "topK": request.topK,
         "matches": matches,
     }
+
+EmbedRequest.model_rebuild()
+ChunkPayload.model_rebuild()
+IndexVideoRequest.model_rebuild()
+SearchRequest.model_rebuild()
