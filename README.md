@@ -39,14 +39,12 @@ pytest services/embedding-service/tests
 ## CI
 
 GitHub Actions runs on pushes and pull requests to `main`:
-
 - Node job: `npm ci`, `npm run check`, `npm test`
 - Python job: installs embedding-service deps and runs `pytest services/embedding-service/tests`
 
 ## Full manual testing prerequisites
 
 For end-to-end local manual testing you should run:
-
 - MongoDB
 - Python embedding service (FastAPI)
 - Ollama service (local model, e.g. `llama3`)

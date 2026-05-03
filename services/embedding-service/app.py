@@ -150,7 +150,6 @@ def index_video(request: IndexVideoRequest) -> Dict[str, Any]:
         raise HTTPException(
             status_code=500, detail=f"Failed to save video index: {error}"
         ) from error
-
     return {
         "videoId": request.videoId,
         "indexed": len(valid_chunks),
@@ -199,3 +198,8 @@ def search(request: SearchRequest) -> Dict[str, Any]:
         "topK": request.topK,
         "matches": matches,
     }
+
+EmbedRequest.model_rebuild()
+ChunkPayload.model_rebuild()
+IndexVideoRequest.model_rebuild()
+SearchRequest.model_rebuild()
