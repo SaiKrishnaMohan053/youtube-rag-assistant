@@ -37,7 +37,7 @@ const VideoChatPage = () => {
     setLoading(true);
     setError('');
     try {
-      const response = await askVideoApi(id, query, 2);
+      const response = await askVideoApi(id, query);
       setChats((prev) => [
         ...prev,
         {
@@ -62,7 +62,7 @@ const VideoChatPage = () => {
         {error && <Alert severity="error">{error}</Alert>}
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
           <TextField fullWidth label="Ask a question" value={query} onChange={(e) => setQuery(e.target.value)} />
-          <LoadingButton loading={loading} onClick={askQuestion} disabled={!query.trim()}>{loading ? "Thinking..." : "Ask"}</LoadingButton>
+          <LoadingButton loading={loading} onClick={askQuestion}>Ask</LoadingButton>
         </Stack>
         <Stack spacing={2}>
           {chats.map((chat) => (

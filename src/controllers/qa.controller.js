@@ -22,13 +22,13 @@ const findOwnedVideo = async (videoIdParam, userId) => {
 
 const askVideo = asyncHandler(async (req, res) => {
   const video = await findOwnedVideo(req.params.id, req.user._id);
-  const { query, topK = 2 } = req.body;
+  const { query, topK = 3 } = req.body;
 
   if (!query || typeof query !== 'string' || !query.trim()) {
     throw new ApiError(400, 'Query is required');
   }
 
-  const normalizedTopK = Math.min(3, Math.max(1, Number.parseInt(topK, 10) || 2));
+  const normalizedTopK = Math.min(5, Math.max(1, Number.parseInt(topK, 10) || 3));
 
   const searchResponse = await searchVideoEmbeddings({
     videoId: video.videoId,
@@ -37,14 +37,22 @@ const askVideo = asyncHandler(async (req, res) => {
   });
 
   const supportingChunks = Array.isArray(searchResponse.matches) ? searchResponse.matches : [];
-  const compactChunks = supportingChunks.map((chunk) => ({
-    ...chunk,
-    text: String(chunk.text || '').slice(0, 600),
-  }));
+  const context = supportingChunks
+    .map((chunk, idx) => `[${idx + 1}] ${chunk.text || ''}`)
+    .join('\n\n');
 
-  const context = compactChunks.map((chunk, idx) => `[${idx + 1}] ${chunk.text}`).join('\n');
+  const prompt = `You are a helpful assistant.
+Answer ONLY using the provided video transcript context.
+If the answer is not clearly supported by the context, say:
+"I don't know based on this video."
 
-  const prompt = `Use only this transcript context to answer.\nContext: ${context}\nQuestion: ${query.trim()}\nAnswer in 3-5 sentences.`;
+Context:
+${context}
+
+Question:
+${query.trim()}
+
+Answer:`;
 
   const answer = await generateAnswer(prompt);
 
@@ -61,7 +69,7 @@ const askVideo = asyncHandler(async (req, res) => {
     new ApiResponse(200, 'Answer generated successfully', {
       chatMessageId: chatMessage._id,
       answer,
-      supportingChunks: compactChunks,
+      supportingChunks,
     })
   );
 });

@@ -1,4 +1,4 @@
 module.exports = {
-  testEnvironment: 'node',
-  clearMocks: true,
+  testEnvironment: "node",
+  setupFiles: ["<rootDir>/tests/setupEnv.js"],
 };

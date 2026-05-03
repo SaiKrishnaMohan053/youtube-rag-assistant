@@ -31,10 +31,6 @@ const generateAnswer = async (prompt) => {
       model: env.ollamaModel,
       prompt,
       stream: false,
-      options: {
-        num_predict: 180,
-        temperature: 0.2,
-      },
     };
 
     const { data } = await client.post('/api/generate', payload);
