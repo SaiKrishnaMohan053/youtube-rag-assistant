@@ -2,12 +2,45 @@
   "name": "youtube-rag-assistant",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:embedding\"",
+    "dev:api": "nodemon src/server.js",
+    "dev:embedding": "cd services/embedding-service && .venv/Scripts/python.exe -m uvicorn app:app --reload --port 8001",
+    "start": "node src/server.js",
+    "test": "jest --runInBand",
+    "test:watch": "jest --watch",
+    "check": "node -e \"const {execSync}=require('child_process');const files=execSync('find src -name \\\"*.js\\\"').toString().trim().split('\\n').filter(Boolean);for(const f of files){execSync('node --check '+f,{stdio:'inherit'})}\"",
+    "audit": "npm audit --audit-level=high",
+    "format": "prettier --write \"**/*.{js,json,yml,yaml,md}\"",
+    "format:check": "prettier --check \"**/*.{js,json,yml,yaml,md}\"",
+    "format:python": "black services/embedding-service",
+    "format:python:check": "black --check services/embedding-service",
+    "dev:client": "npm --prefix client run dev",
+    "dev:all": "concurrently \"npm run dev\" \"npm run dev:client\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs"
+  "type": "commonjs",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "helmet": "^7.1.0",
+    "mongoose": "^8.5.2",
+    "morgan": "^1.10.0",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "youtube-transcript": "^1.2.1",
+    "axios": "^1.7.7",
+    "openai": "^4.68.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4",
+    "concurrently": "^9.0.1",
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0",
+    "prettier": "^3.3.3"
+  }
 }

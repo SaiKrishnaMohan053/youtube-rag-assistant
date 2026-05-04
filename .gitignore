@@ -1,0 +1,15 @@
+node_modules/
+.env
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+*.log
+
+services/embedding-service/.venv/
+services/embedding-service/__pycache__/
+services/embedding-service/**/*.pyc
+services/embedding-service/vector_store/*.index
+services/embedding-service/vector_store/*.metadata.json
+__pycache__/
+*.py[cod]
