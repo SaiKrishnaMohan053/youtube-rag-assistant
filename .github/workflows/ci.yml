@@ -37,6 +37,6 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install -r services/embedding-service/requirements.txt
-      - run: pip install pytest httpx
+      - run: pip install pytest httpx black
       - run: black --check services/embedding-service
       - run: pytest services/embedding-service/tests
