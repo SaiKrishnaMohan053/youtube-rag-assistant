@@ -1,4 +1,6 @@
 const Video = require('../models/video.model');
+const TranscriptChunk = require('../models/transcriptChunk.model');
+const ChatMessage = require('../models/chatMessage.model');
 const asyncHandler = require('../utils/asyncHandler');
 const ApiResponse = require('../utils/apiResponse');
 const ApiError = require('../utils/apiError');
@@ -50,11 +52,13 @@ const processVideo = asyncHandler(async (req, res) => {
 
 const getMyVideos = asyncHandler(async (req, res) => {
   const videos = await Video.find({ user: req.user._id }).sort({ createdAt: -1 });
+
   return res.status(200).json(new ApiResponse(200, 'Videos fetched successfully', { videos }));
 });
 
 const getVideoById = asyncHandler(async (req, res) => {
   const { id } = req.params;
+
   const video = await Video.findOne({ _id: id, user: req.user._id });
 
   if (!video) {
@@ -64,8 +68,29 @@ const getVideoById = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, 'Video fetched successfully', { video }));
 });
 
+const deleteVideo = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const video = await Video.findOne({ _id: id, user: req.user._id });
+
+  if (!video) {
+    throw new ApiError(404, 'Video not found');
+  }
+
+  await Promise.all([
+    TranscriptChunk.deleteMany({ video: video._id, user: req.user._id }),
+    ChatMessage.deleteMany({ video: video._id, user: req.user._id }),
+    Video.deleteOne({ _id: video._id, user: req.user._id }),
+  ]);
+
+  // TODO: Add FAISS/vector-store cleanup when embedding service supports delete by videoId.
+
+  return res.status(200).json(new ApiResponse(200, 'Video deleted successfully'));
+});
+
 module.exports = {
   processVideo,
   getMyVideos,
   getVideoById,
+  deleteVideo,
 };

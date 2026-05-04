@@ -12,7 +12,8 @@ const openaiClient = env.openaiApiKey ? new OpenAI({ apiKey: env.openaiApiKey })
 
 const normalizeOllamaError = (error) => {
   if (error.response) {
-    const detail = error.response.data?.error || error.response.data?.message || 'Ollama request failed';
+    const detail =
+      error.response.data?.error || error.response.data?.message || 'Ollama request failed';
     return new ApiError(error.response.status || 502, `Ollama error: ${detail}`);
   }
   if (error.code === 'ECONNABORTED') {

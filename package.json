@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "concurrently \"npm run dev:api\" \"npm run dev:embedding\"",
     "dev:api": "nodemon src/server.js",
-    "dev:embedding": "cd services/embedding-service && .venv/Scripts/python.exe -m uvicorn app:app --reload --port 8001",
+    "dev:embedding": "cd services/embedding-service && .\\.venv\\Scripts\\python.exe -m uvicorn app:app --reload --port 8001",
     "start": "node src/server.js",
     "test": "jest --runInBand",
     "test:watch": "jest --watch",
@@ -14,8 +14,8 @@
     "format": "prettier --write \"**/*.{js,json,yml,yaml,md}\"",
     "format:check": "prettier --check \"**/*.{js,json,yml,yaml,md}\"",
     "format:python": "black services/embedding-service",
-    "format:python:check": "black --check services/embedding-service"
-    "check": "node scripts/check-js.js",
+    "format:python:check": "black --check services/embedding-service",
+    "check": "node scripts/check-js.js"
   },
   "keywords": [],
   "author": "",
@@ -39,5 +39,6 @@
     "concurrently": "^9.0.1",
     "jest": "^29.7.0",
     "supertest": "^7.0.0",
-    "prettier": "^3.3.3
+    "prettier": "^3.3.3"
+  }
 }

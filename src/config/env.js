@@ -1,7 +1,9 @@
 const path = require('path');
 const dotenv = require('dotenv');
 
-dotenv.config({ path: path.resolve(process.cwd(), process.env.NODE_ENV === 'test' ? '.env.test' : '.env') });
+dotenv.config({
+  path: path.resolve(process.cwd(), process.env.NODE_ENV === 'test' ? '.env.test' : '.env'),
+});
 
 const requiredEnvVars = [
   'PORT',
@@ -22,7 +24,9 @@ requiredEnvVars.forEach((key) => {
 
 const allowedNodeEnvs = ['development', 'production', 'test'];
 if (!allowedNodeEnvs.includes(process.env.NODE_ENV)) {
-  throw new Error(`Invalid NODE_ENV: ${process.env.NODE_ENV}. Allowed values are ${allowedNodeEnvs.join(', ')}`);
+  throw new Error(
+    `Invalid NODE_ENV: ${process.env.NODE_ENV}. Allowed values are ${allowedNodeEnvs.join(', ')}`
+  );
 }
 
 const llmProvider = (process.env.LLM_PROVIDER || 'ollama').trim().toLowerCase();
