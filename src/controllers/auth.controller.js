@@ -48,7 +48,13 @@ const login = asyncHandler(async (req, res) => {
   }
 
   const normalizedEmail = email.trim().toLowerCase();
-  const user = await User.findOne({ email: normalizedEmail }).select('+password');
+  let userQuery = User.findOne({ email: normalizedEmail });
+
+  if (userQuery && typeof userQuery.select === 'function') {
+    userQuery = userQuery.select('+password');
+  }
+
+  const user = await userQuery;
 
   if (!user || !(await user.comparePassword(password))) {
     throw new ApiError(401, 'Invalid email or password');

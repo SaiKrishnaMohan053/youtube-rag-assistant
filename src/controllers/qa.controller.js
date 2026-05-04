@@ -61,7 +61,7 @@ const askVideo = asyncHandler(async (req, res) => {
     new ApiResponse(200, 'Answer generated successfully', {
       chatMessageId: chatMessage._id,
       answer,
-      supportingChunks: compactChunks,
+      supportingChunks,
     })
   );
 });

@@ -27,21 +27,18 @@ uvicorn app:app --reload --port 8001
 Returns service health and loaded model name.
 
 ### `POST /embed`
-
 Body:
-
 ```json
 {
   "texts": ["text one", "text two"]
 }
-```
 
 Returns normalized embeddings as numeric arrays.
+```
 
 ### `POST /index-video`
 
 Body:
-
 ```json
 {
   "videoId": "youtube id",
@@ -56,8 +53,6 @@ Body:
   ]
 }
 ```
-
-Creates/overwrites a FAISS index file and sidecar metadata JSON under `vector_store/` for that `videoId`.
 
 ### `POST /search`
 
