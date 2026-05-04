@@ -200,6 +200,7 @@ def search(request: SearchRequest) -> Dict[str, Any]:
         "matches": matches,
     }
 
+
 EmbedRequest.model_rebuild()
 ChunkPayload.model_rebuild()
 IndexVideoRequest.model_rebuild()

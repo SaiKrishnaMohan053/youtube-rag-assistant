@@ -23,10 +23,10 @@ def load_app_with_mock_model():
 
     app_path = Path(__file__).resolve().parents[1] / "app.py"
     spec = importlib.util.spec_from_file_location("embedding_app", app_path)
-    sys.modules['sentence_transformers'] = fake_module
+    sys.modules["sentence_transformers"] = fake_module
 
-    app_path = Path(__file__).resolve().parents[1] / 'app.py'
-    spec = importlib.util.spec_from_file_location('embedding_app', app_path)
+    app_path = Path(__file__).resolve().parents[1] / "app.py"
+    spec = importlib.util.spec_from_file_location("embedding_app", app_path)
     module = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
     spec.loader.exec_module(module)
