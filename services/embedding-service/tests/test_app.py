@@ -164,8 +164,7 @@ def test_search_topk_limit():
         json={
             "videoId": "video_topk",
             "chunks": [
-                {"chunkId": f"c{i}", "text": f"text {i}", "chunkIndex": i}
-                for i in range(5)
+                {"chunkId": f"c{i}", "text": f"text {i}", "chunkIndex": i} for i in range(5)
             ],
         },
     )
