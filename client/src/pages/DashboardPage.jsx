@@ -4,6 +4,7 @@ import {
   Card,
   CardActions,
   CardContent,
+  CardMedia,
   Container,
   Grid,
   Stack,
@@ -114,38 +115,66 @@ const DashboardPage = () => {
         {error && <Alert severity="error">{error}</Alert>}
 
         <Grid container spacing={2}>
-          {videos.map((video) => (
-            <Grid item xs={12} md={6} lg={4} key={video._id}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" noWrap>
-                    {video.title || video.videoId}
-                  </Typography>
+          {videos.map((video) => {
+            const thumbnailUrl = `https://img.youtube.com/vi/${video.videoId}/hqdefault.jpg`;
 
-                  <Typography variant="body2" color="text.secondary" noWrap>
-                    {video.url}
-                  </Typography>
-                </CardContent>
+            return (
+              <Grid item xs={12} md={6} lg={4} key={video._id}>
+                <Card
+                  sx={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
+                >
+                  <CardMedia
+                    component="img"
+                    height="180"
+                    image={thumbnailUrl}
+                    alt={video.title || video.videoId}
+                    sx={{
+                      width: '100%',
+                      aspectRatio: '16/9',
+                      objectFit: 'cover',
+                      bgcolor: 'grey.100',
+                    }}
+                  />
 
-                <CardActions sx={{ flexWrap: 'wrap', gap: 1 }}>
-                  <Button
-                    size="small"
-                    component={RouterLink}
-                    to={`/videos/${video._id}`}
-                  >
-                    Open Chat
-                  </Button>
+                  <CardContent sx={{ flexGrow: 1 }}>
+                    <Typography variant="h6" noWrap>
+                      {video.title || video.videoId}
+                    </Typography>
 
-                  <LoadingButton
-                    loading={deletingId === video._id}
-                    onClick={() => deleteVideo(video._id)}
-                  >
-                    Delete Video
-                  </LoadingButton>
-                </CardActions>
-              </Card>
-            </Grid>
-          ))}
+                    <Typography variant="body2" color="text.secondary" noWrap>
+                      {video.url}
+                    </Typography>
+                  </CardContent>
+
+                  <CardActions sx={{ p: 2 }}>
+                    <Stack direction="row" spacing={2} width="100%">
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        size="small"
+                        component={RouterLink}
+                        to={`/videos/${video._id}`}
+                      >
+                        Open Chat
+                      </Button>
+
+                      <LoadingButton
+                        fullWidth
+                        loading={deletingId === video._id}
+                        onClick={() => deleteVideo(video._id)}
+                      >
+                        Delete Video
+                      </LoadingButton>
+                    </Stack>
+                  </CardActions>
+                </Card>
+              </Grid>
+            );
+          })}
         </Grid>
       </Stack>
     </Container>

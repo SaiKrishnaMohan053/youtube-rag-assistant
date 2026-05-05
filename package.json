@@ -27,18 +27,20 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "google-auth-library": "^10.6.2",
     "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.5.2",
     "morgan": "^1.10.0",
-    "jsonwebtoken": "^9.0.2",
-    "youtube-transcript": "^1.2.1",
-    "openai": "^4.68.1"
+    "nodemailer": "^8.0.7",
+    "openai": "^4.68.1",
+    "youtube-transcript": "^1.2.1"
   },
   "devDependencies": {
-    "nodemon": "^3.1.4",
     "concurrently": "^9.0.1",
     "jest": "^29.7.0",
-    "supertest": "^7.0.0",
-    "prettier": "^3.3.3"
+    "nodemon": "^3.1.4",
+    "prettier": "^3.3.3",
+    "supertest": "^7.0.0"
   }
 }

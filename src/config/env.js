@@ -56,4 +56,11 @@ module.exports = {
   llmProvider,
   openaiApiKey: process.env.OPENAI_API_KEY?.trim() || '',
   openaiModel: (process.env.OPENAI_MODEL || 'gpt-4.1-mini').trim(),
+  googleClientId: process.env.GOOGLE_CLIENT_ID?.trim() || '',
+  frontendUrl: (process.env.FRONTEND_URL || 'http://localhost:5173').trim(),
+  smtpHost: process.env.SMTP_HOST?.trim() || '',
+  smtpPort: Number.parseInt(process.env.SMTP_PORT || '587', 10),
+  smtpUser: process.env.SMTP_USER?.trim() || '',
+  smtpPass: process.env.SMTP_PASS?.trim() || '',
+  emailFrom: process.env.EMAIL_FROM?.trim() || 'YouTube RAG Assistant <no-reply@example.com>',
 };
