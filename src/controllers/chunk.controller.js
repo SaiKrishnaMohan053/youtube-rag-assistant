@@ -5,6 +5,7 @@ const asyncHandler = require('../utils/asyncHandler');
 const ApiResponse = require('../utils/apiResponse');
 const ApiError = require('../utils/apiError');
 const { chunkTranscriptText } = require('../services/chunk.service');
+const { logInfo } = require('../utils/logger');
 
 const getOwnedVideo = async (videoIdParam, userId) => {
   if (!mongoose.Types.ObjectId.isValid(videoIdParam)) {
@@ -50,6 +51,13 @@ const createVideoChunks = asyncHandler(async (req, res) => {
   }));
 
   await TranscriptChunk.insertMany(docs);
+
+  logInfo('video.chunks.created', {
+    userId: req.user._id.toString(),
+    videoMongoId: video._id.toString(),
+    youtubeVideoId: video.videoId,
+    chunkCount: chunks.length,
+  });
 
   return res
     .status(201)

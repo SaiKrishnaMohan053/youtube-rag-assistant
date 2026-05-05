@@ -7,6 +7,8 @@ const ApiError = require('../utils/apiError');
 const { searchVideoEmbeddings } = require('../services/embeddingClient.service');
 const { generateAnswer } = require('../services/llm.service');
 const ChatMessage = require('../models/chatMessage.model');
+const { logInfo } = require('../utils/logger');
+const env = require('../config/env');
 
 const PROMO_PATTERNS = [
   /subscribe/i,
@@ -167,6 +169,7 @@ Answer in 3-5 sentences.
 };
 
 const askVideo = asyncHandler(async (req, res) => {
+  const startedAt = Date.now();
   const video = await findOwnedVideo(req.params.id, req.user._id);
 
   const { query, topK = 6 } = req.body;
@@ -207,6 +210,18 @@ const askVideo = asyncHandler(async (req, res) => {
     question: cleanQuery,
     answer,
     supportingChunks,
+  });
+
+  logInfo('video.ask.completed', {
+    userId: req.user._id.toString(),
+    videoMongoId: video._id.toString(),
+    youtubeVideoId: video.videoId,
+    mode: summaryMode ? 'summary' : 'qa',
+    topK: normalizedTopK,
+    supportingChunkCount: supportingChunks.length,
+    llmProvider: env.llmProvider,
+    llmModel: env.llmProvider === 'openai' ? env.openaiModel : env.ollamaModel,
+    durationMs: Date.now() - startedAt,
   });
 
   return res.status(200).json(

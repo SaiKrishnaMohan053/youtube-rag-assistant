@@ -2,12 +2,16 @@ const Video = require('../models/video.model');
 const TranscriptChunk = require('../models/transcriptChunk.model');
 const ChatMessage = require('../models/chatMessage.model');
 const asyncHandler = require('../utils/asyncHandler');
+const axios = require('axios');
 const ApiResponse = require('../utils/apiResponse');
 const ApiError = require('../utils/apiError');
 const { getYouTubeVideoId } = require('../utils/youtube');
 const { fetchTranscriptByVideoId } = require('../services/transcript.service');
+const { logInfo, logError } = require('../utils/logger');
 
 const processVideo = asyncHandler(async (req, res) => {
+  const startedAt = Date.now();
+
   const { url, title } = req.body;
 
   if (!url || typeof url !== 'string' || !url.trim()) {
@@ -38,10 +42,23 @@ const processVideo = asyncHandler(async (req, res) => {
     video.transcriptError = null;
     video.duration = duration;
     await video.save();
+    logInfo('video.process.completed', {
+      userId: req.user._id.toString(),
+      videoMongoId: video._id.toString(),
+      youtubeVideoId: video.videoId,
+      durationMs: Date.now() - startedAt,
+      transcriptLength: video.transcriptText.length,
+    });
   } catch (error) {
     video.transcriptStatus = 'failed';
     video.transcriptError = error.message;
     await video.save();
+    logError('video.process.failed', {
+      userId: req.user._id.toString(),
+      youtubeVideoId: videoId,
+      durationMs: Date.now() - startedAt,
+      error: error.message,
+    });
     throw error;
   }
 
@@ -77,13 +94,17 @@ const deleteVideo = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Video not found');
   }
 
+  try {
+    await axios.delete(`$process.env.EMBEDDING_SERVICE_URL/videos/${video.videoId}/index`);
+  } catch (err) {
+    console.warn('FAISS delete failed:', err.response?.data || err.message);
+  }
+
   await Promise.all([
     TranscriptChunk.deleteMany({ video: video._id, user: req.user._id }),
     ChatMessage.deleteMany({ video: video._id, user: req.user._id }),
     Video.deleteOne({ _id: video._id, user: req.user._id }),
   ]);
-
-  // TODO: Add FAISS/vector-store cleanup when embedding service supports delete by videoId.
 
   return res.status(200).json(new ApiResponse(200, 'Video deleted successfully'));
 });

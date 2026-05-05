@@ -9,6 +9,7 @@ const {
   indexVideoEmbeddings,
   searchVideoEmbeddings,
 } = require('../services/embeddingClient.service');
+const { logInfo, logError } = require('../utils/logger');
 
 const findOwnedVideo = async (videoIdParam, userId) => {
   if (!mongoose.Types.ObjectId.isValid(videoIdParam)) {
@@ -29,6 +30,8 @@ const embeddingHealth = asyncHandler(async (_req, res) => {
 });
 
 const indexVideo = asyncHandler(async (req, res) => {
+  const startedAt = Date.now();
+
   const video = await findOwnedVideo(req.params.id, req.user._id);
 
   const chunks = await TranscriptChunk.find({ video: video._id }).sort({ chunkIndex: 1 });
@@ -60,6 +63,14 @@ const indexVideo = asyncHandler(async (req, res) => {
       }
     );
 
+    logInfo('video.index.completed', {
+      userId: req.user._id.toString(),
+      videoMongoId: video._id.toString(),
+      youtubeVideoId: video.videoId,
+      chunkCount: chunks.length,
+      durationMs: Date.now() - startedAt,
+    });
+
     return res.status(200).json(
       new ApiResponse(200, 'Video chunks indexed successfully', {
         indexedCount: payload.chunks.length,
@@ -76,6 +87,13 @@ const indexVideo = asyncHandler(async (req, res) => {
         },
       }
     );
+
+    logError('video.index.failed', {
+      userId: req.user._id.toString(),
+      videoMongoId: video?._id?.toString(),
+      durationMs: Date.now() - startedAt,
+      error: error.message,
+    });
 
     throw error;
   }
