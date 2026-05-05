@@ -164,7 +164,8 @@ def test_search_topk_limit():
         json={
             "videoId": "video_topk",
             "chunks": [
-                {"chunkId": f"c{i}", "text": f"text {i}", "chunkIndex": i} for i in range(5)
+                {"chunkId": f"c{i}", "text": f"text {i}", "chunkIndex": i}
+                for i in range(5)
             ],
         },
     )
@@ -176,3 +177,52 @@ def test_search_topk_limit():
 
     assert res.status_code == 200
     assert len(res.json()["matches"]) == 2
+
+
+def test_delete_video_index_success():
+    app_module = load_app_with_mock_model()
+    client = TestClient(app_module.app)
+
+    video_id = "delete_video123"
+
+    client.post(
+        "/index-video",
+        json={
+            "videoId": video_id,
+            "chunks": [
+                {"chunkId": "c1", "text": "hello world", "chunkIndex": 0},
+                {"chunkId": "c2", "text": "machine learning", "chunkIndex": 1},
+            ],
+        },
+    )
+
+    index_path, metadata_path, _ = app_module._video_paths(video_id)
+
+    assert index_path.exists()
+    assert metadata_path.exists()
+
+    res = client.delete(f"/videos/{video_id}/index")
+
+    assert res.status_code == 200
+    assert res.json()["videoId"] == video_id
+    assert res.json()["deleted"] is True
+    assert not index_path.exists()
+    assert not metadata_path.exists()
+
+
+def test_delete_video_index_missing_returns_404():
+    app_module = load_app_with_mock_model()
+    client = TestClient(app_module.app)
+
+    res = client.delete("/videos/missing_video/index")
+
+    assert res.status_code == 404
+
+
+def test_delete_video_index_invalid_video_id():
+    app_module = load_app_with_mock_model()
+    client = TestClient(app_module.app)
+
+    res = client.delete("/videos/invalid video id/index")
+
+    assert res.status_code == 400

@@ -48,7 +48,8 @@ def _validate_texts(texts: List[str]) -> List[str]:
     cleaned = [text.strip() for text in texts if isinstance(text, str) and text.strip()]
     if not cleaned:
         raise HTTPException(
-            status_code=400, detail="texts must contain at least one non-empty string"
+            status_code=400,
+            detail="texts must contain at least one non-empty string",
         )
     return cleaned
 
@@ -62,8 +63,10 @@ def _embed_texts(texts: List[str]) -> np.ndarray:
 
 def _video_paths(video_id: str) -> tuple[Path, Path, Path]:
     safe_video_id = video_id.strip()
+
     if not safe_video_id:
         raise HTTPException(status_code=400, detail="videoId is required")
+
     if not VIDEO_ID_REGEX.fullmatch(safe_video_id):
         raise HTTPException(
             status_code=400,
@@ -73,6 +76,7 @@ def _video_paths(video_id: str) -> tuple[Path, Path, Path]:
     index_path = VECTOR_STORE_DIR / f"{safe_video_id}.index"
     metadata_path = VECTOR_STORE_DIR / f"{safe_video_id}.metadata.json"
     temp_index_path = VECTOR_STORE_DIR / f"{safe_video_id}.index.tmp"
+
     return index_path, metadata_path, temp_index_path
 
 
@@ -82,7 +86,11 @@ def _atomic_write_json(path: Path, payload: Dict[str, Any]) -> None:
     tmp.replace(path)
 
 
-def _save_video_index(video_id: str, chunks: List[ChunkPayload], embeddings: np.ndarray) -> None:
+def _save_video_index(
+    video_id: str,
+    chunks: List[ChunkPayload],
+    embeddings: np.ndarray,
+) -> None:
     index_path, metadata_path, temp_index_path = _video_paths(video_id)
 
     index = faiss.IndexFlatIP(embeddings.shape[1])
@@ -98,6 +106,7 @@ def _save_video_index(video_id: str, chunks: List[ChunkPayload], embeddings: np.
         "count": len(chunks),
         "chunks": [chunk.model_dump() for chunk in chunks],
     }
+
     _atomic_write_json(metadata_path, metadata)
 
 
@@ -125,7 +134,11 @@ def health() -> Dict[str, str]:
 def embed(request: EmbedRequest) -> Dict[str, Any]:
     texts = _validate_texts(request.texts)
     embeddings = _embed_texts(texts)
-    return {"count": len(texts), "embeddings": embeddings.tolist()}
+
+    return {
+        "count": len(texts),
+        "embeddings": embeddings.tolist(),
+    }
 
 
 @app.post("/index-video")
@@ -134,9 +147,11 @@ def index_video(request: IndexVideoRequest) -> Dict[str, Any]:
         raise HTTPException(status_code=400, detail="videoId is required")
 
     valid_chunks = [chunk for chunk in request.chunks if chunk.text and chunk.text.strip()]
+
     if not valid_chunks:
         raise HTTPException(
-            status_code=400, detail="chunks must include at least one non-empty text"
+            status_code=400,
+            detail="chunks must include at least one non-empty text",
         )
 
     texts = [chunk.text.strip() for chunk in valid_chunks]
@@ -148,7 +163,8 @@ def index_video(request: IndexVideoRequest) -> Dict[str, Any]:
         raise
     except Exception as error:
         raise HTTPException(
-            status_code=500, detail=f"Failed to save video index: {error}"
+            status_code=500,
+            detail=f"Failed to save video index: {error}",
         ) from error
 
     return {
@@ -162,6 +178,7 @@ def index_video(request: IndexVideoRequest) -> Dict[str, Any]:
 def search(request: SearchRequest) -> Dict[str, Any]:
     if not request.videoId.strip():
         raise HTTPException(status_code=400, detail="videoId is required")
+
     if not request.query.strip():
         raise HTTPException(status_code=400, detail="query is required")
 
@@ -181,7 +198,9 @@ def search(request: SearchRequest) -> Dict[str, Any]:
     for score, idx in zip(scores[0], indices[0]):
         if idx < 0 or idx >= len(chunks):
             continue
+
         chunk_meta = chunks[idx]
+
         matches.append(
             {
                 "score": float(score),
@@ -198,6 +217,27 @@ def search(request: SearchRequest) -> Dict[str, Any]:
         "query": request.query,
         "topK": request.topK,
         "matches": matches,
+    }
+
+
+@app.delete("/videos/{video_id}/index")
+def delete_video_index(video_id: str) -> Dict[str, Any]:
+    index_path, metadata_path, temp_index_path = _video_paths(video_id)
+
+    if not index_path.exists() and not metadata_path.exists():
+        raise HTTPException(status_code=404, detail="Index for videoId not found")
+
+    deleted_files = []
+
+    for path in [index_path, metadata_path, temp_index_path]:
+        if path.exists():
+            path.unlink()
+            deleted_files.append(path.name)
+
+    return {
+        "videoId": video_id,
+        "deleted": True,
+        "deletedFiles": deleted_files,
     }
 
 
