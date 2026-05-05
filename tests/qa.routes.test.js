@@ -46,12 +46,12 @@ describe('QA routes', () => {
     const User = require('../src/models/user.model');
 
     User.findById.mockReturnValue({
-    select: jest.fn().mockResolvedValue({
+      select: jest.fn().mockResolvedValue({
         _id: '507f1f77bcf86cd799439011',
         name: 'Tester',
         email: 'tester@example.com',
         role: 'user',
-    }),
+      }),
     });
   });
 
@@ -91,11 +91,12 @@ describe('QA routes', () => {
 
     TranscriptChunk.find.mockReturnValue({
       sort: () => ({
-        lean: () => Promise.resolve([
-          { text: 'intro content' },
-          { text: 'main topic explained' },
-          { text: 'important details' },
-        ]),
+        lean: () =>
+          Promise.resolve([
+            { text: 'intro content' },
+            { text: 'main topic explained' },
+            { text: 'important details' },
+          ]),
       }),
     });
 
@@ -117,10 +118,7 @@ describe('QA routes', () => {
     Video.findOne.mockResolvedValue({ _id: videoId, user: userId });
 
     searchVideoEmbeddings.mockResolvedValue({
-      matches: [
-        { text: 'relevant chunk 1' },
-        { text: 'relevant chunk 2' },
-      ],
+      matches: [{ text: 'relevant chunk 1' }, { text: 'relevant chunk 2' }],
     });
 
     generateAnswer.mockResolvedValue('qa answer');
