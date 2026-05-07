@@ -3,6 +3,7 @@ import { GoogleLogin } from '@react-oauth/google';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import LoadingButton from '../components/LoadingButton';
+import PageLoader from '../components/PageLoader';
 import { googleAuthApi, loginApi } from '../api/authApi';
 import { useAuth } from '../context/AuthContext';
 
@@ -35,6 +36,7 @@ const LoginPage = () => {
   };
 
   const handleGoogleSuccess = async (credentialResponse) => {
+    setLoading(true);
     setError('');
 
     try {
@@ -42,8 +44,11 @@ const LoginPage = () => {
       completeLogin(response);
     } catch (apiError) {
       setError(apiError.response?.data?.message || 'Google login failed');
+      setLoading(false);
     }
   };
+
+  if (loading) return <PageLoader text='Signing you in...' />;
 
   return (
     <Container maxWidth="sm" sx={{ py: 8 }}>

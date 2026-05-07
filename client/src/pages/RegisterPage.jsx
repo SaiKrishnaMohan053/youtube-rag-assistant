@@ -3,6 +3,7 @@ import { GoogleLogin } from '@react-oauth/google';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import LoadingButton from '../components/LoadingButton';
+import PageLoader from '../components/PageLoader';
 import { googleAuthApi, registerApi } from '../api/authApi';
 import { useAuth } from '../context/AuthContext';
 
@@ -38,6 +39,7 @@ const RegisterPage = () => {
   };
 
   const handleGoogleSuccess = async (credentialResponse) => {
+    setLoading(true);
     setError('');
     setMessage('');
 
@@ -46,8 +48,11 @@ const RegisterPage = () => {
       completeLogin(response);
     } catch (apiError) {
       setError(apiError.response?.data?.message || 'Google signup failed');
+      setLoading(false);
     }
   };
+
+  if (loading) return <PageLoader text='Creating account...' />;
 
   return (
     <Container maxWidth="sm" sx={{ py: 8 }}>

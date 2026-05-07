@@ -13,13 +13,16 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import LoadingButton from '../components/LoadingButton';
+import PageLoader from '../components/PageLoader';
 import { askVideoApi, getChatsApi, getVideoApi } from '../api/videoApi';
 
 const VideoChatPage = () => {
   const { id } = useParams();
+
   const [video, setVideo] = useState(null);
   const [chats, setChats] = useState([]);
   const [query, setQuery] = useState('');
+  const [pageLoading, setPageLoading] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -30,19 +33,33 @@ const VideoChatPage = () => {
   };
 
   useEffect(() => {
-    loadData().catch(() => setError('Failed to load video chat data'));
+    const initChat = async () => {
+      try {
+        await loadData();
+      } catch (_error) {
+        setError('Failed to load video or chats');
+      } finally {
+        setPageLoading(false);
+      }
+    };
+
+    initChat();
   }, [id]);
 
   const askQuestion = async () => {
+    if (!query.trim()) return;
+
     setLoading(true);
     setError('');
     try {
-      const response = await askVideoApi(id, query, 2);
+      const currentQuery = query.trim();
+
+      const response = await askVideoApi(id, currentQuery, 2);
       setChats((prev) => [
         ...prev,
         {
           _id: response.data.chatMessageId,
-          question: query,
+          question: currentQuery,
           answer: response.data.answer,
           supportingChunks: response.data.supportingChunks,
         },
@@ -55,13 +72,17 @@ const VideoChatPage = () => {
     }
   };
 
+  if (pageLoading) {
+    return <PageLoader text='Loading chat...' />;
+  }
+
   return (
     <Container sx={{ py: 4 }}>
       <Stack spacing={3}>
         <Typography variant="h4">{video?.title || 'Video Chat'}</Typography>
         {error && <Alert severity="error">{error}</Alert>}
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-          <TextField fullWidth label="Ask a question" value={query} onChange={(e) => setQuery(e.target.value)} />
+          <TextField fullWidth label="Ask a question" value={query} onChange={(e) => setQuery(e.target.value)} disabled={loading} />
           <LoadingButton loading={loading} onClick={askQuestion} disabled={!query.trim()}>{loading ? "Thinking..." : "Ask"}</LoadingButton>
         </Stack>
         <Stack spacing={2}>

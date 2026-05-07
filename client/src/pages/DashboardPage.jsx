@@ -14,6 +14,7 @@ import {
 import { useEffect, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import LoadingButton from '../components/LoadingButton';
+import PageLoader from '../components/PageLoader';
 import {
   createChunksApi,
   deleteVideoApi,
@@ -25,6 +26,7 @@ import {
 const DashboardPage = () => {
   const [url, setUrl] = useState('');
   const [videos, setVideos] = useState([]);
+  const [pageLoading, setPageLoading] = useState(true);
   const [loading, setLoading] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const [message, setMessage] = useState('');
@@ -36,7 +38,17 @@ const DashboardPage = () => {
   };
 
   useEffect(() => {
-    loadVideos().catch(() => setError('Failed to load videos'));
+    const initDashboard = async () => {
+      try {
+        await loadVideos();
+      } catch (_error) {
+        setError('Failed to load videos');
+      } finally {
+        setPageLoading(false);
+      }
+    };
+
+    initDashboard();
   }, []);
 
   const processVideo = async () => {
@@ -91,6 +103,10 @@ const DashboardPage = () => {
       setDeletingId(null);
     }
   };
+
+  if (pageLoading) {
+    return <PageLoader text='Loading you videos...' />
+  }
 
   return (
     <Container sx={{ py: 4 }}>
@@ -167,7 +183,7 @@ const DashboardPage = () => {
                         loading={deletingId === video._id}
                         onClick={() => deleteVideo(video._id)}
                       >
-                        Delete Video
+                        {deletingId === video._id ? 'Deleting video...' : 'Delete Video'}
                       </LoadingButton>
                     </Stack>
                   </CardActions>
