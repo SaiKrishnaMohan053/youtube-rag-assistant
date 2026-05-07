@@ -6,19 +6,20 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import faiss
+import os
+from openai import OpenAI
 import numpy as np
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
-from sentence_transformers import SentenceTransformer
 
-MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+MODEL_NAME = "text-embedding-3-small"
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 BASE_DIR = Path(__file__).resolve().parent
 VECTOR_STORE_DIR = BASE_DIR / "vector_store"
 VECTOR_STORE_DIR.mkdir(parents=True, exist_ok=True)
 VIDEO_ID_REGEX = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
 
 app = FastAPI(title="Local Embedding Service", version="1.0.0")
-model = SentenceTransformer(MODEL_NAME)
 
 
 class EmbedRequest(BaseModel):
@@ -55,8 +56,16 @@ def _validate_texts(texts: List[str]) -> List[str]:
 
 
 def _embed_texts(texts: List[str]) -> np.ndarray:
-    embeddings = model.encode(texts, convert_to_numpy=True)
-    embeddings = embeddings.astype("float32")
+    response = client.embeddings.create(
+        model=MODEL_NAME,
+        input=texts,
+    )
+
+    embeddings = np.array(
+        [item.embedding for item in response.data],
+        dtype="float32",
+    )
+
     faiss.normalize_L2(embeddings)
     return embeddings
 
