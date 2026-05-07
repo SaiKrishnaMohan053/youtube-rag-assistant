@@ -15,6 +15,7 @@ from pydantic import BaseModel, Field
 MODEL_NAME = "text-embedding-3-small"
 client = None
 
+
 def get_client():
     global client
     if client is None:
@@ -23,6 +24,8 @@ def get_client():
             raise HTTPException(status_code=500, detail="OPENAI_API_KEY not set")
         client = OpenAI(api_key=api_key)
     return client
+
+
 BASE_DIR = Path(__file__).resolve().parent
 VECTOR_STORE_DIR = BASE_DIR / "vector_store"
 VECTOR_STORE_DIR.mkdir(parents=True, exist_ok=True)
