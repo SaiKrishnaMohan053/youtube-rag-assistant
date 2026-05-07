@@ -13,7 +13,16 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
 MODEL_NAME = "text-embedding-3-small"
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = None
+
+def get_client():
+    global client
+    if client is None:
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            raise HTTPException(status_code=500, detail="OPENAI_API_KEY not set")
+        client = OpenAI(api_key=api_key)
+    return client
 BASE_DIR = Path(__file__).resolve().parent
 VECTOR_STORE_DIR = BASE_DIR / "vector_store"
 VECTOR_STORE_DIR.mkdir(parents=True, exist_ok=True)
@@ -56,7 +65,7 @@ def _validate_texts(texts: List[str]) -> List[str]:
 
 
 def _embed_texts(texts: List[str]) -> np.ndarray:
-    response = client.embeddings.create(
+    response = get_client().embeddings.create(
         model=MODEL_NAME,
         input=texts,
     )
