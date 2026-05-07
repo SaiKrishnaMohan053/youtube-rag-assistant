@@ -12,10 +12,7 @@ const errorHandler = require('./middleware/error.middleware');
 const app = express();
 
 app.use(helmet());
-const allowedOrigins = [
-  process.env.CLIENT_URL,
-  'http://localhost:5173',
-].filter(Boolean);
+const allowedOrigins = [process.env.CLIENT_URL, 'http://localhost:5173'].filter(Boolean);
 
 app.use(
   cors({
