@@ -1,37 +1,27 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import faiss
-import os
-from openai import OpenAI
 import numpy as np
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
 MODEL_NAME = "text-embedding-3-small"
-client = None
-
-
-def get_client():
-    global client
-    if client is None:
-        api_key = os.getenv("OPENAI_API_KEY")
-        if not api_key:
-            raise HTTPException(status_code=500, detail="OPENAI_API_KEY not set")
-        client = OpenAI(api_key=api_key)
-    return client
-
 
 BASE_DIR = Path(__file__).resolve().parent
 VECTOR_STORE_DIR = BASE_DIR / "vector_store"
 VECTOR_STORE_DIR.mkdir(parents=True, exist_ok=True)
+
 VIDEO_ID_REGEX = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
 
-app = FastAPI(title="Local Embedding Service", version="1.0.0")
+app = FastAPI(title="Embedding Service", version="1.0.0")
+
+_openai_client = None
 
 
 class EmbedRequest(BaseModel):
@@ -57,18 +47,51 @@ class SearchRequest(BaseModel):
     topK: int = Field(default=5, ge=1, le=50)
 
 
+def get_openai_client():
+    global _openai_client
+
+    if _openai_client is not None:
+        return _openai_client
+
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise HTTPException(status_code=500, detail="OPENAI_API_KEY not set")
+
+    try:
+        from openai import OpenAI
+    except ImportError as error:
+        raise HTTPException(status_code=500, detail="openai package is not installed") from error
+
+    _openai_client = OpenAI(api_key=api_key)
+    return _openai_client
+
+
 def _validate_texts(texts: List[str]) -> List[str]:
     cleaned = [text.strip() for text in texts if isinstance(text, str) and text.strip()]
+
     if not cleaned:
         raise HTTPException(
             status_code=400,
             detail="texts must contain at least one non-empty string",
         )
+
     return cleaned
 
 
 def _embed_texts(texts: List[str]) -> np.ndarray:
-    response = get_client().embeddings.create(
+    if os.getenv("EMBEDDING_TEST_MODE") == "true":
+        embeddings = []
+
+        for index, _ in enumerate(texts):
+            vector = np.zeros(4, dtype="float32")
+            vector[index % 4] = 1.0
+            embeddings.append(vector)
+
+        embeddings_array = np.array(embeddings, dtype="float32")
+        faiss.normalize_L2(embeddings_array)
+        return embeddings_array
+
+    response = get_openai_client().embeddings.create(
         model=MODEL_NAME,
         input=texts,
     )

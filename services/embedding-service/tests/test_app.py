@@ -1,28 +1,20 @@
 import importlib.util
+import os
 import sys
-import types
 from pathlib import Path
 
-import numpy as np
 from fastapi.testclient import TestClient
 
 
-def load_app_with_mock_model():
-    fake_module = types.ModuleType("sentence_transformers")
+def load_app_with_test_embeddings():
+    os.environ["EMBEDDING_TEST_MODE"] = "true"
 
-    class DummyModel:
-        def encode(self, texts, convert_to_numpy=True):
-            return np.ones((len(texts), 4), dtype=np.float32)
-
-    class FakeSentenceTransformer:
-        def __new__(cls, _name):
-            return DummyModel()
-
-    fake_module.SentenceTransformer = FakeSentenceTransformer
-    sys.modules["sentence_transformers"] = fake_module
+    module_name = "embedding_app"
+    if module_name in sys.modules:
+        del sys.modules[module_name]
 
     app_path = Path(__file__).resolve().parents[1] / "app.py"
-    spec = importlib.util.spec_from_file_location("embedding_app", app_path)
+    spec = importlib.util.spec_from_file_location(module_name, app_path)
     module = importlib.util.module_from_spec(spec)
 
     assert spec.loader is not None
@@ -32,7 +24,7 @@ def load_app_with_mock_model():
 
 
 def test_health_endpoint():
-    app_module = load_app_with_mock_model()
+    app_module = load_app_with_test_embeddings()
     client = TestClient(app_module.app)
 
     res = client.get("/health")
@@ -42,7 +34,7 @@ def test_health_endpoint():
 
 
 def test_embed_validation():
-    app_module = load_app_with_mock_model()
+    app_module = load_app_with_test_embeddings()
     client = TestClient(app_module.app)
 
     res = client.post("/embed", json={"texts": ["   "]})
@@ -51,12 +43,13 @@ def test_embed_validation():
 
 
 def test_embed_success():
-    app_module = load_app_with_mock_model()
+    app_module = load_app_with_test_embeddings()
     client = TestClient(app_module.app)
 
     res = client.post("/embed", json={"texts": ["hello", "world"]})
 
     assert res.status_code == 200
+
     data = res.json()
 
     assert data["count"] == 2
@@ -65,7 +58,7 @@ def test_embed_success():
 
 
 def test_index_video_success():
-    app_module = load_app_with_mock_model()
+    app_module = load_app_with_test_embeddings()
     client = TestClient(app_module.app)
 
     payload = {
@@ -79,6 +72,7 @@ def test_index_video_success():
     res = client.post("/index-video", json=payload)
 
     assert res.status_code == 200
+
     data = res.json()
 
     assert data["videoId"] == "video123"
@@ -86,7 +80,7 @@ def test_index_video_success():
 
 
 def test_index_video_empty_chunks():
-    app_module = load_app_with_mock_model()
+    app_module = load_app_with_test_embeddings()
     client = TestClient(app_module.app)
 
     payload = {
@@ -102,7 +96,7 @@ def test_index_video_empty_chunks():
 
 
 def test_search_missing_index():
-    app_module = load_app_with_mock_model()
+    app_module = load_app_with_test_embeddings()
     client = TestClient(app_module.app)
 
     res = client.post(
@@ -114,7 +108,7 @@ def test_search_missing_index():
 
 
 def test_search_blank_query():
-    app_module = load_app_with_mock_model()
+    app_module = load_app_with_test_embeddings()
     client = TestClient(app_module.app)
 
     res = client.post(
@@ -126,7 +120,7 @@ def test_search_blank_query():
 
 
 def test_search_success():
-    app_module = load_app_with_mock_model()
+    app_module = load_app_with_test_embeddings()
     client = TestClient(app_module.app)
 
     client.post(
@@ -146,6 +140,7 @@ def test_search_success():
     )
 
     assert res.status_code == 200
+
     data = res.json()
 
     assert data["videoId"] == "video123"
@@ -156,7 +151,7 @@ def test_search_success():
 
 
 def test_search_topk_limit():
-    app_module = load_app_with_mock_model()
+    app_module = load_app_with_test_embeddings()
     client = TestClient(app_module.app)
 
     client.post(
@@ -179,7 +174,7 @@ def test_search_topk_limit():
 
 
 def test_delete_video_index_success():
-    app_module = load_app_with_mock_model()
+    app_module = load_app_with_test_embeddings()
     client = TestClient(app_module.app)
 
     video_id = "delete_video123"
@@ -210,7 +205,7 @@ def test_delete_video_index_success():
 
 
 def test_delete_video_index_missing_returns_404():
-    app_module = load_app_with_mock_model()
+    app_module = load_app_with_test_embeddings()
     client = TestClient(app_module.app)
 
     res = client.delete("/videos/missing_video/index")
@@ -219,7 +214,7 @@ def test_delete_video_index_missing_returns_404():
 
 
 def test_delete_video_index_invalid_video_id():
-    app_module = load_app_with_mock_model()
+    app_module = load_app_with_test_embeddings()
     client = TestClient(app_module.app)
 
     res = client.delete("/videos/invalid video id/index")
