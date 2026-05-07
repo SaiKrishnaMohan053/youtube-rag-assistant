@@ -12,7 +12,6 @@ const requiredEnvVars = [
   'JWT_SECRET',
   'JWT_EXPIRES_IN',
   'EMBEDDING_SERVICE_URL',
-  'OLLAMA_BASE_URL',
 ];
 
 requiredEnvVars.forEach((key) => {
@@ -34,6 +33,10 @@ if (!['ollama', 'openai'].includes(llmProvider)) {
   throw new Error(`Invalid LLM_PROVIDER: ${llmProvider}. Allowed values are ollama, openai`);
 }
 
+if (llmProvider === 'ollama' && !process.env.OLLAMA_BASE_URL?.trim()) {
+  throw new Error('Missing required environment variable for Ollama provider: OLLAMA_BASE_URL');
+}
+
 if (llmProvider === 'openai' && !process.env.OPENAI_API_KEY?.trim()) {
   throw new Error('Missing required environment variable for OpenAI provider: OPENAI_API_KEY');
 }
@@ -44,20 +47,20 @@ if (Number.isNaN(port) || port <= 0) {
 }
 
 module.exports = {
-  port,
+  port: process.env.PORT || 5000,
   mongoUri: process.env.MONGODB_URI.trim(),
-  nodeEnv: process.env.NODE_ENV,
+  nodeEnv: process.env.NODE_ENV || 'development',
   jwtSecret: process.env.JWT_SECRET,
   jwtExpiresIn: process.env.JWT_EXPIRES_IN,
   embeddingServiceUrl: process.env.EMBEDDING_SERVICE_URL.trim(),
-  ollamaBaseUrl: process.env.OLLAMA_BASE_URL.trim(),
+  ollamaBaseUrl: process.env.OLLAMA_BASE_URL?.trim(),
   ollamaModel: (process.env.OLLAMA_MODEL || 'llama3').trim(),
   ollamaTimeoutMs: Number.parseInt(process.env.OLLAMA_TIMEOUT_MS || '120000', 10),
   llmProvider,
   openaiApiKey: process.env.OPENAI_API_KEY?.trim() || '',
   openaiModel: (process.env.OPENAI_MODEL || 'gpt-4.1-mini').trim(),
   googleClientId: process.env.GOOGLE_CLIENT_ID?.trim() || '',
-  frontendUrl: (process.env.FRONTEND_URL || 'http://localhost:5173').trim(),
+  clientUrl: (process.env.CLIENT_URL || 'http://localhost:5173').trim(),
   smtpHost: process.env.SMTP_HOST?.trim() || '',
   smtpPort: Number.parseInt(process.env.SMTP_PORT || '587', 10),
   smtpUser: process.env.SMTP_USER?.trim() || '',
