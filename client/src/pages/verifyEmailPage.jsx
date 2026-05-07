@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import PageLoader from '../components/PageLoader';
 import { verifyEmailApi } from '../api/authApi';
 
-const VerifyEmailPage = () => {
+const VerifyEmailPage = () => { 
   const [searchParams] = useSearchParams();
   const hasVerifiedRef = useRef(false);
   const [status, setStatus] = useState('loading');
