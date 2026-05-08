@@ -23,16 +23,16 @@ The system lets users:
 
 ## Tech Stack
 
-| Layer | Technology |
-|--------|------------|
-| **Frontend** | React 18, Vite, Material UI, React Router, Axios |
-| **Backend API** | Node.js, Express.js, Mongoose, JWT, bcryptjs |
-| **Database** | MongoDB |
-| **Embedding Service** | Python, FastAPI, Uvicorn, NumPy |
-| **Vector Search** | FAISS CPU |
-| **AI Providers** | OpenAI Embeddings, OpenAI Chat, Ollama |
-| **Auth & Email** | Google OAuth, Nodemailer |
-| **Testing & Quality** | Jest, Supertest, Pytest, Prettier, Black |
+| Layer                 | Technology                                       |
+| --------------------- | ------------------------------------------------ |
+| **Frontend**          | React 18, Vite, Material UI, React Router, Axios |
+| **Backend API**       | Node.js, Express.js, Mongoose, JWT, bcryptjs     |
+| **Database**          | MongoDB                                          |
+| **Embedding Service** | Python, FastAPI, Uvicorn, NumPy                  |
+| **Vector Search**     | FAISS CPU                                        |
+| **AI Providers**      | OpenAI Embeddings, OpenAI Chat, Ollama           |
+| **Auth & Email**      | Google OAuth, Nodemailer                         |
+| **Testing & Quality** | Jest, Supertest, Pytest, Prettier, Black         |
 
 ---
 
@@ -110,15 +110,15 @@ youtube-rag-assistant/
 
 ## Core Modules
 
-| File / Module | Purpose |
-|---------------|---------|
-| `src/services/transcript.service.js` | Fetches transcript data from Supadata. |
-| `src/services/chunk.service.js` | Splits transcripts into timestamp-aware chunks. |
-| `src/services/embeddingClient.service.js` | Sends chunk data to the embedding service. |
-| `src/services/llm.service.js` | Routes answer generation to OpenAI or Ollama. |
-| `src/controllers/video.controller.js` | Handles video processing, listing, retrieval, and deletion. |
-| `src/controllers/qa.controller.js` | Runs RAG Q&A and returns chat responses. |
-| `services/embedding-service/app.py` | Generates embeddings, builds FAISS indexes, and performs vector search. |
+| File / Module                             | Purpose                                                                 |
+| ----------------------------------------- | ----------------------------------------------------------------------- |
+| `src/services/transcript.service.js`      | Fetches transcript data from Supadata.                                  |
+| `src/services/chunk.service.js`           | Splits transcripts into timestamp-aware chunks.                         |
+| `src/services/embeddingClient.service.js` | Sends chunk data to the embedding service.                              |
+| `src/services/llm.service.js`             | Routes answer generation to OpenAI or Ollama.                           |
+| `src/controllers/video.controller.js`     | Handles video processing, listing, retrieval, and deletion.             |
+| `src/controllers/qa.controller.js`        | Runs RAG Q&A and returns chat responses.                                |
+| `services/embedding-service/app.py`       | Generates embeddings, builds FAISS indexes, and performs vector search. |
 
 ---
 
@@ -286,37 +286,37 @@ Base API URL:
 
 ### Health
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/health` | Backend API health check. |
+| Method | Endpoint  | Description               |
+| ------ | --------- | ------------------------- |
+| `GET`  | `/health` | Backend API health check. |
 
 ### Authentication
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/auth/register` | Register a new user. |
-| `GET` | `/auth/verify-email` | Verify email with token. |
-| `POST` | `/auth/login` | Login with email and password. |
-| `POST` | `/auth/google` | Login with Google OAuth credential. |
-| `GET` | `/auth/me` | Get logged-in user profile. |
+| Method | Endpoint             | Description                         |
+| ------ | -------------------- | ----------------------------------- |
+| `POST` | `/auth/register`     | Register a new user.                |
+| `GET`  | `/auth/verify-email` | Verify email with token.            |
+| `POST` | `/auth/login`        | Login with email and password.      |
+| `POST` | `/auth/google`       | Login with Google OAuth credential. |
+| `GET`  | `/auth/me`           | Get logged-in user profile.         |
 
 ### Videos, Chunks, Search, and Q&A
 
 All routes below require JWT authentication.
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/videos/process` | Process a YouTube URL and create the video record. |
-| `GET` | `/videos` | Get all videos for the logged-in user. |
-| `GET` | `/videos/:id` | Get one processed video. |
-| `DELETE` | `/videos/:id` | Delete video, chunks, chats, and FAISS index. |
-| `POST` | `/videos/:id/chunks` | Create transcript chunks for a video. |
-| `GET` | `/videos/:id/chunks` | Get transcript chunks. |
-| `GET` | `/videos/embedding-health` | Check embedding service health through backend. |
-| `POST` | `/videos/:id/index` | Generate embeddings and build the FAISS index. |
-| `POST` | `/videos/:id/search` | Run semantic search on the indexed transcript. |
-| `POST` | `/videos/:id/ask` | Ask a grounded question about the video. |
-| `GET` | `/videos/:id/chats` | Fetch persistent chat history for a video. |
+| Method   | Endpoint                   | Description                                        |
+| -------- | -------------------------- | -------------------------------------------------- |
+| `POST`   | `/videos/process`          | Process a YouTube URL and create the video record. |
+| `GET`    | `/videos`                  | Get all videos for the logged-in user.             |
+| `GET`    | `/videos/:id`              | Get one processed video.                           |
+| `DELETE` | `/videos/:id`              | Delete video, chunks, chats, and FAISS index.      |
+| `POST`   | `/videos/:id/chunks`       | Create transcript chunks for a video.              |
+| `GET`    | `/videos/:id/chunks`       | Get transcript chunks.                             |
+| `GET`    | `/videos/embedding-health` | Check embedding service health through backend.    |
+| `POST`   | `/videos/:id/index`        | Generate embeddings and build the FAISS index.     |
+| `POST`   | `/videos/:id/search`       | Run semantic search on the indexed transcript.     |
+| `POST`   | `/videos/:id/ask`          | Ask a grounded question about the video.           |
+| `GET`    | `/videos/:id/chats`        | Fetch persistent chat history for a video.         |
 
 ### Embedding Service
 
@@ -324,13 +324,13 @@ Base URL:
 
 `http://localhost:8001`
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/health` | Embedding service health check. |
-| `POST` | `/embed` | Generate embeddings for raw text. |
-| `POST` | `/index-video` | Build a FAISS index for a video. |
-| `POST` | `/search` | Search a video index by semantic similarity. |
-| `DELETE` | `/videos/:video_id/index` | Delete a stored FAISS index. |
+| Method   | Endpoint                  | Description                                  |
+| -------- | ------------------------- | -------------------------------------------- |
+| `GET`    | `/health`                 | Embedding service health check.              |
+| `POST`   | `/embed`                  | Generate embeddings for raw text.            |
+| `POST`   | `/index-video`            | Build a FAISS index for a video.             |
+| `POST`   | `/search`                 | Search a video index by semantic similarity. |
+| `DELETE` | `/videos/:video_id/index` | Delete a stored FAISS index.                 |
 
 ---
 
@@ -352,29 +352,29 @@ Base URL:
 
 ### Root Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start backend API and embedding service together. |
-| `npm run dev:api` | Start backend API only. |
-| `npm run dev:embedding` | Start embedding service only. |
-| `npm start` | Start backend in production mode. |
-| `npm test` | Run backend Jest tests. |
-| `npm run test:watch` | Run Jest in watch mode. |
-| `npm run format` | Format JS, JSON, YAML, and Markdown files. |
-| `npm run format:check` | Check formatting with Prettier. |
-| `npm run format:python` | Format Python files with Black. |
-| `npm run format:python:check` | Check Python formatting with Black. |
-| `npm run audit` | Run `npm audit` with high severity threshold. |
-| `npm run check` | Run project JS checks from `scripts/check-js.js`. |
+| Command                       | Description                                       |
+| ----------------------------- | ------------------------------------------------- |
+| `npm run dev`                 | Start backend API and embedding service together. |
+| `npm run dev:api`             | Start backend API only.                           |
+| `npm run dev:embedding`       | Start embedding service only.                     |
+| `npm start`                   | Start backend in production mode.                 |
+| `npm test`                    | Run backend Jest tests.                           |
+| `npm run test:watch`          | Run Jest in watch mode.                           |
+| `npm run format`              | Format JS, JSON, YAML, and Markdown files.        |
+| `npm run format:check`        | Check formatting with Prettier.                   |
+| `npm run format:python`       | Format Python files with Black.                   |
+| `npm run format:python:check` | Check Python formatting with Black.               |
+| `npm run audit`               | Run `npm audit` with high severity threshold.     |
+| `npm run check`               | Run project JS checks from `scripts/check-js.js`. |
 
 ### Frontend Scripts
 
 Run these inside `client/`.
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start Vite dev server. |
-| `npm run build` | Build the frontend for production. |
+| Command           | Description                           |
+| ----------------- | ------------------------------------- |
+| `npm run dev`     | Start Vite dev server.                |
+| `npm run build`   | Build the frontend for production.    |
 | `npm run preview` | Preview the production build locally. |
 
 ---
