@@ -1,5 +1,8 @@
+const dns = require('dns');
 const nodemailer = require('nodemailer');
 const env = require('../config/env');
+
+dns.setDefaultResultOrder('ipv4first');
 
 const createTransporter = () => {
   if (!env.smtpHost || !env.smtpUser || !env.smtpPass) {
@@ -10,6 +13,7 @@ const createTransporter = () => {
     host: env.smtpHost,
     port: Number(env.smtpPort) || 587,
     secure: Number(env.smtpPort) === 465,
+    requireTLS: true,
     auth: {
       user: env.smtpUser,
       pass: env.smtpPass,
