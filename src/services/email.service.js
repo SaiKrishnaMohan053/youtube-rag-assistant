@@ -8,12 +8,15 @@ const createTransporter = () => {
 
   return nodemailer.createTransport({
     host: env.smtpHost,
-    port: env.smtpPort,
-    secure: env.smtpPort === 465,
+    port: Number(env.smtpPort) || 587,
+    secure: Number(env.smtpPort) === 465,
     auth: {
       user: env.smtpUser,
       pass: env.smtpPass,
     },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 10000,
   });
 };
 
@@ -25,17 +28,26 @@ const sendVerificationEmail = async ({ to, name, verificationUrl }) => {
     return;
   }
 
-  await transporter.sendMail({
-    from: env.emailFrom,
-    to,
-    subject: 'Verify your YouTube RAG Assistant account',
-    html: `
-      <p>Hi ${name},</p>
-      <p>Please verify your email by clicking the link below:</p>
-      <p><a href="${verificationUrl}">Verify Email</a></p>
-      <p>This link expires in 24 hours.</p>
-    `,
-  });
+  try {
+    await transporter.verify();
+
+    await transporter.sendMail({
+      from: env.emailFrom,
+      to,
+      subject: 'Verify your YouTube RAG Assistant account',
+      html: `
+        <p>Hi ${name},</p>
+        <p>Please verify your email by clicking the link below:</p>
+        <p><a href="${verificationUrl}">Verify Email</a></p>
+        <p>This link expires in 24 hours.</p>
+      `,
+    });
+
+    console.log(`Verification email sent successfully to ${to}`);
+  } catch (error) {
+    console.error('Failed to send verification email:', error.message);
+    throw error;
+  }
 };
 
 module.exports = {

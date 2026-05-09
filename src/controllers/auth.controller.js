@@ -42,34 +42,48 @@ const register = asyncHandler(async (req, res) => {
   const normalizedEmail = email.trim().toLowerCase();
 
   const existingUser = await User.findOne({ email: normalizedEmail });
+
   if (existingUser) {
     throw new ApiError(409, 'Email is already registered');
   }
 
-  const user = new User({
-    name: name.trim(),
-    email: normalizedEmail,
-    password,
-    authProvider: 'local',
-    isEmailVerified: false,
-  });
+  let user = null;
 
-  const rawToken = user.createEmailVerificationToken();
-  await user.save();
+  try {
+    user = new User({
+      name: name.trim(),
+      email: normalizedEmail,
+      password,
+      authProvider: 'local',
+      isEmailVerified: false,
+    });
 
-  const verificationUrl = `${env.frontendUrl}/verify-email?token=${rawToken}`;
+    const rawToken = user.createEmailVerificationToken();
 
-  await sendVerificationEmail({
-    to: user.email,
-    name: user.name,
-    verificationUrl,
-  });
+    await user.save();
 
-  return res.status(201).json(
-    new ApiResponse(201, 'Registration successful. Please verify your email before logging in.', {
-      user: buildUserResponse(user),
-    })
-  );
+    const verificationUrl = `${env.frontendUrl}/verify-email?token=${rawToken}`;
+
+    await sendVerificationEmail({
+      to: user.email,
+      name: user.name,
+      verificationUrl,
+    });
+
+    return res.status(201).json(
+      new ApiResponse(201, 'Registration successful. Please verify your email before logging in.', {
+        user: buildUserResponse(user),
+      })
+    );
+  } catch (error) {
+    console.error('Registration failed:', error.message);
+
+    if (user?._id) {
+      await User.findByIdAndDelete(user._id);
+    }
+
+    throw new ApiError(500, 'Failed to create account. Verification email could not be sent.');
+  }
 });
 
 const verifyEmail = asyncHandler(async (req, res) => {
