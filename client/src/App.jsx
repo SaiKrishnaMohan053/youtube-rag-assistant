@@ -18,12 +18,13 @@ const AppContent = () => {
 
   return (
     <Box>
-      {navLoading && <PageLoader text='Loading...' />}
       <Navbar />
-      <AppRoutes />
+      <Box component="main">
+        {navLoading ? <PageLoader text="Loading..." /> : <AppRoutes />}
+      </Box>
     </Box>
-  )
-}
+  );
+};
 
 const App = () => (
   <ThemeProvider theme={theme}>
