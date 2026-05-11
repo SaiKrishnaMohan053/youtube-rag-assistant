@@ -113,9 +113,6 @@ const verifyEmail = asyncHandler(async (req, res) => {
 
   user.isEmailVerified = true;
 
-  user.emailVerificationToken = undefined;
-  user.emailVerificationExpires = undefined;
-
   await user.save();
 
   return res.status(200).json(new ApiResponse(200, 'Email verified successfully'));
