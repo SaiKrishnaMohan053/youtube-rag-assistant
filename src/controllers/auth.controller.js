@@ -97,16 +97,25 @@ const verifyEmail = asyncHandler(async (req, res) => {
 
   const user = await User.findOne({
     emailVerificationToken: hashedToken,
-    emailVerificationExpires: { $gt: Date.now() },
   }).select('+emailVerificationToken +emailVerificationExpires');
 
   if (!user) {
-    throw new ApiError(400, 'Invalid or expired verification link');
+    throw new ApiError(400, 'Invalid verification link');
+  }
+
+  if (user.isEmailVerified) {
+    return res.status(200).json(new ApiResponse(200, 'Email already verified. You can login.'));
+  }
+
+  if (!user.emailVerificationExpires || user.emailVerificationExpires < Date.now()) {
+    throw new ApiError(400, 'Verification link expired');
   }
 
   user.isEmailVerified = true;
-  user.emailVerificationToken = null;
-  user.emailVerificationExpires = null;
+
+  user.emailVerificationToken = undefined;
+  user.emailVerificationExpires = undefined;
+
   await user.save();
 
   return res.status(200).json(new ApiResponse(200, 'Email verified successfully'));
