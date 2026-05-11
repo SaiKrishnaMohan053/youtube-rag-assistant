@@ -62,7 +62,7 @@ const register = asyncHandler(async (req, res) => {
 
     await user.save();
 
-    const verificationUrl = `${env.frontendUrl}/verify-email?token=${rawToken}`;
+    const verificationUrl = `${env.clientUrl}/verify-email?token=${rawToken}`;
 
     await sendVerificationEmail({
       to: user.email,
