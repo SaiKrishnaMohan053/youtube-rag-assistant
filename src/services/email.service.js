@@ -1,48 +1,57 @@
-const { Resend } = require('resend');
+const axios = require('axios');
 const env = require('../config/env');
 
-const createResendClient = () => {
-  if (!env.resendApiKey) {
-    return null;
-  }
-
-  return new Resend(env.resendApiKey);
-};
+const BREVO_EMAIL_URL = 'https://api.brevo.com/v3/smtp/email';
 
 const sendVerificationEmail = async ({ to, name, verificationUrl }) => {
   console.log('Starting verification email flow for:', to);
 
-  const resend = createResendClient();
-
-  if (!resend) {
-    console.log(`RESEND_API_KEY missing. Verification link for ${to}: ${verificationUrl}`);
+  if (!env.brevoApiKey) {
+    console.log(`BREVO_API_KEY missing. Verification link for ${to}: ${verificationUrl}`);
     return;
   }
 
   try {
-    const result = await resend.emails.send({
-      from: env.emailFrom || 'YouTube RAG Assistant <onboarding@resend.dev>',
-      to,
+    const payload = {
+      sender: {
+        name: 'YouTube RAG Assistant',
+        email: env.emailFrom,
+      },
+      to: [
+        {
+          email: to,
+          name,
+        },
+      ],
       subject: 'Verify your YouTube RAG Assistant account',
-      html: `
+      htmlContent: `
         <p>Hi ${name},</p>
         <p>Please verify your email by clicking the link below:</p>
         <p><a href="${verificationUrl}">Verify Email</a></p>
         <p>This link expires in 24 hours.</p>
       `,
+    };
+
+    const { data } = await axios.post(BREVO_EMAIL_URL, payload, {
+      headers: {
+        accept: 'application/json',
+        'api-key': env.brevoApiKey,
+        'content-type': 'application/json',
+      },
+      timeout: 15000,
     });
 
     console.log('Verification email sent successfully:', {
       to,
-      id: result?.data?.id,
+      messageId: data?.messageId,
     });
 
-    return result;
+    return data;
   } catch (error) {
     console.error('Failed to send verification email:', {
       message: error.message,
-      name: error.name,
-      statusCode: error.statusCode,
+      status: error.response?.status,
+      data: error.response?.data,
     });
 
     throw error;

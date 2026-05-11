@@ -61,10 +61,6 @@ module.exports = {
   openaiModel: (process.env.OPENAI_MODEL || 'gpt-4.1-mini').trim(),
   googleClientId: process.env.GOOGLE_CLIENT_ID?.trim() || '',
   clientUrl: (process.env.CLIENT_URL || 'http://localhost:5173').trim(),
-  smtpHost: process.env.SMTP_HOST?.trim() || '',
-  smtpPort: Number.parseInt(process.env.SMTP_PORT || '587', 10),
-  smtpUser: process.env.SMTP_USER?.trim() || '',
-  smtpPass: process.env.SMTP_PASS?.trim() || '',
-  resendApiKey: process.env.RESEND_API_KEY?.trim() || '',
-  emailFrom: process.env.EMAIL_FROM?.trim() || 'YouTube RAG Assistant <no-reply@example.com>',
+  brevoApiKey: process.env.BREVO_API_KEY?.trim() || '',
+  emailFrom: process.env.EMAIL_FROM?.trim() || '',
 };
