@@ -1,85 +1,27 @@
-const dns = require('dns');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 const env = require('../config/env');
 
-dns.setDefaultResultOrder('ipv4first');
-
-const resolveIPv4 = async (host) => {
-  const addresses = await dns.promises.resolve4(host);
-
-  if (!addresses.length) {
-    throw new Error(`No IPv4 address found for SMTP host: ${host}`);
-  }
-
-  return addresses[0];
-};
-
-const createTransporter = async () => {
-  console.log('SMTP config check:', {
-    smtpHost: env.smtpHost,
-    smtpPort: env.smtpPort,
-    smtpUserExists: Boolean(env.smtpUser),
-    smtpPassExists: Boolean(env.smtpPass),
-    emailFrom: env.emailFrom,
-  });
-
-  if (!env.smtpHost || !env.smtpUser || !env.smtpPass) {
-    console.log('SMTP config missing. Email will only be logged');
+const createResendClient = () => {
+  if (!env.resendApiKey) {
     return null;
   }
 
-  console.log('Resolving SMTP IPv4:', env.smtpHost);
-
-  const smtpIPv4 = await resolveIPv4(env.smtpHost);
-
-  console.log('Resolved SMTP IPv4:', smtpIPv4);
-
-  const transporter = nodemailer.createTransport({
-    host: smtpIPv4,
-    port: Number(env.smtpPort) || 587,
-    secure: Number(env.smtpPort) === 465,
-    requireTLS: true,
-
-    tls: {
-      servername: env.smtpHost,
-    },
-
-    auth: {
-      user: env.smtpUser,
-      pass: env.smtpPass,
-    },
-
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 10000,
-  });
-
-  console.log('SMTP transporter created');
-
-  return transporter;
+  return new Resend(env.resendApiKey);
 };
 
 const sendVerificationEmail = async ({ to, name, verificationUrl }) => {
   console.log('Starting verification email flow for:', to);
 
-  const transporter = await createTransporter();
+  const resend = createResendClient();
 
-  if (!transporter) {
-    console.log(`Email verification link for ${to}: ${verificationUrl}`);
+  if (!resend) {
+    console.log(`RESEND_API_KEY missing. Verification link for ${to}: ${verificationUrl}`);
     return;
   }
 
   try {
-    console.log('Verifying SMTP connection...');
-
-    await transporter.verify();
-
-    console.log('SMTP connection verified successfully');
-
-    console.log('Sending verification email...');
-
-    const info = await transporter.sendMail({
-      from: env.emailFrom,
+    const result = await resend.emails.send({
+      from: env.emailFrom || 'YouTube RAG Assistant <onboarding@resend.dev>',
       to,
       subject: 'Verify your YouTube RAG Assistant account',
       html: `
@@ -92,18 +34,17 @@ const sendVerificationEmail = async ({ to, name, verificationUrl }) => {
 
     console.log('Verification email sent successfully:', {
       to,
-      messageId: info.messageId,
-      accepted: info.accepted,
-      rejected: info.rejected,
+      id: result?.data?.id,
     });
+
+    return result;
   } catch (error) {
     console.error('Failed to send verification email:', {
       message: error.message,
-      code: error.code,
-      command: error.command,
-      response: error.response,
-      responseCode: error.responseCode,
+      name: error.name,
+      statusCode: error.statusCode,
     });
+
     throw error;
   }
 };

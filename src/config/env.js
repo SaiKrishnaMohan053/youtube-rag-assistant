@@ -65,5 +65,6 @@ module.exports = {
   smtpPort: Number.parseInt(process.env.SMTP_PORT || '587', 10),
   smtpUser: process.env.SMTP_USER?.trim() || '',
   smtpPass: process.env.SMTP_PASS?.trim() || '',
+  resendApiKey: process.env.RESEND_API_KEY?.trim() || '',
   emailFrom: process.env.EMAIL_FROM?.trim() || 'YouTube RAG Assistant <no-reply@example.com>',
 };
