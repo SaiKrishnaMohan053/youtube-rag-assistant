@@ -1,8 +1,6 @@
 const dns = require('dns');
 const nodemailer = require('nodemailer');
 const env = require('../config/env');
-const { code } = require('framer-motion/client');
-const { comma } = require('postcss/lib/list');
 
 dns.setDefaultResultOrder('ipv4first');
 
