@@ -274,6 +274,28 @@ describe('QA routes', () => {
   });
 
   it('handles action extraction mode', async () => {
+    TranscriptChunk.find.mockReturnValue({
+      sort: jest.fn().mockReturnValue({
+        lean: jest.fn().mockResolvedValue([
+          {
+            chunkIndex: 0,
+            text: 'Important discussion about governance.',
+            startTime: 0,
+          },
+          {
+            chunkIndex: 1,
+            text: 'Discussion about AI and public trust.',
+            startTime: 120,
+          },
+          {
+            chunkIndex: 2,
+            text: 'Important political analysis section.',
+            startTime: 240,
+          },
+        ]),
+      }),
+    });
+
     Video.findOne.mockResolvedValue(createMockVideo());
 
     searchVideoEmbeddings.mockResolvedValue({
@@ -298,8 +320,9 @@ describe('QA routes', () => {
     expect(res.status).toBe(200);
     expect(res.body.data.intent).toBe('ACTION_EXTRACTION');
     expect(res.body.data.mode).toBe('action_extraction');
-    expect(res.body.data.actionType).toBe('ACTION_EXTRACTION');
+    expect(res.body.data.actionType).toBe('GENERIC_NOTES');
     expect(searchVideoEmbeddings).not.toHaveBeenCalled();
+    expect(res.body.data.supportingChunks).toHaveLength(3);
     expect(generateAnswer).toHaveBeenCalled();
   });
 
@@ -322,5 +345,50 @@ describe('QA routes', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.data.chats).toHaveLength(1);
+  });
+
+  it('handles detailed notes action type', async () => {
+    TranscriptChunk.find.mockReturnValue({
+      sort: jest.fn().mockReturnValue({
+        lean: jest.fn().mockResolvedValue([
+          {
+            chunkIndex: 0,
+            text: 'Beginning discussion about India thorium reserves.',
+            startTime: 0,
+          },
+          {
+            chunkIndex: 1,
+            text: 'Middle discussion about three-stage nuclear program.',
+            startTime: 120,
+          },
+          {
+            chunkIndex: 2,
+            text: 'Later discussion about PFBR and uranium-233.',
+            startTime: 240,
+          },
+        ]),
+      }),
+    });
+
+    Video.findOne.mockResolvedValue(createMockVideo());
+
+    generateAnswer.mockResolvedValue('# Detailed Video Notes');
+
+    mockChatCreate();
+
+    const res = await request(app)
+      .post(`/api/videos/${videoId}/ask`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        query: 'Create detailed notes from this video',
+      });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.intent).toBe('ACTION_EXTRACTION');
+    expect(res.body.data.mode).toBe('action_extraction');
+    expect(res.body.data.actionType).toBe('DETAILED_NOTES');
+    expect(res.body.data.supportingChunks).toHaveLength(3);
+    expect(searchVideoEmbeddings).not.toHaveBeenCalled();
+    expect(generateAnswer).toHaveBeenCalled();
   });
 });

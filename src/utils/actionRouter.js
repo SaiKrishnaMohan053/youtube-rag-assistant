@@ -1,4 +1,5 @@
 const ACTION_TYPES = Object.freeze({
+  DETAILED_NOTES: 'DETAILED_NOTES',
   STUDY_NOTES: 'STUDY_NOTES',
   LINKEDIN_POST: 'LINKEDIN_POST',
   TWEET_THREAD: 'TWEET_THREAD',
@@ -9,6 +10,10 @@ const ACTION_TYPES = Object.freeze({
 });
 
 const ACTION_PATTERNS = [
+  {
+    type: ACTION_TYPES.DETAILED_NOTES,
+    patterns: [/detailed notes/i, /create detailed notes/i, /make detailed notes/i, /deep notes/i],
+  },
   {
     type: ACTION_TYPES.STUDY_NOTES,
     patterns: [/study notes/i, /exam notes/i, /revision notes/i, /class notes/i],

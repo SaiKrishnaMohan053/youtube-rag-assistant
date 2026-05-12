@@ -168,6 +168,7 @@ const askVideo = asyncHandler(async (req, res) => {
   let answer = '';
   let supportingChunks = [];
   let mode = 'specific_qa';
+  let actionType = null;
 
   if (route.intent === QUESTION_INTENTS.VIDEO_OVERVIEW) {
     mode = 'summary';
@@ -213,6 +214,7 @@ const askVideo = asyncHandler(async (req, res) => {
 
     answer = result.answer;
     supportingChunks = result.supportingChunks;
+    actionType = result.actionType;
   } else {
     mode = 'qa';
 
@@ -241,6 +243,7 @@ const askVideo = asyncHandler(async (req, res) => {
     youtubeVideoId: video.videoId,
     mode,
     intent: route.intent,
+    actionType,
     entity: route.entity || null,
     topic: route.topic || null,
     topK: normalizedTopK,
@@ -249,9 +252,6 @@ const askVideo = asyncHandler(async (req, res) => {
     llmModel: env.llmProvider === 'openai' ? env.openaiModel : env.ollamaModel,
     durationMs: Date.now() - startedAt,
   });
-
-  const actionType =
-    route.intent === QUESTION_INTENTS.ACTION_EXTRACTION ? 'ACTION_EXTRACTION' : null;
 
   return res.status(200).json(
     new ApiResponse(200, 'Answer generated successfully', {

@@ -35,6 +35,10 @@ const TIMESTAMP_PATTERNS = [
 ];
 
 const ACTION_EXTRACTION_PATTERNS = [
+  /create detailed notes/i,
+  /detailed notes/i,
+  /make detailed notes/i,
+  /deep notes/i,
   /create notes/i,
   /make notes/i,
   /study notes/i,
