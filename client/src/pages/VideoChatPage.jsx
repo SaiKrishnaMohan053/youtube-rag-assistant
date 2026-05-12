@@ -15,6 +15,7 @@ import { useParams } from 'react-router-dom';
 import LoadingButton from '../components/LoadingButton';
 import PageLoader from '../components/PageLoader';
 import { askVideoApi, getChatsApi, getVideoApi } from '../api/videoApi';
+import MarkdownAnswer from '../components/MarkdownAnswer';
 
 const VideoChatPage = () => {
   const { id } = useParams();
@@ -89,7 +90,12 @@ const VideoChatPage = () => {
           {chats.map((chat) => (
             <Box key={chat._id} sx={{ border: '1px solid #e0e0e0', borderRadius: 2, p: 2 }}>
               <Typography variant="subtitle2">Q: {chat.question}</Typography>
-              <Typography variant="body1" sx={{ mt: 1 }}>A: {chat.answer}</Typography>
+              <Box sx={{ mt: 1 }}>
+                <Typography variant="body2" fontWeight={700} sx={{ mb: 0.5 }}>
+                  A:
+                </Typography>
+                <MarkdownAnswer text={chat.answer} />
+              </Box>
               <Accordion sx={{ mt: 2 }}>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                   <Typography variant="body2">Supporting Chunks</Typography>

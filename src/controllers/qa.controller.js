@@ -9,6 +9,8 @@ const ChatMessage = require('../models/chatMessage.model');
 const { logInfo } = require('../utils/logger');
 const env = require('../config/env');
 const { routeQuestion, QUESTION_INTENTS } = require('../utils/questionRouter');
+const { buildTimestampPrompt } = require('../services/timestamp.service');
+const { answerFromActionRequest } = require('../services/action.service');
 
 const {
   answerFromVideoSummary,
@@ -123,6 +125,30 @@ const answerFromFaissChunks = async ({ video, query, topK }) => {
   };
 };
 
+const answerFromTimestampChunks = async ({ video, query, topK }) => {
+  const supportingChunks = await buildSearchChunks({
+    video,
+    query,
+    topK,
+  });
+
+  if (!supportingChunks.length) {
+    throw new ApiError(404, 'No relevant timestamp chunks found');
+  }
+
+  const prompt = buildTimestampPrompt({
+    query,
+    chunks: supportingChunks,
+  });
+
+  const answer = await generateAnswer(prompt);
+
+  return {
+    answer,
+    supportingChunks,
+  };
+};
+
 const askVideo = asyncHandler(async (req, res) => {
   const startedAt = Date.now();
 
@@ -166,13 +192,29 @@ const askVideo = asyncHandler(async (req, res) => {
       query: cleanQuery,
       topic: route.topic,
     });
+  } else if (route.intent === QUESTION_INTENTS.TIMESTAMP_QUERY) {
+    mode = 'timestamp_query';
+
+    const result = await answerFromTimestampChunks({
+      video,
+      query: cleanQuery,
+      topK: normalizedTopK,
+    });
+
+    answer = result.answer;
+    supportingChunks = result.supportingChunks;
+  } else if (route.intent === QUESTION_INTENTS.ACTION_EXTRACTION) {
+    mode = 'action_extraction';
+
+    const result = await answerFromActionRequest({
+      video,
+      query: cleanQuery,
+    });
+
+    answer = result.answer;
+    supportingChunks = result.supportingChunks;
   } else {
-    mode =
-      route.intent === QUESTION_INTENTS.ACTION_EXTRACTION
-        ? 'action_extraction'
-        : route.intent === QUESTION_INTENTS.TIMESTAMP_QUERY
-          ? 'timestamp_query'
-          : 'qa';
+    mode = 'qa';
 
     const result = await answerFromFaissChunks({
       video,
@@ -208,6 +250,9 @@ const askVideo = asyncHandler(async (req, res) => {
     durationMs: Date.now() - startedAt,
   });
 
+  const actionType =
+    route.intent === QUESTION_INTENTS.ACTION_EXTRACTION ? 'ACTION_EXTRACTION' : null;
+
   return res.status(200).json(
     new ApiResponse(200, 'Answer generated successfully', {
       chatMessageId: chatMessage._id,
@@ -217,6 +262,7 @@ const askVideo = asyncHandler(async (req, res) => {
       intent: route.intent,
       entity: route.entity || null,
       topic: route.topic || null,
+      actionType,
     })
   );
 });

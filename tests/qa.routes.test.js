@@ -298,7 +298,9 @@ describe('QA routes', () => {
     expect(res.status).toBe(200);
     expect(res.body.data.intent).toBe('ACTION_EXTRACTION');
     expect(res.body.data.mode).toBe('action_extraction');
-    expect(searchVideoEmbeddings).toHaveBeenCalled();
+    expect(res.body.data.actionType).toBe('ACTION_EXTRACTION');
+    expect(searchVideoEmbeddings).not.toHaveBeenCalled();
+    expect(generateAnswer).toHaveBeenCalled();
   });
 
   it('fetches chat history for a video', async () => {
