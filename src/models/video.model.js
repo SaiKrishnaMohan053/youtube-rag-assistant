@@ -1,5 +1,36 @@
 const mongoose = require('mongoose');
 
+const peopleSummarySchema = new mongoose.Schema(
+  {
+    name: { type: String, trim: true },
+    summary: { type: String, default: '' },
+    talkedAbout: [{ type: String, trim: true }],
+  },
+  { _id: false }
+);
+
+const topicSummarySchema = new mongoose.Schema(
+  {
+    name: { type: String, trim: true },
+    summary: { type: String, default: '' },
+    keyPoints: [{ type: String, trim: true }],
+  },
+  { _id: false }
+);
+
+const videoSummarySchema = new mongoose.Schema(
+  {
+    shortSummary: { type: String, default: '' },
+    detailedSummary: { type: String, default: '' },
+    mainTopics: [{ type: String, trim: true }],
+    keyTakeaways: [{ type: String, trim: true }],
+    people: [peopleSummarySchema],
+    topics: [topicSummarySchema],
+    generatedAt: { type: Date, default: null },
+  },
+  { _id: false }
+);
+
 const videoSchema = new mongoose.Schema(
   {
     user: {
@@ -38,6 +69,21 @@ const videoSchema = new mongoose.Schema(
     duration: {
       type: Number,
       default: null,
+    },
+
+    summaryStatus: {
+      type: String,
+      enum: ['pending', 'completed', 'failed'],
+      default: 'pending',
+      index: true,
+    },
+    summaryError: {
+      type: String,
+      default: null,
+    },
+    summary: {
+      type: videoSummarySchema,
+      default: () => ({}),
     },
   },
   { timestamps: true }
