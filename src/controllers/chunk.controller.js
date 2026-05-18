@@ -6,6 +6,7 @@ const ApiResponse = require('../utils/apiResponse');
 const ApiError = require('../utils/apiError');
 const { chunkTranscriptText } = require('../services/chunk.service');
 const { logInfo } = require('../utils/logger');
+const { generateAndSaveVideoSummary } = require('../services/summary.service');
 
 const getOwnedVideo = async (videoIdParam, userId) => {
   if (!mongoose.Types.ObjectId.isValid(videoIdParam)) {
@@ -52,18 +53,39 @@ const createVideoChunks = asyncHandler(async (req, res) => {
 
   await TranscriptChunk.insertMany(docs);
 
+  let summaryStatus = 'pending';
+  let summaryError = null;
+
+  try {
+    await generateAndSaveVideoSummary(video);
+    summaryStatus = 'completed';
+  } catch (error) {
+    summaryStatus = 'failed';
+    summaryError = error.message || 'Summary generation failed';
+
+    logInfo('video.summary.failed_after_chunks', {
+      userId: req.user._id.toString(),
+      videoMongoId: video._id.toString(),
+      youtubeVideoId: video.videoId,
+      error: summaryError,
+    });
+  }
+
   logInfo('video.chunks.created', {
     userId: req.user._id.toString(),
     videoMongoId: video._id.toString(),
     youtubeVideoId: video.videoId,
     chunkCount: chunks.length,
+    summaryStatus,
   });
 
-  return res
-    .status(201)
-    .json(
-      new ApiResponse(201, 'Transcript chunks created successfully', { chunkCount: docs.length })
-    );
+  return res.status(201).json(
+    new ApiResponse(201, 'Transcript chunks created successfully', {
+      chunkCount: docs.length,
+      summaryStatus,
+      summaryError,
+    })
+  );
 });
 
 const getVideoChunks = asyncHandler(async (req, res) => {
