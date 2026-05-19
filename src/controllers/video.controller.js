@@ -109,9 +109,67 @@ const deleteVideo = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, 'Video deleted successfully'));
 });
 
+const getVideoProcessingStatus = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const video = await Video.findOne({ _id: id, user: req.user._id });
+
+  if (!video) {
+    throw new ApiError(404, 'Video not found');
+  }
+
+  const totalChunks = await TranscriptChunk.countDocuments({ video: video._id });
+
+  const completedEmbeddings = await TranscriptChunk.countDocuments({
+    video: video._id,
+    embeddingStatus: 'completed',
+  });
+
+  const failedEmbeddings = await TranscriptChunk.countDocuments({
+    video: video._id,
+    embeddingStatus: 'failed',
+  });
+
+  const summaryReady = video.summaryStatus === 'completed';
+  const embeddingsReady = totalChunks > 0 && completedEmbeddings === totalChunks;
+
+  const ready = summaryReady && embeddingsReady;
+
+  let message = 'Video is ready for chat.';
+
+  if (!summaryReady && !embeddingsReady) {
+    message = 'Generating video summary and indexing transcript chunks. Please wait.';
+  } else if (!summaryReady) {
+    message = 'Generating video summary. Please wait.';
+  } else if (!embeddingsReady) {
+    message = 'Indexing transcript chunks for search. Please wait.';
+  }
+
+  if (failedEmbeddings > 0 || video.summaryStatus === 'failed') {
+    message = 'Video processing failed. Please retry chunking or indexing.';
+  }
+
+  return res.status(200).json(
+    new ApiResponse(200, 'Video processing status fetched successfully', {
+      ready,
+      message,
+      summaryStatus: video.summaryStatus,
+      embeddingStatus: embeddingsReady
+        ? 'completed'
+        : failedEmbeddings > 0
+          ? 'failed'
+          : 'processing',
+      totalChunks,
+      completedEmbeddings,
+      failedEmbeddings,
+    })
+  );
+});
+
 module.exports = {
   processVideo,
   getMyVideos,
   getVideoById,
+  getVideoProcessingStatus,
   deleteVideo,
 };

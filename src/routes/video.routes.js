@@ -4,6 +4,7 @@ const {
   processVideo,
   getMyVideos,
   getVideoById,
+  getVideoProcessingStatus,
   deleteVideo,
 } = require('../controllers/video.controller');
 const { createVideoChunks, getVideoChunks } = require('../controllers/chunk.controller');
@@ -26,6 +27,7 @@ router.post('/:id/ask', askVideo);
 router.get('/:id/chats', getVideoChats);
 
 router.delete('/:id', deleteVideo);
+router.get('/:id/status', getVideoProcessingStatus);
 router.get('/:id', getVideoById);
 
 module.exports = router;

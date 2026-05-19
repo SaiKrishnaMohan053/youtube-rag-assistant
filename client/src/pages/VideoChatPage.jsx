@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import LoadingButton from '../components/LoadingButton';
 import PageLoader from '../components/PageLoader';
-import { askVideoApi, getChatsApi, getVideoApi } from '../api/videoApi';
+import { askVideoApi, getChatsApi, getVideoApi, getVideoStatusApi } from '../api/videoApi';
 import MarkdownAnswer from '../components/MarkdownAnswer';
 
 const VideoChatPage = () => {
@@ -24,13 +24,25 @@ const VideoChatPage = () => {
   const [chats, setChats] = useState([]);
   const [query, setQuery] = useState('');
   const [pageLoading, setPageLoading] = useState(true);
+  const [status, setStatus] = useState(null);
+  const [statusLoading, setStatusLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const loadData = async () => {
-    const [videoResponse, chatResponse] = await Promise.all([getVideoApi(id), getChatsApi(id)]);
+    const [videoResponse, chatResponse, statusResponse] = await Promise.all([getVideoApi(id), getChatsApi(id), getVideoStatusApi(id)]);
     setVideo(videoResponse.data.video);
     setChats(chatResponse.data.chats || []);
+    setStatus(statusResponse.data);
+  };
+
+  const refreshStatus = async () => {
+    try {
+      const statusResponse = await getVideoStatusApi(id);
+      setStatus(statusResponse.data);
+    } catch (_error) {
+      setError('Failed to refresh processing status');
+    }
   };
 
   useEffect(() => {
@@ -47,8 +59,23 @@ const VideoChatPage = () => {
     initChat();
   }, [id]);
 
+  useEffect(() => {
+    if (!status || status.ready) return undefined;
+
+    const intervalId = setInterval(() => {
+      refreshStatus();
+    }, 5000);
+
+    return () => clearInterval(intervalId);
+  }, [id, status?.ready]);
+
   const askQuestion = async () => {
     if (!query.trim()) return;
+
+    if (!status?.ready) {
+      setError(status?.message || 'Video is still processing. Please wait.');
+      return;
+    }
 
     setLoading(true);
     setError('');
@@ -82,9 +109,16 @@ const VideoChatPage = () => {
       <Stack spacing={3}>
         <Typography variant="h4">{video?.title || 'Video Chat'}</Typography>
         {error && <Alert severity="error">{error}</Alert>}
+        {status && !status.ready && (
+          <Alert severity="info">
+            {status.message} This page will update automatically.
+          </Alert>
+        )}
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
           <TextField fullWidth label="Ask a question" value={query} onChange={(e) => setQuery(e.target.value)} disabled={loading} />
-          <LoadingButton loading={loading} onClick={askQuestion} disabled={!query.trim()}>{loading ? "Thinking..." : "Ask"}</LoadingButton>
+          <LoadingButton loading={loading} onClick={askQuestion} disabled={!query.trim() || !status?.ready}>
+            {loading ? "Thinking..." : status?.ready ? "Ask" : "Processing..."}
+          </LoadingButton>
         </Stack>
         <Stack spacing={2}>
           {chats.map((chat) => (
