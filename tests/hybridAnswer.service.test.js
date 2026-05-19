@@ -96,7 +96,7 @@ describe('hybridAnswer.service', () => {
 
     expect(result.strategy).toBe('semantic');
     expect(searchVideoEmbeddings).toHaveBeenCalledWith({
-      videoId: mockVideo.videoId,
+      videoId: mockVideo._id,
       query: 'Create notes about thorium reactors',
       topK: 5,
     });

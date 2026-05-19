@@ -4,7 +4,7 @@ const { indexVideoEmbeddings } = require('./embeddingClient.service');
 const { logInfo, logError } = require('../utils/logger');
 
 const buildEmbeddingPayload = ({ video, chunks }) => ({
-  videoId: video.videoId,
+  videoId: video._id.toString(),
   chunks: chunks.map((chunk) => ({
     chunkId: chunk._id.toString(),
     text: chunk.text,

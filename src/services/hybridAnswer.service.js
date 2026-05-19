@@ -87,7 +87,7 @@ const isBroadActionQuery = (query = '') => {
 
 const getSemanticGroundingChunks = async ({ video, query, topK = 5 }) => {
   const searchResponse = await searchVideoEmbeddings({
-    videoId: video.videoId,
+    videoId: video._id.toString(),
     query,
     topK,
   });

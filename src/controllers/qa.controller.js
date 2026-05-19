@@ -58,7 +58,7 @@ const findOwnedVideo = async (videoIdParam, userId) => {
 
 const buildSearchChunks = async ({ video, query, topK }) => {
   const searchResponse = await searchVideoEmbeddings({
-    videoId: video.videoId,
+    videoId: video._id.toString(),
     query,
     topK,
   });

@@ -40,7 +40,7 @@ const indexVideo = asyncHandler(async (req, res) => {
   }
 
   const payload = {
-    videoId: video.videoId,
+    videoId: video._id.toString(),
     chunks: chunks.map((chunk) => ({
       chunkId: chunk._id.toString(),
       text: chunk.text,
@@ -110,7 +110,7 @@ const searchVideo = asyncHandler(async (req, res) => {
   const normalizedTopK = Math.min(5, Math.max(1, Number.parseInt(topK, 10) || 3));
 
   const serviceResponse = await searchVideoEmbeddings({
-    videoId: video.videoId,
+    videoId: video._id.toString(),
     query: query.trim(),
     topK: normalizedTopK,
   });

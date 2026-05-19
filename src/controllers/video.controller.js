@@ -95,7 +95,7 @@ const deleteVideo = asyncHandler(async (req, res) => {
   }
 
   try {
-    await axios.delete(`$process.env.EMBEDDING_SERVICE_URL/videos/${video.videoId}/index`);
+    await axios.delete(`${process.env.EMBEDDING_SERVICE_URL}/videos/${video._id.toString()}/index`);
   } catch (err) {
     console.warn('FAISS delete failed:', err.response?.data || err.message);
   }
