@@ -19,7 +19,6 @@ import {
   createChunksApi,
   deleteVideoApi,
   getVideosApi,
-  indexVideoApi,
   processVideoApi,
 } from '../api/videoApi';
 
@@ -68,11 +67,8 @@ const DashboardPage = () => {
       setMessage('Creating chunks...');
       await createChunksApi(video._id);
 
-      setMessage('Indexing video...');
-      await indexVideoApi(video._id);
-
       setUrl('');
-      setMessage('Video is ready. You can open chat now.');
+      setMessage('Video is processing in the background. Open chat to see readiness status.');
       await loadVideos();
     } catch (apiError) {
       setError(apiError.response?.data?.message || 'Failed to process video');

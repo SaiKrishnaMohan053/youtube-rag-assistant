@@ -14,19 +14,47 @@ const Navbar = () => {
   return (
     <AppBar position="sticky">
       <Toolbar>
-        <Typography variant="h6" sx={{ flexGrow: 1 }}>
+        <Typography
+          variant="h6"
+          component={RouterLink}
+          to={user ? '/dashboard' : '/guest'}
+          sx={{
+            flexGrow: 1,
+            color: 'inherit',
+            textDecoration: 'none',
+            fontWeight: 700,
+          }}
+        >
           YouTube RAG Assistant
         </Typography>
-        {user && (
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <Button color="inherit" component={RouterLink} to="/dashboard">
-              Dashboard
+
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          {!user && (
+            <Button color="inherit" component={RouterLink} to="/guest">
+              Try Free
             </Button>
-            <Button color="inherit" onClick={onLogout}>
-              Logout
-            </Button>
-          </Box>
-        )}
+          )}
+
+          {user ? (
+            <>
+              <Button color="inherit" component={RouterLink} to="/dashboard">
+                Dashboard
+              </Button>
+              <Button color="inherit" onClick={onLogout}>
+                Logout
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button color="inherit" component={RouterLink} to="/login">
+                Login
+              </Button>
+              <Button color="inherit" component={RouterLink} to="/register">
+                Register
+              </Button>
+            </>
+          )}
+        </Box>
       </Toolbar>
     </AppBar>
   );
