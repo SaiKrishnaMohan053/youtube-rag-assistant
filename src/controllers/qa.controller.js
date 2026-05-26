@@ -117,7 +117,12 @@ const answerFromFaissChunks = async ({ video, query, topK }) => {
     chunks: supportingChunks,
   });
 
-  const answer = await generateAnswer(prompt);
+  const answer = await generateAnswer(prompt, {
+    source: 'auth_rag',
+    videoMongoId: video._id.toString(),
+    youtubeVideoId: video.videoId,
+    mode: 'qa'
+  });
 
   return {
     answer,
@@ -141,7 +146,12 @@ const answerFromTimestampChunks = async ({ video, query, topK }) => {
     chunks: supportingChunks,
   });
 
-  const answer = await generateAnswer(prompt);
+  const answer = await generateAnswer(prompt, {
+    source: 'auth_rag',
+    videoMongoId: video._id.toString(),
+    youtubeVideoId: video.videoId,
+    mode: 'timestamp_query'
+  });
 
   return {
     answer,

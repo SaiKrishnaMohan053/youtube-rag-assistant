@@ -1,6 +1,7 @@
 const { generateAnswer } = require('./llm.service');
 const { getHybridGrounding } = require('./hybridAnswer.service');
 const { ACTION_TYPES, detectActionType } = require('../utils/actionRouter');
+const { source } = require('framer-motion/client');
 
 const buildActionPrompt = ({ query, actionType, hybridContext }) => {
   const baseContext = `
@@ -252,7 +253,13 @@ const answerFromActionRequest = async ({ video, query }) => {
     hybridContext: hybrid.context,
   });
 
-  const answer = await generateAnswer(prompt);
+  const answer = await generateAnswer(prompt, {
+    source: 'auth_rag',
+    videoMongoId: video._id.toString(),
+    youtubeVideoId: video.videoId,
+    mode: 'action_extraction',
+    actionType,
+  });
 
   return {
     answer,

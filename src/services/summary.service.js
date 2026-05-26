@@ -227,7 +227,12 @@ Answer format:
 2. Main points
 `.trim();
 
-  return generateAnswer(prompt);
+  return generateAnswer(prompt, {
+    source: 'auth_summary',
+    videoMongoId: video._id.toString(),
+    youtubeVideoId: video.videoId,
+    mode: 'summary',
+  });
 };
 
 const answerFromEntitySummary = async ({ video, query, entity }) => {
@@ -274,7 +279,13 @@ Rules:
 - Be clear and concise.
 `.trim();
 
-  return generateAnswer(prompt);
+  return generateAnswer(prompt, {
+    source: 'auth_summary',
+    videoMongoId: video._id.toString(),
+    youtubeVideoId: video.videoId,
+    mode: 'entity_overview',
+    entity,
+  });
 };
 
 const answerFromTopicSummary = async ({ video, query, topic }) => {
@@ -321,7 +332,13 @@ Rules:
 - Be clear and concise.
 `.trim();
 
-  return generateAnswer(prompt);
+  return generateAnswer(prompt, {
+    source: 'auth_summary',
+    videoMongoId: video._id.toString(),
+    youtubeVideoId: video.videoId,
+    mode: 'topic_overview',
+    topic,
+  });
 };
 
 module.exports = {

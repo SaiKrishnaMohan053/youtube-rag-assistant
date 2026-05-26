@@ -2,6 +2,7 @@ const axios = require('axios');
 const OpenAI = require('openai');
 const env = require('../config/env');
 const ApiError = require('../utils/apiError');
+const { logMetric, logError, getDurationMs } = require('../utils/logger');
 
 const ollamaClient = axios.create({
   baseURL: env.ollamaBaseUrl,
@@ -72,11 +73,36 @@ const generateWithOpenAI = async (prompt) => {
   }
 };
 
-const generateAnswer = async (prompt) => {
-  if (env.llmProvider === 'openai') {
-    return generateWithOpenAI(prompt);
+const generateAnswer = async (prompt, meta = {}) => {
+  const startedAt = Date.now();
+  const provider = env.llmProvider;
+
+  try {
+    const answer = provider === 'openai' 
+      ? await generateWithOpenAI(prompt)
+      : await generateWithOllama(prompt);
+
+    logMetric('llm.generation.completed', {
+      provider,
+      model: provider === 'openai' ? env.openaiModel : env.ollamaModel,
+      promptChars: prompt.length,
+      answerChars: answer.length,
+      durationMs: getDurationMs(startedAt),
+      status: 'success',
+      ...meta,
+    });
+    return answer;
+  } catch (error) {
+    logError('llm.generation.failed', {
+      provider,
+      model: provider === 'openai' ? env.openaiModel : env.ollamaModel,
+      promptChars: prompt.length,
+      durationMs: getDurationMs(startedAt),
+      error: error.message,
+      ...meta,
+    });
+    throw error;
   }
-  return generateWithOllama(prompt);
 };
 
 module.exports = {
