@@ -6,7 +6,7 @@ const adminOnly = asyncHandler(async (req, _res, next) => {
     throw new ApiError(401, 'Authentication required');
   }
 
-  if (!req.user.isAdmin) {
+  if (req.user.role !== 'admin') {
     throw new ApiError(403, 'Admin access required');
   }
 

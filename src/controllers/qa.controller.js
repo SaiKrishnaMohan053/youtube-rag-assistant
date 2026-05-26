@@ -42,12 +42,15 @@ const truncate = (text = '', max = 900) => {
   return clean.length > max ? `${clean.slice(0, max)}...` : clean;
 };
 
-const findOwnedVideo = async (videoIdParam, userId) => {
+const findOwnedVideo = async (videoIdParam, user) => {
   if (!mongoose.Types.ObjectId.isValid(videoIdParam)) {
     throw new ApiError(400, 'Invalid video id');
   }
 
-  const video = await Video.findOne({ _id: videoIdParam, user: userId });
+  const query =
+    user.role === 'admin' ? { _id: videoIdParam } : { _id: videoIdParam, user: user._id };
+
+  const video = await Video.findOne(query);
 
   if (!video) {
     throw new ApiError(404, 'Video not found');
@@ -162,7 +165,7 @@ const answerFromTimestampChunks = async ({ video, query, topK }) => {
 const askVideo = asyncHandler(async (req, res) => {
   const startedAt = Date.now();
 
-  const video = await findOwnedVideo(req.params.id, req.user._id);
+  const video = await findOwnedVideo(req.params.id, req.user);
 
   const { query, topK = 6 } = req.body;
 
@@ -278,7 +281,7 @@ const askVideo = asyncHandler(async (req, res) => {
 });
 
 const getVideoChats = asyncHandler(async (req, res) => {
-  const video = await findOwnedVideo(req.params.id, req.user._id);
+  const video = await findOwnedVideo(req.params.id, req.user);
 
   const chats = await ChatMessage.find({
     user: req.user._id,

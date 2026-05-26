@@ -14,7 +14,7 @@ const safeMeta = (meta = {}) =>
 
 const persistLog = async (payload) => {
   try {
-    if (process.env.PERSIST_METRICS !== true) return;
+    if (String(process.env.PERSIST_METRICS).toLowerCase() !== 'true') return;
 
     const MetricLog = require('../models/metricLog.model');
 
@@ -26,7 +26,9 @@ const persistLog = async (payload) => {
       createdAt: payload.timestamp ? new Date(payload.timestamp) : new Date(),
     });
   } catch {
-    // Never break app because logging failed
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('Metric persistence failed:', error.message);
+    }
   }
 };
 

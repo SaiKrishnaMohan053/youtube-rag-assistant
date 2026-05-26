@@ -16,8 +16,15 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   const completeLogin = (response) => {
-    login(response.data.token, response.data.user);
-    navigate('/dashboard');
+    const authUser = response.data.user;
+
+    login(response.data.token, authUser);
+
+    if (authUser.role === 'admin') {
+      navigate('/admin');
+    } else {
+      navigate('/dashboard');
+    }
   };
 
   const handleSubmit = async (event) => {
