@@ -1,7 +1,8 @@
 const TranscriptChunk = require('../models/transcriptChunk.model');
 const { generateAndSaveVideoSummary } = require('./summary.service');
 const { indexVideoEmbeddings } = require('./embeddingClient.service');
-const { logInfo, logError } = require('../utils/logger');
+const { logInfo, logError, logMetric, getDurationMs } = require('../utils/logger');
+const { stat } = require('node:fs');
 
 const buildEmbeddingPayload = ({ video, chunks }) => ({
   videoId: video._id.toString(),
@@ -17,14 +18,25 @@ const buildEmbeddingPayload = ({ video, chunks }) => ({
 const runVideoPostChunkJobs = async ({ video, userId }) => {
   const startedAt = Date.now();
 
+  const baseMeta = {
+    userId: userId.toString(),
+    videoMongoId: video._id.toString(),
+    youtubeVideoId: video.videoId,
+    jobType: 'video_post_chunk_jobs',
+  };
+
   try {
-    logInfo('video.post_chunk_jobs.started', {
-      userId: userId.toString(),
-      videoMongoId: video._id.toString(),
-      youtubeVideoId: video.videoId,
-    });
+    logInfo('video.post_chunk_jobs.started', baseMeta);
+
+    const summaryStartedAt = Date.now();
 
     await generateAndSaveVideoSummary(video);
+
+    logMetric('video.summary_job.completed', {
+      ...baseMeta,
+      durationMs: getDurationMs(summaryStartedAt),
+      status: 'success',
+    });
 
     const chunks = await TranscriptChunk.find({ video: video._id }).sort({ chunkIndex: 1 });
 
@@ -33,7 +45,16 @@ const runVideoPostChunkJobs = async ({ video, userId }) => {
       chunks,
     });
 
+    const embeddingStartedAt = Date.now();
+
     await indexVideoEmbeddings(payload);
+
+    logMetric('video.embedding_job.completed', {
+      ...baseMeta,
+      chunkCount: chunks.length,
+      durationMs: getDurationMs(embeddingStartedAt),
+      status: 'success',
+    });
 
     await TranscriptChunk.updateMany(
       { video: video._id },
@@ -45,13 +66,14 @@ const runVideoPostChunkJobs = async ({ video, userId }) => {
       }
     );
 
-    logInfo('video.post_chunk_jobs.completed', {
-      userId: userId.toString(),
-      videoMongoId: video._id.toString(),
-      youtubeVideoId: video.videoId,
+    logMetric('video.post_chunk_jobs.completed', {
+      ...baseMeta,
       chunkCount: chunks.length,
-      durationMs: Date.now() - startedAt,
-    });
+      durationMs: getDurationMs(startedAt),
+      summaryStatus: 'completed',
+      embeddingStatus: 'completed',
+      status: 'success',
+    })
   } catch (error) {
     await TranscriptChunk.updateMany(
       { video: video._id },
@@ -64,10 +86,11 @@ const runVideoPostChunkJobs = async ({ video, userId }) => {
     );
 
     logError('video.post_chunk_jobs.failed', {
-      userId: userId.toString(),
-      videoMongoId: video._id.toString(),
-      youtubeVideoId: video.videoId,
-      durationMs: Date.now() - startedAt,
+      ...baseMeta,
+      durationMs: getDurationMs(startedAt),
+      summaryStatus: 'unknown',
+      embeddingStatus: 'failed',
+      status: 'failed',
       error: error.message,
     });
   }
@@ -80,6 +103,8 @@ const startVideoPostChunkJobs = ({ video, userId }) => {
         userId: userId.toString(),
         videoMongoId: video._id.toString(),
         youtubeVideoId: video.videoId,
+        jobType: 'video_post_chunk_jobs',
+        status: 'failed',
         error: error.message,
       });
     });
