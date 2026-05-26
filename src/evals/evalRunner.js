@@ -16,8 +16,7 @@ const containsRefusal = (answer = '') => {
   );
 };
 
-const hasTimestampFormat = (answer = '') =>
-  /\b\d{1,2}:\d{2}\b/.test(String(answer));
+const hasTimestampFormat = (answer = '') => /\b\d{1,2}:\d{2}\b/.test(String(answer));
 
 const getLatencyScore = (latencyMs = 0) => {
   if (latencyMs <= 3000) return 1;
@@ -52,7 +51,11 @@ const getGroundednessScore = ({ answer = '', supportingChunks = [], category }) 
     return containsRefusal(answer) ? 0.6 : 0.8;
   }
 
-  if (category === 'video_overview' || category === 'entity_overview' || category === 'topic_overview') {
+  if (
+    category === 'video_overview' ||
+    category === 'entity_overview' ||
+    category === 'topic_overview'
+  ) {
     return containsRefusal(answer) ? 0.5 : 0.8;
   }
 
@@ -82,12 +85,7 @@ const getHallucinationRisk = ({ answer = '', supportingChunks = [] }) => {
   return 'low';
 };
 
-const getWeightedScore = ({
-  relevanceScore,
-  groundednessScore,
-  completenessScore,
-  latencyScore,
-}) =>
+const getWeightedScore = ({ relevanceScore, groundednessScore, completenessScore, latencyScore }) =>
   Number(
     (
       relevanceScore * 0.3 +
@@ -110,18 +108,12 @@ const keywordScore = (answer = '', keywords = []) => {
 
   const clean = String(answer).toLowerCase();
 
-  const matches = keywords.filter((keyword) =>
-    clean.includes(String(keyword).toLowerCase())
-  );
+  const matches = keywords.filter((keyword) => clean.includes(String(keyword).toLowerCase()));
 
   return matches.length / keywords.length;
 };
 
-const runAuthEval = async ({
-  caseItem,
-  videoId,
-  token,
-}) => {
+const runAuthEval = async ({ caseItem, videoId, token }) => {
   const startedAt = now();
 
   const response = await axios.post(
@@ -144,16 +136,18 @@ const runAuthEval = async ({
   const supportingChunks = Array.isArray(data.supportingChunks) ? data.supportingChunks : [];
 
   const relevanceScore = keywordScore(answer, caseItem.expectedKeywords);
-  
+
   const groundednessJudge = await judgeGroundedness({
     answer,
     supportingChunks,
   });
-  const groundednessScore = groundednessJudge?.score ?? getGroundednessScore({
-    answer,
-    supportingChunks,
-    category: caseItem.category,
-  });
+  const groundednessScore =
+    groundednessJudge?.score ??
+    getGroundednessScore({
+      answer,
+      supportingChunks,
+      category: caseItem.category,
+    });
 
   const completenessScore = getCompletenessScore({
     answer,
@@ -167,8 +161,7 @@ const runAuthEval = async ({
     latencyScore,
   });
 
-  const timestampPass =
-    caseItem.category === 'timestamp_query' ? hasTimestampFormat(answer) : true;
+  const timestampPass = caseItem.category === 'timestamp_query' ? hasTimestampFormat(answer) : true;
 
   const intentPass = data.intent === caseItem.expectedIntent;
   const modePass = data.mode === caseItem.expectedMode;
@@ -199,18 +192,12 @@ const runAuthEval = async ({
   };
 };
 
-const runGuestSummaryEval = async ({
-  caseItem,
-  url,
-}) => {
+const runGuestSummaryEval = async ({ caseItem, url }) => {
   const startedAt = now();
 
-  const response = await axios.post(
-    `${BASE_URL}/api/guest/summary`,
-    {
-      url,
-    }
-  );
+  const response = await axios.post(`${BASE_URL}/api/guest/summary`, {
+    url,
+  });
 
   const latencyMs = now() - startedAt;
 
@@ -253,19 +240,13 @@ const runGuestSummaryEval = async ({
   };
 };
 
-const runGuestQaEval = async ({
-  caseItem,
-  sessionId,
-}) => {
+const runGuestQaEval = async ({ caseItem, sessionId }) => {
   const startedAt = now();
 
-  const response = await axios.post(
-    `${BASE_URL}/api/guest/ask`,
-    {
-      sessionId,
-      query: caseItem.question,
-    }
-  );
+  const response = await axios.post(`${BASE_URL}/api/guest/ask`, {
+    sessionId,
+    query: caseItem.question,
+  });
 
   const latencyMs = now() - startedAt;
 
@@ -307,11 +288,7 @@ const runGuestQaEval = async ({
   };
 };
 
-const runEvalSuite = async ({
-  videoId,
-  token,
-  guestUrl,
-}) => {
+const runEvalSuite = async ({ videoId, token, guestUrl }) => {
   const results = [];
   let guestSessionId = null;
 
@@ -332,10 +309,7 @@ const runEvalSuite = async ({
         });
 
         guestSessionId = result.sessionId;
-      } else if (
-        caseItem.category === 'guest_qa' &&
-        guestSessionId
-      ) {
+      } else if (caseItem.category === 'guest_qa' && guestSessionId) {
         result = await runGuestQaEval({
           caseItem,
           sessionId: guestSessionId,
@@ -350,9 +324,7 @@ const runEvalSuite = async ({
         id: caseItem.id,
         category: caseItem.category,
         passed: false,
-        error:
-          error.response?.data?.message ||
-          error.message,
+        error: error.response?.data?.message || error.message,
       });
     }
   }
@@ -363,12 +335,7 @@ const runEvalSuite = async ({
     total: results.length,
     passed: passCount,
     failed: results.length - passCount,
-    passRate:
-      results.length > 0
-        ? Number(
-            ((passCount / results.length) * 100).toFixed(2)
-          )
-        : 0,
+    passRate: results.length > 0 ? Number(((passCount / results.length) * 100).toFixed(2)) : 0,
     results,
   };
 };

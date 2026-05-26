@@ -1,6 +1,11 @@
 const { Router } = require('express');
 const { protect } = require('../middleware/auth.middleware');
-const { runEvals, getEvalReports, getEvalReport, getEvalStatsSummary } = require('../controllers/eval.controller');
+const {
+  runEvals,
+  getEvalReports,
+  getEvalReport,
+  getEvalStatsSummary,
+} = require('../controllers/eval.controller');
 const { adminOnly } = require('../middleware/admin.middleware');
 
 const router = Router();

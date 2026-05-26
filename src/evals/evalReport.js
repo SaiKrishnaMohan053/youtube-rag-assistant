@@ -14,34 +14,26 @@ const buildEvalConsoleReport = (report) => {
   for (const result of report.results) {
     const icon = result.passed ? 'PASS' : 'FAIL';
 
-    lines.push(
-      `${icon} | ${result.id} | ${result.category}`
-    );
+    lines.push(`${icon} | ${result.id} | ${result.category}`);
 
     if (result.grade) {
       lines.push(
         `   Grade=${result.grade} ` +
-        `Weighted=${result.weightedScore} ` +
-        `Latency=${result.latencyMs}ms`
+          `Weighted=${result.weightedScore} ` +
+          `Latency=${result.latencyMs}ms`
       );
     }
 
     if (result.intent) {
-      lines.push(
-        `   Intent=${result.intent} Mode=${result.mode}`
-      );
+      lines.push(`   Intent=${result.intent} Mode=${result.mode}`);
     }
 
     if (result.supportingChunkCount !== undefined) {
-      lines.push(
-        `   Chunks=${result.supportingChunkCount}`
-      );
+      lines.push(`   Chunks=${result.supportingChunkCount}`);
     }
 
     if (result.hallucinationRisk) {
-      lines.push(
-        `   HallucinationRisk=${result.hallucinationRisk}`
-      );
+      lines.push(`   HallucinationRisk=${result.hallucinationRisk}`);
     }
 
     if (result.error) {

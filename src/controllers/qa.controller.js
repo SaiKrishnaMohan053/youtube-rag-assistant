@@ -121,7 +121,7 @@ const answerFromFaissChunks = async ({ video, query, topK }) => {
     source: 'auth_rag',
     videoMongoId: video._id.toString(),
     youtubeVideoId: video.videoId,
-    mode: 'qa'
+    mode: 'qa',
   });
 
   return {
@@ -150,7 +150,7 @@ const answerFromTimestampChunks = async ({ video, query, topK }) => {
     source: 'auth_rag',
     videoMongoId: video._id.toString(),
     youtubeVideoId: video.videoId,
-    mode: 'timestamp_query'
+    mode: 'timestamp_query',
   });
 
   return {

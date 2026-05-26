@@ -21,18 +21,18 @@ const normalizeAxiosError = (error, fallbackMessage) => {
 
 const getEmbeddingHealth = async () => {
   const startedAt = Date.now();
-  
+
   try {
     const { data } = await client.get('/health');
-    logMetric('embedding.health.completed', { 
+    logMetric('embedding.health.completed', {
       durationMs: getDurationMs(startedAt),
       status: 'success',
     });
     return data;
   } catch (error) {
     logError('embedding.health.failed', {
-      durationMs: getDurationMs(startedAt), 
-      error: error.message 
+      durationMs: getDurationMs(startedAt),
+      error: error.message,
     });
     throw normalizeAxiosError(error, 'Failed to check embedding service health');
   }
@@ -40,17 +40,17 @@ const getEmbeddingHealth = async () => {
 
 const indexVideoEmbeddings = async (payload) => {
   const startedAt = Date.now();
-  
+
   try {
     const { data } = await client.post('/index-video', payload);
-    
-    logMetric('embedding.index.completed', { 
+
+    logMetric('embedding.index.completed', {
       durationMs: getDurationMs(startedAt),
       videoId: payload.videoId,
       chunkCount: payload.chunks.length || 0,
       status: 'success',
     });
-    
+
     return data;
   } catch (error) {
     logError('embedding.index.failed', {
@@ -66,10 +66,10 @@ const indexVideoEmbeddings = async (payload) => {
 
 const searchVideoEmbeddings = async (payload) => {
   const startedAt = Date.now();
-  
+
   try {
     const { data } = await client.post('/search', payload);
-    logMetric('embedding.search.completed', { 
+    logMetric('embedding.search.completed', {
       durationMs: getDurationMs(startedAt),
       videoId: payload.videoId,
       topK: payload.topK,

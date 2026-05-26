@@ -1,7 +1,9 @@
 const { generateAnswer } = require('../services/llm.service');
 
 const truncate = (text = '', max = 4000) => {
-  const clean = String(text || '').replace(/\s+/g, ' ').trim();
+  const clean = String(text || '')
+    .replace(/\s+/g, ' ')
+    .trim();
   return clean.length > max ? `${clean.slice(0, max)}...` : clean;
 };
 

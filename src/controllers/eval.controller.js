@@ -4,12 +4,17 @@ const ApiError = require('../utils/apiError');
 const { runEvalSuite } = require('../evals/evalRunner');
 const { logMetric, logError } = require('../utils/logger');
 const { buildEvalConsoleReport } = require('../evals/evalReport');
-const { saveEvalReport, listEvalReports, getEvalReportByFileName, getEvalStats } = require('../evals/evalReporterStore');
+const {
+  saveEvalReport,
+  listEvalReports,
+  getEvalReportByFileName,
+  getEvalStats,
+} = require('../evals/evalReporterStore');
 
 const runEvals = asyncHandler(async (req, res) => {
   const { videoId, guestUrl } = req.body;
-  const authToken = req.headers.authorization?.replace('Bearer ', '')
-  
+  const authToken = req.headers.authorization?.replace('Bearer ', '');
+
   if (!videoId) {
     throw new ApiError(400, 'videoId is required');
   }
@@ -25,7 +30,7 @@ const runEvals = asyncHandler(async (req, res) => {
     const savedReport = saveEvalReport({
       report,
       videoId,
-    }) 
+    });
 
     logMetric('eval.run.completed', {
       videoId,

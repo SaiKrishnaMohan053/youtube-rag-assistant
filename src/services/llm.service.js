@@ -78,9 +78,8 @@ const generateAnswer = async (prompt, meta = {}) => {
   const provider = env.llmProvider;
 
   try {
-    const answer = provider === 'openai' 
-      ? await generateWithOpenAI(prompt)
-      : await generateWithOllama(prompt);
+    const answer =
+      provider === 'openai' ? await generateWithOpenAI(prompt) : await generateWithOllama(prompt);
 
     logMetric('llm.generation.completed', {
       provider,

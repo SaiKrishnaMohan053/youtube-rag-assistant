@@ -73,7 +73,7 @@ const runVideoPostChunkJobs = async ({ video, userId }) => {
       summaryStatus: 'completed',
       embeddingStatus: 'completed',
       status: 'success',
-    })
+    });
   } catch (error) {
     await TranscriptChunk.updateMany(
       { video: video._id },

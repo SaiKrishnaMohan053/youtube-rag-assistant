@@ -24,11 +24,11 @@ const persistLog = async (payload) => {
       service: payload.service,
       meta: payload,
       createdAt: payload.timestamp ? new Date(payload.timestamp) : new Date(),
-    })
+    });
   } catch {
     // Never break app because logging failed
   }
-}
+};
 
 const writeLog = (level, event, meta = {}) => {
   const payload = {
