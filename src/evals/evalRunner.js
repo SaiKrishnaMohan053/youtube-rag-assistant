@@ -6,6 +6,20 @@ const BASE_URL = process.env.EVAL_BASE_URL || 'http://localhost:5000';
 
 const now = () => Date.now();
 
+const getEvalErrorMessage = (error) => {
+  const data = error.response?.data;
+
+  if (data?.message) return data.message;
+  if (data?.error) return data.error;
+  if (data?.detail) return data.detail;
+
+  if (typeof data === 'string') return data;
+
+  if (error.message) return error.message;
+
+  return 'Eval case failed';
+};
+
 const containsRefusal = (answer = '') => {
   const clean = String(answer).toLowerCase();
 
@@ -293,6 +307,8 @@ const runEvalSuite = async ({ videoId, token, guestUrl }) => {
   let guestSessionId = null;
 
   for (const caseItem of EVAL_CASES) {
+    const caseStartedAt = now();
+
     try {
       let result;
 
@@ -303,17 +319,39 @@ const runEvalSuite = async ({ videoId, token, guestUrl }) => {
           token,
         });
       } else if (caseItem.category === 'guest_summary') {
-        result = await runGuestSummaryEval({
-          caseItem,
-          url: guestUrl,
-        });
+        if (!guestUrl?.trim()) {
+          result = {
+            id: caseItem.id,
+            category: caseItem.category,
+            passed: false,
+            skipped: true,
+            error: 'Guest URL not provided. Guest summary eval skipped.',
+            latencyMs: now() - caseStartedAt,
+          };
+        } else {
+          result = await runGuestSummaryEval({
+            caseItem,
+            url: guestUrl,
+          });
 
-        guestSessionId = result.sessionId;
-      } else if (caseItem.category === 'guest_qa' && guestSessionId) {
-        result = await runGuestQaEval({
-          caseItem,
-          sessionId: guestSessionId,
-        });
+          guestSessionId = result.sessionId;
+        }
+      } else if (caseItem.category === 'guest_qa') {
+        if (!guestSessionId) {
+          result = {
+            id: caseItem.id,
+            category: caseItem.category,
+            passed: false,
+            skipped: true,
+            error: 'Guest session not available. Guest QA eval skipped.',
+            latencyMs: now() - caseStartedAt,
+          };
+        } else {
+          result = await runGuestQaEval({
+            caseItem,
+            sessionId: guestSessionId,
+          });
+        }
       }
 
       if (result) {
@@ -324,7 +362,9 @@ const runEvalSuite = async ({ videoId, token, guestUrl }) => {
         id: caseItem.id,
         category: caseItem.category,
         passed: false,
-        error: error.response?.data?.message || error.message,
+        error: getEvalErrorMessage(error),
+        statusCode: error.response?.status || null,
+        latencyMs: now() - caseStartedAt,
       });
     }
   }
