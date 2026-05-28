@@ -14,7 +14,9 @@ from pydantic import BaseModel, Field
 MODEL_NAME = "text-embedding-3-small"
 
 BASE_DIR = Path(__file__).resolve().parent
-VECTOR_STORE_DIR = BASE_DIR / "vector_store"
+
+VECTOR_STORE_DIR = Path(os.getenv("FAISS_INDEX_DIR", str(BASE_DIR / "vector_store"))).resolve()
+
 VECTOR_STORE_DIR.mkdir(parents=True, exist_ok=True)
 
 VIDEO_ID_REGEX = re.compile(r"^[A-Za-z0-9_-]{1,64}$")

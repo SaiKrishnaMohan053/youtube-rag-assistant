@@ -3,7 +3,7 @@ const Video = require('../models/video.model');
 const asyncHandler = require('../utils/asyncHandler');
 const ApiResponse = require('../utils/apiResponse');
 const ApiError = require('../utils/apiError');
-const { searchVideoEmbeddings } = require('../services/embeddingClient.service');
+const { searchVideoEmbeddingsWithAutoReindex } = require('../services/ragRetrieval.service');
 const { generateAnswer } = require('../services/llm.service');
 const ChatMessage = require('../models/chatMessage.model');
 const { logInfo } = require('../utils/logger');
@@ -60,8 +60,8 @@ const findOwnedVideo = async (videoIdParam, user) => {
 };
 
 const buildSearchChunks = async ({ video, query, topK }) => {
-  const searchResponse = await searchVideoEmbeddings({
-    videoId: video._id.toString(),
+  const searchResponse = await searchVideoEmbeddingsWithAutoReindex({
+    video,
     query,
     topK,
   });
