@@ -1,102 +1,74 @@
-const fs = require('fs');
-const path = require('path');
+const EvalReport = require('../models/evalReport.model');
 
-const REPORT_DIR = path.join(__dirname, 'reports');
-
-const ensureReportDir = () => {
-  if (!fs.existsSync(REPORT_DIR)) {
-    fs.mkdirSync(REPORT_DIR, { recursive: true });
-  }
+const buildFileName = (videoId) => {
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  return `eval-${videoId}-${timestamp}.json`;
 };
 
-const sanitizeFileName = (fileName = '') => {
-  if (fileName.includes('..') || fileName.includes('/') || fileName.includes('\\')) {
+const saveEvalReport = async ({ report, videoId }) => {
+  const generatedAt = new Date();
+  const fileName = buildFileName(videoId);
+
+  const payload = {
+    videoId,
+    generatedAt: generatedAt.toISOString(),
+    ...report,
+  };
+
+  const saved = await EvalReport.create({
+    fileName,
+    videoId,
+    generatedAt,
+    total: report.total || 0,
+    passed: report.passed || 0,
+    failed: report.failed || 0,
+    passRate: report.passRate || 0,
+    results: report.results || [],
+    report: payload,
+  });
+
+  return {
+    fileName: saved.fileName,
+    reportId: saved._id.toString(),
+  };
+};
+
+const listEvalReports = async () => {
+  const reports = await EvalReport.find({})
+    .sort({ generatedAt: -1 })
+    .select('fileName videoId generatedAt total passed failed passRate createdAt updatedAt')
+    .lean();
+
+  return reports.map((item) => ({
+    fileName: item.fileName,
+    createdAt: item.createdAt,
+    modifiedAt: item.updatedAt,
+    sizeBytes: JSON.stringify(item).length,
+    summary: {
+      videoId: item.videoId,
+      generatedAt: item.generatedAt,
+      total: item.total,
+      passed: item.passed,
+      failed: item.failed,
+      passRate: item.passRate,
+    },
+  }));
+};
+
+const getEvalReportByFileName = async (fileName) => {
+  if (!fileName || fileName.includes('..') || fileName.includes('/') || fileName.includes('\\')) {
     return null;
   }
 
-  if (!fileName.endsWith('.json')) return null;
+  const doc = await EvalReport.findOne({ fileName }).lean();
 
-  return fileName;
+  if (!doc) return null;
+
+  return doc.report;
 };
 
-const saveEvalReport = ({ report, videoId }) => {
-  ensureReportDir();
-
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const fileName = `eval-${videoId}-${timestamp}.json`;
-  const filePath = path.join(REPORT_DIR, fileName);
-
-  fs.writeFileSync(
-    filePath,
-    JSON.stringify(
-      {
-        videoId,
-        generatedAt: new Date().toISOString(),
-        ...report,
-      },
-      null,
-      2
-    )
-  );
-
-  return { fileName, filePath };
-};
-
-const listEvalReports = () => {
-  ensureReportDir();
-
-  return fs
-    .readdirSync(REPORT_DIR)
-    .filter((fileName) => fileName.endsWith('.json'))
-    .map((fileName) => {
-      const filePath = path.join(REPORT_DIR, fileName);
-      const stats = fs.statSync(filePath);
-
-      let summary = null;
-
-      try {
-        const parsed = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-
-        summary = {
-          videoId: parsed.videoId,
-          generatedAt: parsed.generatedAt,
-          total: parsed.total,
-          passed: parsed.passed,
-          failed: parsed.failed,
-          passRate: parsed.passRate,
-        };
-      } catch {
-        summary = { parseError: true };
-      }
-
-      return {
-        fileName,
-        createdAt: stats.birthtime,
-        modifiedAt: stats.mtime,
-        sizeBytes: stats.size,
-        summary,
-      };
-    })
-    .sort((a, b) => new Date(b.modifiedAt) - new Date(a.modifiedAt));
-};
-
-const getEvalReportByFileName = (fileName) => {
-  ensureReportDir();
-
-  const safeName = sanitizeFileName(fileName);
-  if (!safeName) return null;
-
-  const filePath = path.join(REPORT_DIR, safeName);
-
-  if (!fs.existsSync(filePath)) return null;
-
-  return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-};
-
-const getEvalStats = () => {
-  const reports = listEvalReports()
-    .map((report) => getEvalReportByFileName(report.fileName))
-    .filter(Boolean);
+const getEvalStats = async () => {
+  const reports = await EvalReport.find({}).sort({ generatedAt: -1 }).lean();
 
   if (!reports.length) {
     return {
@@ -107,13 +79,17 @@ const getEvalStats = () => {
       hallucinationRiskTotals: {},
       slowestCategory: null,
       bestCategory: null,
+      categories: [],
+      recentReports: [],
     };
   }
 
-  const allResults = reports.flatMap((report) => report.results || []);
+  const normalizedReports = reports.map((doc) => doc.report || doc);
+  const allResults = normalizedReports.flatMap((report) => report.results || []);
 
   const avgPassRate =
-    reports.reduce((sum, report) => sum + Number(report.passRate || 0), 0) / reports.length;
+    normalizedReports.reduce((sum, report) => sum + Number(report.passRate || 0), 0) /
+    normalizedReports.length;
 
   const latencyItems = allResults.filter((item) => typeof item.latencyMs === 'number');
 
@@ -159,11 +135,13 @@ const getEvalStats = () => {
     avgWeightedScore: Number((item.totalWeightedScore / item.count).toFixed(2)),
   }));
 
-  const slowestCategory = [...categories].sort((a, b) => b.avgLatencyMs - a.avgLatencyMs)[0];
-  const bestCategory = [...categories].sort((a, b) => b.avgWeightedScore - a.avgWeightedScore)[0];
+  const slowestCategory =
+    [...categories].sort((a, b) => b.avgLatencyMs - a.avgLatencyMs)[0] || null;
+  const bestCategory =
+    [...categories].sort((a, b) => b.avgWeightedScore - a.avgWeightedScore)[0] || null;
 
   return {
-    reportCount: reports.length,
+    reportCount: normalizedReports.length,
     avgPassRate: Number(avgPassRate.toFixed(2)),
     avgLatencyMs,
     gradeDistribution,
@@ -171,7 +149,7 @@ const getEvalStats = () => {
     slowestCategory,
     bestCategory,
     categories,
-    recentReports: reports.slice(0, 10).map((report) => ({
+    recentReports: normalizedReports.slice(0, 10).map((report) => ({
       videoId: report.videoId,
       generatedAt: report.generatedAt,
       passRate: report.passRate,

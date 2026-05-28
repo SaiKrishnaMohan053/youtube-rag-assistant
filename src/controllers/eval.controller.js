@@ -27,7 +27,7 @@ const runEvals = asyncHandler(async (req, res) => {
     });
 
     console.log(buildEvalConsoleReport(report));
-    const savedReport = saveEvalReport({
+    const savedReport = await saveEvalReport({
       report,
       videoId,
     });
@@ -59,7 +59,7 @@ const runEvals = asyncHandler(async (req, res) => {
 });
 
 const getEvalReport = asyncHandler(async (req, res) => {
-  const report = getEvalReportByFileName(req.params.fileName);
+  const report = await getEvalReportByFileName(req.params.fileName);
 
   if (!report) {
     throw new ApiError(404, 'Eval report not found');
@@ -73,7 +73,7 @@ const getEvalReport = asyncHandler(async (req, res) => {
 });
 
 const getEvalStatsSummary = asyncHandler(async (_req, res) => {
-  const stats = getEvalStats();
+  const stats = await getEvalStats();
 
   return res.status(200).json(
     new ApiResponse(200, 'Eval stats fetched successfully', {
@@ -83,7 +83,7 @@ const getEvalStatsSummary = asyncHandler(async (_req, res) => {
 });
 
 const getEvalReports = asyncHandler(async (_req, res) => {
-  const reports = listEvalReports();
+  const reports = await listEvalReports();
 
   return res.status(200).json(
     new ApiResponse(200, 'Eval reports fetched successfully', {
