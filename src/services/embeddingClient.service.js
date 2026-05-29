@@ -88,8 +88,18 @@ const searchVideoEmbeddings = async (payload) => {
   }
 };
 
+const getVideoIndexStatus = async (videoId) => {
+  try {
+    const { data } = await client.get(`/videos/${videoId}/index/status`);
+    return data;
+  } catch (error) {
+    throw normalizeAxiosError(error, 'Failed to fetch video index status');
+  }
+};
+
 module.exports = {
   getEmbeddingHealth,
   indexVideoEmbeddings,
   searchVideoEmbeddings,
+  getVideoIndexStatus,
 };

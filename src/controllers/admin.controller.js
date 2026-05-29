@@ -5,6 +5,7 @@ const TranscriptChunk = require('../models/transcriptChunk.model');
 const ApiError = require('../utils/apiError');
 const ApiResponse = require('../utils/apiResponse');
 const asyncHandler = require('../utils/asyncHandler');
+const { getVideoIndexStatus } = require('../services/embeddingClient.service');
 
 const getEmbeddingCounts = async (match = {}) => {
   const counts = await TranscriptChunk.aggregate([
@@ -220,6 +221,20 @@ const getAdminVideoChunks = asyncHandler(async (req, res) => {
     { pending: 0, completed: 0, failed: 0 }
   );
 
+  let faissIndexStatus = {
+    indexed: false,
+    error: null,
+  };
+
+  try {
+    faissIndexStatus = await getVideoIndexStatus(video._id.toString());
+  } catch (error) {
+    faissIndexStatus = {
+      indexed: false,
+      error: error.message,
+    };
+  }
+
   return res.status(200).json(
     new ApiResponse(200, 'Admin video chunks fetched successfully', {
       video: {
@@ -241,6 +256,7 @@ const getAdminVideoChunks = asyncHandler(async (req, res) => {
       },
       chunkCount: chunks.length,
       embeddingCounts,
+      faissIndexStatus,
       chunks,
     })
   );

@@ -287,6 +287,29 @@ def delete_video_index(video_id: str) -> Dict[str, Any]:
     }
 
 
+@app.get("/videos/{video_id}/index/status")
+def video_index_status(video_id: str) -> Dict[str, Any]:
+    index_path, metadata_path, _ = _video_paths(video_id)
+
+    exists = index_path.exists() and metadata_path.exists()
+
+    metadata = None
+    if metadata_path.exists():
+        try:
+            metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+        except Exception:
+            metadata = None
+
+    return {
+        "videoId": video_id,
+        "indexed": exists,
+        "indexFileExists": index_path.exists(),
+        "metadataFileExists": metadata_path.exists(),
+        "chunkCount": metadata.get("count") if metadata else 0,
+        "model": metadata.get("model") if metadata else MODEL_NAME,
+    }
+
+
 EmbedRequest.model_rebuild()
 ChunkPayload.model_rebuild()
 IndexVideoRequest.model_rebuild()

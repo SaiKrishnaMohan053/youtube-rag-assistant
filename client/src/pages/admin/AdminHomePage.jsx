@@ -40,6 +40,7 @@ import {
   getAdminUsersApi,
   getAdminUserVideosApi,
   getAdminVideoChunksApi,
+  reindexAdminVideoApi,
 } from '../../api/adminApi';
 
 const GRADE_COLORS = ['#4caf50', '#2196f3', '#ff9800', '#f44336'];
@@ -99,6 +100,9 @@ const AdminHomePage = () => {
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [videoChunks, setVideoChunks] = useState([]);
 
+  const [reindexingVideoId, setReindexingVideoId] = useState(null);
+  const [successMessage, setSuccessMessage] = useState('');
+
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -137,6 +141,33 @@ const AdminHomePage = () => {
     }
   };
 
+  const handleReindexVideo = async (video) => {
+    try {
+      setError('');
+      setSuccessMessage('');
+      setReindexingVideoId(video._id);
+
+      await reindexAdminVideoApi(video._id);
+
+      setSuccessMessage(`Re-index completed for ${video.title || video.videoId}`);
+
+      if (selectedUser?._id) {
+        const data = await getAdminUserVideosApi(selectedUser._id);
+        setUserVideos(data.videos);
+      }
+
+      await fetchDashboard();
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          'Failed to re-index video'
+      );
+    } finally {
+      setReindexingVideoId(null);
+    }
+  };
+
   useEffect(() => {
     fetchDashboard();
   }, []);
@@ -149,7 +180,10 @@ const AdminHomePage = () => {
 
   const openChunks = async (video) => {
     const data = await getAdminVideoChunksApi(video._id);
-    setSelectedVideo(data.video);
+    setSelectedVideo({
+      ...data.video,
+      faissIndexStatus: data.faissIndexStatus,
+    });
     setVideoChunks(data.chunks);
   };
 
@@ -183,6 +217,7 @@ const AdminHomePage = () => {
       </Box>
 
       {error && <Alert severity="error">{error}</Alert>}
+      {successMessage && <Alert severity="success">{successMessage}</Alert>}
 
       <Grid container spacing={2}>
         <Grid item xs={12} md={2}>
@@ -330,7 +365,7 @@ const AdminHomePage = () => {
                 <TableCell>Summary</TableCell>
                 <TableCell>Chunks</TableCell>
                 <TableCell>Embeddings</TableCell>
-                <TableCell />
+                <TableCell>Actions</TableCell>
               </TableRow>
             </TableHead>
 
@@ -360,9 +395,20 @@ const AdminHomePage = () => {
                   </TableCell>
 
                   <TableCell>
-                    <Button onClick={() => openChunks(video)}>
-                      Chunks
-                    </Button>
+                    <Stack direction="row" spacing={1}>
+                      <Button onClick={() => openChunks(video)}>
+                        Chunks
+                      </Button>
+
+                      <Button
+                        variant="outlined"
+                        color="warning"
+                        disabled={reindexingVideoId === video._id || video.chunkCount === 0}
+                        onClick={() => handleReindexVideo(video)}
+                      >
+                        {reindexingVideoId === video._id ? 'Re-indexing...' : 'Re-index'}
+                      </Button>
+                    </Stack>
                   </TableCell>
                 </TableRow>
               ))}
@@ -382,6 +428,20 @@ const AdminHomePage = () => {
         </DialogTitle>
 
         <DialogContent>
+          <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
+            <Chip
+              label={
+                selectedVideo?.faissIndexStatus?.indexed
+                  ? 'FAISS Indexed'
+                  : 'FAISS Missing'
+              }
+              color={selectedVideo?.faissIndexStatus?.indexed ? 'success' : 'error'}
+            />
+
+            <Chip
+              label={`FAISS chunks: ${selectedVideo?.faissIndexStatus?.chunkCount || 0}`}
+            />
+          </Stack>
           <Table>
             <TableHead>
               <TableRow>
