@@ -12,6 +12,7 @@ const errorHandler = require('./middleware/error.middleware');
 const requestLogger = require('./middleware/requestLogger.middleware');
 const evalRoutes = require('./routes/eval.routes');
 const metricsRoutes = require('./routes/metrics.routes');
+const adminRoutes = require('./routes/admin.routes');
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
 app.use('/api/evals', evalRoutes);
 app.use('/api/metrics', metricsRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.use('/api/guest', guestRoutes);
 app.use('/api/health', healthRoutes);

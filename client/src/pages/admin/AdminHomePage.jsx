@@ -5,8 +5,17 @@ import {
   Button,
   Card,
   CardContent,
+  Chip,
+  Dialog,
+  DialogContent,
+  DialogTitle,
   Grid,
   Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
   Typography,
 } from '@mui/material';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -22,26 +31,35 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+
 import {
   getEvalStatsApi,
   getHealthStatusApi,
   getMetricsSummaryApi,
+  getAdminOverviewApi,
+  getAdminUsersApi,
+  getAdminUserVideosApi,
+  getAdminVideoChunksApi,
 } from '../../api/adminApi';
 
 const GRADE_COLORS = ['#4caf50', '#2196f3', '#ff9800', '#f44336'];
 const RISK_COLORS = ['#4caf50', '#ff9800', '#f44336'];
 
+const statusColor = (status) => {
+  if (status === 'completed') return 'success';
+  if (status === 'failed') return 'error';
+  return 'warning';
+};
+
 const InfoCard = ({ title, value, subtitle }) => (
-  <Card sx={{ borderRadius: 4, height: '100%' }}>
+  <Card sx={{ borderRadius: 4 }}>
     <CardContent>
-      <Typography color="text.secondary" fontSize={14}>
-        {title}
-      </Typography>
-      <Typography variant="h5" fontWeight={800} sx={{ mt: 1 }}>
+      <Typography color="text.secondary">{title}</Typography>
+      <Typography variant="h5" fontWeight={800}>
         {value}
       </Typography>
       {subtitle && (
-        <Typography color="text.secondary" sx={{ mt: 1 }}>
+        <Typography color="text.secondary">
           {subtitle}
         </Typography>
       )}
@@ -52,10 +70,12 @@ const InfoCard = ({ title, value, subtitle }) => (
 const ChartCard = ({ title, children }) => (
   <Card sx={{ borderRadius: 4, height: 380 }}>
     <CardContent sx={{ height: '100%' }}>
-      <Typography variant="h6" fontWeight={800} gutterBottom>
+      <Typography variant="h6" fontWeight={800}>
         {title}
       </Typography>
-      <Box sx={{ height: 300 }}>{children}</Box>
+      <Box sx={{ height: 300 }}>
+        {children}
+      </Box>
     </CardContent>
   </Card>
 );
@@ -70,6 +90,15 @@ const AdminHomePage = () => {
   const [health, setHealth] = useState(null);
   const [evalStats, setEvalStats] = useState(null);
   const [metrics, setMetrics] = useState(null);
+  const [overview, setOverview] = useState(null);
+  const [users, setUsers] = useState([]);
+
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [userVideos, setUserVideos] = useState([]);
+
+  const [selectedVideo, setSelectedVideo] = useState(null);
+  const [videoChunks, setVideoChunks] = useState([]);
+
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -78,20 +107,30 @@ const AdminHomePage = () => {
       setLoading(true);
       setError('');
 
-      const [healthData, evalData, metricsData] = await Promise.all([
+      const [
+        healthData,
+        evalData,
+        metricsData,
+        overviewData,
+        usersData,
+      ] = await Promise.all([
         getHealthStatusApi(),
         getEvalStatsApi(),
         getMetricsSummaryApi(),
+        getAdminOverviewApi(),
+        getAdminUsersApi(),
       ]);
 
       setHealth(healthData);
       setEvalStats(evalData);
       setMetrics(metricsData);
+      setOverview(overviewData);
+      setUsers(usersData);
     } catch (err) {
       setError(
         err.response?.data?.message ||
           err.message ||
-          'Failed to fetch dashboard data'
+          'Failed to load dashboard'
       );
     } finally {
       setLoading(false);
@@ -100,13 +139,19 @@ const AdminHomePage = () => {
 
   useEffect(() => {
     fetchDashboard();
-
-    const interval = setInterval(() => {
-      fetchDashboard();
-    }, 60000);
-
-    return () => clearInterval(interval);
   }, []);
+
+  const openUserVideos = async (user) => {
+    const data = await getAdminUserVideosApi(user._id);
+    setSelectedUser(data.user);
+    setUserVideos(data.videos);
+  };
+
+  const openChunks = async (video) => {
+    const data = await getAdminVideoChunksApi(video._id);
+    setSelectedVideo(data.video);
+    setVideoChunks(data.chunks);
+  };
 
   const categoryData = evalStats?.categories || [];
 
@@ -120,23 +165,16 @@ const AdminHomePage = () => {
     [evalStats]
   );
 
-  const recentErrors = metrics?.recentErrors || [];
-
   return (
     <Stack spacing={3}>
-      <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Box>
-          <Typography variant="h4" fontWeight={800}>
-            Admin Dashboard
-          </Typography>
-          <Typography color="text.secondary">
-            Monitoring, RAG evaluation, and backend observability.
-          </Typography>
-        </Box>
+      <Box display="flex" justifyContent="space-between">
+        <Typography variant="h4" fontWeight={800}>
+          Admin Dashboard
+        </Typography>
 
         <Button
-          variant="contained"
           startIcon={<RefreshIcon />}
+          variant="contained"
           onClick={fetchDashboard}
           disabled={loading}
         >
@@ -146,56 +184,39 @@ const AdminHomePage = () => {
 
       {error && <Alert severity="error">{error}</Alert>}
 
-      <Grid container spacing={3}>
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={2}>
+          <InfoCard title="Users" value={overview?.totalUsers || 0} />
+        </Grid>
+
+        <Grid item xs={12} md={2}>
+          <InfoCard title="Videos" value={overview?.totalVideos || 0} />
+        </Grid>
+
+        <Grid item xs={12} md={2}>
+          <InfoCard title="Chunks" value={overview?.totalChunks || 0} />
+        </Grid>
+
         <Grid item xs={12} md={2}>
           <InfoCard
-            title="System Status"
+            title="Summaries"
+            value={overview?.summaries?.completed || 0}
+            subtitle="completed"
+          />
+        </Grid>
+
+        <Grid item xs={12} md={2}>
+          <InfoCard
+            title="Embeddings"
+            value={overview?.embeddings?.completed || 0}
+            subtitle="completed"
+          />
+        </Grid>
+
+        <Grid item xs={12} md={2}>
+          <InfoCard
+            title="System"
             value={health?.status || 'N/A'}
-            subtitle={`Mongo: ${health?.database?.mongo || 'N/A'}`}
-          />
-        </Grid>
-
-        <Grid item xs={12} md={2}>
-          <InfoCard
-            title="Eval Reports"
-            value={evalStats?.reportCount || 0}
-            subtitle="Stored reports"
-          />
-        </Grid>
-
-        <Grid item xs={12} md={2}>
-          <InfoCard
-            title="Avg Pass Rate"
-            value={`${evalStats?.avgPassRate || 0}%`}
-            subtitle="Across eval runs"
-          />
-        </Grid>
-
-        <Grid item xs={12} md={2}>
-          <InfoCard
-            title="Avg Latency"
-            value={`${evalStats?.avgLatencyMs || 0} ms`}
-            subtitle="Eval case latency"
-          />
-        </Grid>
-
-        <Grid item xs={12} md={2}>
-          <InfoCard
-            title="Recent Errors"
-            value={recentErrors.length}
-            subtitle="Last 24h"
-          />
-        </Grid>
-
-        <Grid item xs={12} md={2}>
-          <InfoCard
-            title="Slowest Category"
-            value={evalStats?.slowestCategory?.category || 'N/A'}
-            subtitle={
-              evalStats?.slowestCategory
-                ? `${evalStats.slowestCategory.avgLatencyMs} ms`
-                : 'No data'
-            }
           />
         </Grid>
       </Grid>
@@ -206,13 +227,7 @@ const AdminHomePage = () => {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={categoryData}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="category"
-                  angle={-20}
-                  textAnchor="end"
-                  interval={0}
-                  height={75}
-                />
+                <XAxis dataKey="category" />
                 <YAxis domain={[0, 1]} />
                 <Tooltip />
                 <Bar dataKey="avgWeightedScore" fill="#1976d2" />
@@ -222,24 +237,17 @@ const AdminHomePage = () => {
         </Grid>
 
         <Grid item xs={12} lg={3}>
-          <ChartCard title="Grade Distribution">
+          <ChartCard title="Grades">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie
-                  data={gradeData}
-                  dataKey="value"
-                  nameKey="name"
-                  outerRadius={90}
-                  label={({ name, value }) => `${name}: ${value}`}
-                >
-                  {gradeData.map((entry, index) => (
+                <Pie data={gradeData} dataKey="value">
+                  {gradeData.map((e, i) => (
                     <Cell
-                      key={entry.name}
-                      fill={GRADE_COLORS[index % GRADE_COLORS.length]}
+                      key={e.name}
+                      fill={GRADE_COLORS[i % GRADE_COLORS.length]}
                     />
                   ))}
                 </Pie>
-                <Tooltip />
               </PieChart>
             </ResponsiveContainer>
           </ChartCard>
@@ -249,26 +257,159 @@ const AdminHomePage = () => {
           <ChartCard title="Hallucination Risk">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie
-                  data={riskData}
-                  dataKey="value"
-                  nameKey="name"
-                  outerRadius={90}
-                  label={({ name, value }) => `${name}: ${value}`}
-                >
-                  {riskData.map((entry, index) => (
+                <Pie data={riskData} dataKey="value">
+                  {riskData.map((e, i) => (
                     <Cell
-                      key={entry.name}
-                      fill={RISK_COLORS[index % RISK_COLORS.length]}
+                      key={e.name}
+                      fill={RISK_COLORS[i % RISK_COLORS.length]}
                     />
                   ))}
                 </Pie>
-                <Tooltip />
               </PieChart>
             </ResponsiveContainer>
           </ChartCard>
         </Grid>
       </Grid>
+
+      <Card sx={{ borderRadius: 4 }}>
+        <CardContent>
+          <Typography variant="h6" fontWeight={800} gutterBottom>
+            Users
+          </Typography>
+
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Name</TableCell>
+                <TableCell>Email</TableCell>
+                <TableCell>Role</TableCell>
+                <TableCell>Videos</TableCell>
+                <TableCell>Chunks</TableCell>
+                <TableCell />
+              </TableRow>
+            </TableHead>
+
+            <TableBody>
+              {users.map((user) => (
+                <TableRow key={user._id}>
+                  <TableCell>{user.name}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>
+                    <Chip label={user.role} />
+                  </TableCell>
+                  <TableCell>{user.videoCount}</TableCell>
+                  <TableCell>{user.chunkCount}</TableCell>
+                  <TableCell>
+                    <Button onClick={() => openUserVideos(user)}>
+                      View Videos
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      <Dialog
+        open={Boolean(selectedUser)}
+        maxWidth="lg"
+        fullWidth
+        onClose={() => setSelectedUser(null)}
+      >
+        <DialogTitle>
+          {selectedUser?.name} Videos
+        </DialogTitle>
+
+        <DialogContent>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Title</TableCell>
+                <TableCell>Transcript</TableCell>
+                <TableCell>Summary</TableCell>
+                <TableCell>Chunks</TableCell>
+                <TableCell>Embeddings</TableCell>
+                <TableCell />
+              </TableRow>
+            </TableHead>
+
+            <TableBody>
+              {userVideos.map((video) => (
+                <TableRow key={video._id}>
+                  <TableCell>{video.title || video.videoId}</TableCell>
+
+                  <TableCell>
+                    <Chip
+                      label={video.transcriptStatus}
+                      color={statusColor(video.transcriptStatus)}
+                    />
+                  </TableCell>
+
+                  <TableCell>
+                    <Chip
+                      label={video.summaryStatus}
+                      color={statusColor(video.summaryStatus)}
+                    />
+                  </TableCell>
+
+                  <TableCell>{video.chunkCount}</TableCell>
+
+                  <TableCell>
+                    {video.embeddingCompleted}/{video.chunkCount}
+                  </TableCell>
+
+                  <TableCell>
+                    <Button onClick={() => openChunks(video)}>
+                      Chunks
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={Boolean(selectedVideo)}
+        maxWidth="xl"
+        fullWidth
+        onClose={() => setSelectedVideo(null)}
+      >
+        <DialogTitle>
+          Chunks
+        </DialogTitle>
+
+        <DialogContent>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>#</TableCell>
+                <TableCell>Text</TableCell>
+                <TableCell>Status</TableCell>
+              </TableRow>
+            </TableHead>
+
+            <TableBody>
+              {videoChunks.map((chunk) => (
+                <TableRow key={chunk._id}>
+                  <TableCell>{chunk.chunkIndex}</TableCell>
+                  <TableCell>
+                    {chunk.text.slice(0, 150)}...
+                  </TableCell>
+                  <TableCell>
+                    <Chip
+                      label={chunk.embeddingStatus}
+                      color={statusColor(chunk.embeddingStatus)}
+                    />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </DialogContent>
+      </Dialog>
     </Stack>
   );
 };

@@ -59,3 +59,33 @@ export const runEvalApi = async ({ videoId, guestUrl }) => {
 
   return data.data;
 };
+
+export const getAdminOverviewApi = async () => {
+  const { data } = await axios.get(`${API_BASE_URL}/admin/overview`, getAuthHeaders());
+
+  return data.data;
+};
+
+export const getAdminUsersApi = async () => {
+  const { data } = await axios.get(`${API_BASE_URL}/admin/users`, getAuthHeaders());
+
+  return data.data.users;
+};
+
+export const getAdminUserVideosApi = async (userId) => {
+  const { data } = await axios.get(
+    `${API_BASE_URL}/admin/users/${userId}/videos`,
+    getAuthHeaders()
+  );
+
+  return data.data;
+};
+
+export const getAdminVideoChunksApi = async (videoId) => {
+  const { data } = await axios.get(
+    `${API_BASE_URL}/admin/videos/${videoId}/chunks`,
+    getAuthHeaders()
+  );
+
+  return data.data;
+};
