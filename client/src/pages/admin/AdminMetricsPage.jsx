@@ -11,27 +11,90 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableContainer,
   TableHead,
   TableRow,
   Typography,
 } from '@mui/material';
+import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
+import QueryStatsOutlinedIcon from '@mui/icons-material/QueryStatsOutlined';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import RouteOutlinedIcon from '@mui/icons-material/RouteOutlined';
+import SpeedOutlinedIcon from '@mui/icons-material/SpeedOutlined';
+import TimelineOutlinedIcon from '@mui/icons-material/TimelineOutlined';
+
 import { getMetricsSummaryApi } from '../../api/adminApi';
 
-const InfoCard = ({ title, value, subtitle }) => (
-  <Card sx={{ borderRadius: 4, height: '100%' }}>
+const panelSx = {
+  bgcolor: 'rgba(15,23,42,0.82)',
+  color: '#fff',
+  border: '1px solid rgba(148,163,184,0.18)',
+  boxShadow: '0 24px 70px rgba(0,0,0,0.28)',
+  backdropFilter: 'blur(18px)',
+};
+
+const tableCellSx = {
+  color: '#cbd5e1',
+  borderColor: 'rgba(148,163,184,0.14)',
+};
+
+const headerCellSx = {
+  bgcolor: '#111827',
+  color: '#e5e7eb',
+  fontWeight: 900,
+  borderColor: 'rgba(148,163,184,0.14)',
+};
+
+const InfoCard = ({ title, value, subtitle, icon, accent = '#38bdf8' }) => (
+  <Card sx={{ ...panelSx, height: '100%' }}>
     <CardContent>
-      <Typography color="text.secondary" fontSize={14}>
-        {title}
-      </Typography>
-      <Typography variant="h5" fontWeight={800} sx={{ mt: 1 }}>
-        {value}
-      </Typography>
-      {subtitle && (
-        <Typography color="text.secondary" sx={{ mt: 1 }}>
-          {subtitle}
+      <Stack spacing={2}>
+        <Box
+          sx={{
+            width: 48,
+            height: 48,
+            borderRadius: 4,
+            display: 'grid',
+            placeItems: 'center',
+            color: '#fff',
+            bgcolor: `${accent}26`,
+            border: `1px solid ${accent}55`,
+          }}
+        >
+          {icon}
+        </Box>
+
+        <Box>
+          <Typography sx={{ color: '#94a3b8' }}>{title}</Typography>
+          <Typography variant="h4" fontWeight={950}>
+            {value}
+          </Typography>
+          {subtitle && (
+            <Typography variant="body2" sx={{ color: '#94a3b8' }}>
+              {subtitle}
+            </Typography>
+          )}
+        </Box>
+      </Stack>
+    </CardContent>
+  </Card>
+);
+
+const DataTableCard = ({ title, subtitle, children }) => (
+  <Card sx={panelSx}>
+    <CardContent>
+      <Stack spacing={0.5} sx={{ mb: 2 }}>
+        <Typography variant="h5" fontWeight={900}>
+          {title}
         </Typography>
-      )}
+        {subtitle && (
+          <Typography sx={{ color: '#94a3b8' }}>
+            {subtitle}
+          </Typography>
+        )}
+      </Stack>
+
+      {children}
     </CardContent>
   </Card>
 );
@@ -77,34 +140,57 @@ const AdminMetricsPage = () => {
 
   return (
     <Stack spacing={3}>
-      <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Box>
-          <Typography variant="h4" fontWeight={800}>
-            Application Metrics
-          </Typography>
-          <Typography color="text.secondary">
-            Request volume, error logs, and slow route monitoring.
-          </Typography>
-        </Box>
+      <Card
+        sx={{
+          ...panelSx,
+          background:
+            'linear-gradient(135deg, rgba(6,182,212,0.18), rgba(124,58,237,0.14), rgba(15,23,42,0.92))',
+        }}
+      >
+        <CardContent sx={{ p: { xs: 3, md: 4 } }}>
+          <Stack
+            direction={{ xs: 'column', md: 'row' }}
+            justifyContent="space-between"
+            spacing={3}
+          >
+            <Box>
+              <Typography variant="overline" sx={{ color: '#67e8f9' }}>
+                Runtime telemetry
+              </Typography>
 
-        <Button
-          variant="contained"
-          startIcon={<RefreshIcon />}
-          onClick={fetchMetrics}
-          disabled={loading}
-        >
-          Refresh
-        </Button>
-      </Box>
+              <Typography variant="h3" fontWeight={950}>
+                Application Metrics
+              </Typography>
+
+              <Typography sx={{ color: '#cbd5e1', maxWidth: 820, mt: 1 }}>
+                Monitor request volume, event distribution, slow routes, and backend errors.
+                This page auto-refreshes every 30 seconds.
+              </Typography>
+            </Box>
+
+            <Button
+              variant="contained"
+              startIcon={<RefreshIcon />}
+              onClick={fetchMetrics}
+              disabled={loading}
+              sx={{ alignSelf: 'flex-start' }}
+            >
+              {loading ? 'Refreshing...' : 'Refresh'}
+            </Button>
+          </Stack>
+        </CardContent>
+      </Card>
 
       {error && <Alert severity="error">{error}</Alert>}
 
-      <Grid container spacing={3}>
+      <Grid container spacing={2.5}>
         <Grid item xs={12} md={3}>
           <InfoCard
             title="Window"
             value={metrics?.window || '24h'}
             subtitle="Metrics time range"
+            icon={<TimelineOutlinedIcon />}
+            accent="#38bdf8"
           />
         </Grid>
 
@@ -113,6 +199,8 @@ const AdminMetricsPage = () => {
             title="Total Events"
             value={totalEvents}
             subtitle="Stored metric events"
+            icon={<QueryStatsOutlinedIcon />}
+            accent="#7c3aed"
           />
         </Grid>
 
@@ -120,7 +208,9 @@ const AdminMetricsPage = () => {
           <InfoCard
             title="Event Types"
             value={byEvent.length}
-            subtitle="Unique metric events"
+            subtitle="Unique metric names"
+            icon={<SpeedOutlinedIcon />}
+            accent="#22c55e"
           />
         </Grid>
 
@@ -129,65 +219,106 @@ const AdminMetricsPage = () => {
             title="Recent Errors"
             value={recentErrors.length}
             subtitle="Latest error records"
+            icon={<BugReportOutlinedIcon />}
+            accent="#ef4444"
           />
         </Grid>
       </Grid>
 
-      <Card sx={{ borderRadius: 4 }}>
-        <CardContent>
-          <Typography variant="h6" fontWeight={800} gutterBottom>
-            Events by Count
-          </Typography>
-
-          <Table size="small">
+      <DataTableCard
+        title="Events by Count"
+        subtitle="Grouped backend event totals"
+      >
+        <TableContainer
+          sx={{
+            maxHeight: 420,
+            borderRadius: 4,
+            border: '1px solid rgba(148,163,184,0.14)',
+          }}
+        >
+          <Table stickyHeader size="small">
             <TableHead>
               <TableRow>
-                <TableCell>Event</TableCell>
-                <TableCell align="right">Count</TableCell>
+                <TableCell sx={headerCellSx}>Event</TableCell>
+                <TableCell sx={headerCellSx} align="right">Count</TableCell>
               </TableRow>
             </TableHead>
+
             <TableBody>
               {byEvent.map((item) => (
                 <TableRow key={item._id}>
-                  <TableCell>
-                    <Chip label={item._id || 'unknown'} size="small" />
+                  <TableCell sx={tableCellSx}>
+                    <Chip
+                      label={item._id || 'unknown'}
+                      size="small"
+                      sx={{
+                        color: '#fff',
+                        bgcolor: 'rgba(56,189,248,0.16)',
+                        border: '1px solid rgba(56,189,248,0.28)',
+                      }}
+                    />
                   </TableCell>
-                  <TableCell align="right">{item.count}</TableCell>
+
+                  <TableCell sx={tableCellSx} align="right">
+                    {item.count}
+                  </TableCell>
                 </TableRow>
               ))}
 
               {!byEvent.length && (
                 <TableRow>
-                  <TableCell colSpan={2}>No metric events found.</TableCell>
+                  <TableCell sx={tableCellSx} colSpan={2}>
+                    No metric events found.
+                  </TableCell>
                 </TableRow>
               )}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
+        </TableContainer>
+      </DataTableCard>
 
-      <Card sx={{ borderRadius: 4 }}>
-        <CardContent>
-          <Typography variant="h6" fontWeight={800} gutterBottom>
-            Slow Routes
-          </Typography>
-
-          <Table size="small">
+      <DataTableCard
+        title="Slow Routes"
+        subtitle="Requests with higher latency"
+      >
+        <TableContainer
+          sx={{
+            maxHeight: 420,
+            borderRadius: 4,
+            border: '1px solid rgba(148,163,184,0.14)',
+          }}
+        >
+          <Table stickyHeader size="small">
             <TableHead>
               <TableRow>
-                <TableCell>Route</TableCell>
-                <TableCell>Method</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell align="right">Duration</TableCell>
+                <TableCell sx={headerCellSx}>Route</TableCell>
+                <TableCell sx={headerCellSx}>Method</TableCell>
+                <TableCell sx={headerCellSx}>Status</TableCell>
+                <TableCell sx={headerCellSx} align="right">Duration</TableCell>
               </TableRow>
             </TableHead>
+
             <TableBody>
               {slowRoutes.map((item) => (
                 <TableRow key={item._id}>
-                  <TableCell>{item.meta?.route || item.meta?.path || 'N/A'}</TableCell>
-                  <TableCell>{item.meta?.method || 'N/A'}</TableCell>
-                  <TableCell>{item.meta?.statusCode || 'N/A'}</TableCell>
-                  <TableCell align="right">
+                  <TableCell sx={tableCellSx}>
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      <RouteOutlinedIcon fontSize="small" sx={{ color: '#38bdf8' }} />
+                      <Typography variant="body2" sx={{ color: '#cbd5e1' }}>
+                        {item.meta?.route || item.meta?.path || 'N/A'}
+                      </Typography>
+                    </Stack>
+                  </TableCell>
+
+                  <TableCell sx={tableCellSx}>
+                    <Chip size="small" label={item.meta?.method || 'N/A'} />
+                  </TableCell>
+
+                  <TableCell sx={tableCellSx}>
+                    {item.meta?.statusCode || 'N/A'}
+                  </TableCell>
+
+                  <TableCell sx={tableCellSx} align="right">
                     {item.meta?.durationMs || 0} ms
                   </TableCell>
                 </TableRow>
@@ -195,34 +326,46 @@ const AdminMetricsPage = () => {
 
               {!slowRoutes.length && (
                 <TableRow>
-                  <TableCell colSpan={4}>No slow routes found.</TableCell>
+                  <TableCell sx={tableCellSx} colSpan={4}>
+                    No slow routes found.
+                  </TableCell>
                 </TableRow>
               )}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
+        </TableContainer>
+      </DataTableCard>
 
-      <Card sx={{ borderRadius: 4 }}>
-        <CardContent>
-          <Typography variant="h6" fontWeight={800} gutterBottom>
-            Recent Errors
-          </Typography>
-
-          <Table size="small">
+      <DataTableCard
+        title="Recent Errors"
+        subtitle="Latest error events captured by the backend"
+      >
+        <TableContainer
+          sx={{
+            maxHeight: 420,
+            borderRadius: 4,
+            border: '1px solid rgba(148,163,184,0.14)',
+          }}
+        >
+          <Table stickyHeader size="small">
             <TableHead>
               <TableRow>
-                <TableCell>Event</TableCell>
-                <TableCell>Message</TableCell>
-                <TableCell>Created</TableCell>
+                <TableCell sx={headerCellSx}>Event</TableCell>
+                <TableCell sx={headerCellSx}>Message</TableCell>
+                <TableCell sx={headerCellSx}>Created</TableCell>
               </TableRow>
             </TableHead>
+
             <TableBody>
               {recentErrors.map((item) => (
                 <TableRow key={item._id}>
-                  <TableCell>{item.event}</TableCell>
-                  <TableCell>{item.meta?.error || item.meta?.message || 'N/A'}</TableCell>
-                  <TableCell>
+                  <TableCell sx={tableCellSx}>{item.event}</TableCell>
+
+                  <TableCell sx={tableCellSx}>
+                    {item.meta?.error || item.meta?.message || 'N/A'}
+                  </TableCell>
+
+                  <TableCell sx={tableCellSx}>
                     {item.createdAt
                       ? new Date(item.createdAt).toLocaleString()
                       : 'N/A'}
@@ -232,13 +375,15 @@ const AdminMetricsPage = () => {
 
               {!recentErrors.length && (
                 <TableRow>
-                  <TableCell colSpan={3}>No recent errors found.</TableCell>
+                  <TableCell sx={tableCellSx} colSpan={3}>
+                    No recent errors found.
+                  </TableCell>
                 </TableRow>
               )}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
+        </TableContainer>
+      </DataTableCard>
     </Stack>
   );
 };

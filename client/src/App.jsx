@@ -1,33 +1,23 @@
 import { BrowserRouter } from 'react-router-dom';
-import { CssBaseline, ThemeProvider, createTheme, Box } from '@mui/material';
-import Navbar from './components/Navbar';
+import { CssBaseline, ThemeProvider, Box } from '@mui/material';
 import AppRoutes from './routes/AppRoutes';
 import PageLoader from './components/PageLoader';
 import useNavigationLoader from './hooks/useNavigationLoader';
 import { AuthProvider } from './context/AuthContext';
-
-const theme = createTheme({
-  palette: {
-    mode: 'light',
-    primary: { main: '#1976d2' },
-  },
-});
+import appTheme from './theme/appTheme';
 
 const AppContent = () => {
   const navLoading = useNavigationLoader();
 
   return (
-    <Box>
-      <Navbar />
-      <Box component="main">
-        {navLoading ? <PageLoader text="Loading..." /> : <AppRoutes />}
-      </Box>
+    <Box sx={{ minHeight: '100vh' }}>
+      {navLoading ? <PageLoader text="Loading..." /> : <AppRoutes />}
     </Box>
   );
 };
 
 const App = () => (
-  <ThemeProvider theme={theme}>
+  <ThemeProvider theme={appTheme}>
     <CssBaseline />
     <AuthProvider>
       <BrowserRouter>
