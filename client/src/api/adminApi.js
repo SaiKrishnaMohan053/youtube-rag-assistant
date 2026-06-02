@@ -92,7 +92,7 @@ export const getAdminVideoChunksApi = async (videoId) => {
 
 export const reindexAdminVideoApi = async (videoId) => {
   const { data } = await axios.post(
-    `${API_BASE_URL}/videos/${videoId}/index`,
+    `${API_BASE_URL}/admin/videos/${videoId}/reindex`,
     {},
     getAuthHeaders()
   );

@@ -29,6 +29,8 @@ import {
   deleteVideoApi,
   getVideosApi,
   processVideoApi,
+  indexVideoApi,
+  getVideoIndexStatusApi,
 } from '../api/videoApi';
 
 const getVideoThumb = (video) =>
@@ -54,6 +56,8 @@ const DashboardPage = ({ view = 'dashboard' }) => {
   const [deletingId, setDeletingId] = useState(null);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [indexStatuses, setIndexStatuses] = useState({});
+  const [reindexingId, setReindexingId] = useState(null);
 
   const totalVideos = videos.length;
 
@@ -61,9 +65,55 @@ const DashboardPage = ({ view = 'dashboard' }) => {
   const isDashboardView = view === 'dashboard';
   const visibleVideos = isDashboardView ? videos.slice(0, 2) : videos;
 
+  const loadIndexStatuses = async (videoList) => {
+    const entries = await Promise.all(
+      videoList.map(async (video) => {
+        try {
+          const response = await getVideoIndexStatusApi(video._id);
+
+          return [
+            video._id,
+            response.data.indexStatus,
+          ];
+        } catch (_error) {
+          return [
+            video._id,
+            {
+              indexed: false,
+              indexFileExists: false,
+              metadataFileExists: false,
+              chunkCount: 0,
+            },
+          ];
+        }
+      })
+    );
+
+    setIndexStatuses(Object.fromEntries(entries));
+  };
+
   const loadVideos = async () => {
     const response = await getVideosApi();
+    const videoList = response.data.videos || [];
+
     setVideos(response.data.videos || []);
+    await loadIndexStatuses(videoList);
+  };
+
+  const reindexVideo = async (videoId) => {
+    setReindexingId(videoId);
+    setError('');
+    setMessage('');
+
+    try {
+      await indexVideoApi(videoId);
+      setMessage('Video re-indexed successfully');
+      await loadVideos();
+    } catch (apiError) {
+      setError(apiError.response?.data?.message || 'Failed to re-index video');
+    } finally {
+      setReindexingId(null);
+    }
   };
 
   useEffect(() => {
@@ -376,7 +426,9 @@ const DashboardPage = ({ view = 'dashboard' }) => {
           <Grid container spacing={2.5} justifyContent="flex-start" alignItems="stretch" sx={{ mt: 0 }}>
             {visibleVideos.map((video) => {
               const thumbnailUrl = getVideoThumb(video);
-
+              const indexStatus = indexStatuses[video._id];
+              const isIndexed = Boolean(indexStatus?.indexed);
+              
               return (
                 <Grid item xs={12} sm={6} lg={4} key={video._id}>
                   <Card
@@ -447,57 +499,63 @@ const DashboardPage = ({ view = 'dashboard' }) => {
                         <Stack direction="row" spacing={1} flexWrap="wrap">
                           <Chip size="small" label="Transcript" />
                           <Chip size="small" label="Summary" />
-                          <Chip size="small" label="Indexed" color="success" />
+                          <Chip size="small" label={isIndexed ? 'Indexed' : 'Index missing'} color={isIndexed ? 'success' : 'warning'} />
                         </Stack>
                       </Stack>
                     </CardContent>
 
                     <CardActions sx={{ p: 2, pt: 0 }}>
-                      <Stack direction="row" spacing={1.5} alignItems="center">
+                      <Stack spacing={1.2} sx={{ width: '100%' }}>
                         <Button
+                          fullWidth
                           variant="contained"
                           size="medium"
                           startIcon={<ChatBubbleOutlineOutlinedIcon />}
                           component={RouterLink}
                           to={`/videos/${video._id}`}
                           sx={{
-                            flex: 1,
-                            height: 48,
+                            height: 46,
                             borderRadius: 999,
-                            px: 3,
-                            fontWeight: 700,
-                            fontSize: '0.95rem',
-                            whiteSpace: 'nowrap',
-                            boxShadow: '0 10px 24px rgba(99,91,255,0.22)',
-                            '& .MuiButton-startIcon': {
-                              mr: 0.8,
-                            },
+                            fontWeight: 800,
                           }}
                         >
                           Open Chat
                         </Button>
 
-                        <Button
-                          variant="outlined"
-                          color="error"
-                          onClick={() => deleteVideo(video._id)}
-                          disabled={deletingId === video._id}
-                          sx={{
-                            minWidth: 52,
-                            width: 52,
-                            height: 48,
-                            borderRadius: 999,
-                            bgcolor: 'rgba(220,38,38,0.04)',
-                            borderColor: 'rgba(220,38,38,0.28)',
-                            color: 'error.main',
-                            '&:hover': {
-                              bgcolor: 'rgba(220,38,38,0.08)',
-                              borderColor: 'error.main',
-                            },
-                          }}
-                        >
-                          <DeleteOutlineOutlinedIcon />
-                        </Button>
+                        <Stack direction="row" spacing={1.2} sx={{ width: '100%' }}>
+                          <Button
+                            fullWidth
+                            variant="outlined"
+                            size="medium"
+                            disabled={isIndexed || reindexingId === video._id}
+                            onClick={() => reindexVideo(video._id)}
+                            sx={{
+                              height: 44,
+                              borderRadius: 999,
+                              fontWeight: 800,
+                            }}
+                          >
+                            {reindexingId === video._id ? 'Indexing...' : 'Re-index'}
+                          </Button>
+
+                          <Button
+                            variant="outlined"
+                            color="error"
+                            onClick={() => deleteVideo(video._id)}
+                            disabled={deletingId === video._id}
+                            sx={{
+                              minWidth: 48,
+                              width: 48,
+                              height: 44,
+                              borderRadius: 999,
+                              p: 0,
+                              bgcolor: 'rgba(220,38,38,0.04)',
+                              borderColor: 'rgba(220,38,38,0.28)',
+                            }}
+                          >
+                            <DeleteOutlineOutlinedIcon />
+                          </Button>
+                        </Stack>
                       </Stack>
                     </CardActions>
                   </Card>

@@ -6,6 +6,9 @@ export const processVideoApi = async (url) =>
 export const createChunksApi = async (videoId) =>
   (await axiosClient.post(`/videos/${videoId}/chunks`)).data;
 
+export const getVideoIndexStatusApi = async (videoId) =>
+  (await axiosClient.get(`/videos/${videoId}/index/status`)).data;
+
 export const indexVideoApi = async (videoId) =>
   (await axiosClient.post(`/videos/${videoId}/index`)).data;
 
