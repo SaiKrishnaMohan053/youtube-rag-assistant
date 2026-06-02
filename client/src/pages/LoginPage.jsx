@@ -75,10 +75,10 @@ const LoginPage = () => {
   if (loading) return <PageLoader text="Signing you in..." />;
 
   return (
-    <Container maxWidth="xl" sx={{ py: { xs: 5, md: 8 } }}>
-      <Grid container spacing={4} alignItems="center" justifyContent="center">
-        <Grid item xs={12} md={6}>
-          <Stack spacing={3}>
+    <Container maxWidth={false} disableGutters sx={{ minHeight: { xs: 'auto', md: 'calc(100vh - 72px)' }, display: 'flex', alignItems: 'center', px: { xs: 2, md: 4 }, py: { xs: 4, md: 3 } }}>
+      <Grid container spacing={{ xs: 4, md: 6 }} alignItems="center" justifyContent="space-between" sx={{ height: '100%' }}>
+        <Grid item xs={12} md={6.6}>
+          <Stack spacing={2.3}>
             <Chip
               icon={<LockOutlinedIcon />}
               label="Secure workspace login"
@@ -89,9 +89,9 @@ const LoginPage = () => {
             <Typography
               variant="h2"
               sx={{
-                fontSize: { xs: 40, md: 58 },
-                lineHeight: 0.98,
-                maxWidth: 650,
+                fontSize: { xs: 40, md: 58, lg: 66 },
+                lineHeight: 0.95,
+                maxWidth: 860,
               }}
             >
               Continue your AI video workspace.
@@ -100,13 +100,25 @@ const LoginPage = () => {
             <Typography
               variant="h6"
               color="text.secondary"
-              sx={{ maxWidth: 620, lineHeight: 1.7 }}
+              sx={{ maxWidth: 760, lineHeight: 1.55 }}
             >
               Sign in to access saved videos, summaries, chat history, FAISS indexes,
               and transcript-grounded AI answers.
             </Typography>
 
-            <Grid container spacing={2}>
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: {
+                  xs: '1fr',
+                  md: 'repeat(3, 220px)',
+                },
+                gap: 2.5,
+                width: '100%',
+                justifyContent: 'flex-start',
+                alignItems: 'stretch',
+              }}
+            >
               {[
                 {
                   icon: <VideoLibraryOutlinedIcon />,
@@ -124,35 +136,54 @@ const LoginPage = () => {
                   text: 'Review transcript-based summaries anytime.',
                 },
               ].map((item) => (
-                <Grid item xs={12} sm={4} key={item.title}>
-                  <Card sx={{ height: '100%' }}>
-                    <CardContent>
-                      <Stack spacing={1.2}>
-                        <Box
-                          sx={{
-                            width: 44,
-                            height: 44,
-                            borderRadius: 3,
-                            display: 'grid',
-                            placeItems: 'center',
-                            color: 'primary.main',
-                            bgcolor: 'rgba(99,91,255,0.1)',
-                          }}
-                        >
-                          {item.icon}
-                        </Box>
+                <Card
+                  key={item.title}
+                  sx={{
+                    width: '220px',
+                    height: '210px',
+                    borderRadius: '24px',
+                    overflow: 'hidden',
+                    border: '1px solid rgba(148,163,184,0.12)',
+                    boxShadow: '0 18px 40px rgba(15,23,42,0.06)',
+                    transition: 'all 0.25s ease',
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      boxShadow: '0 24px 50px rgba(99,91,255,0.12)',
+                    },
+                  }}
+                >
+                  <CardContent sx={{ p: 2.3 }}>
+                    <Stack spacing={1.4}>
+                      <Box
+                        sx={{
+                          width: 42,
+                          height: 42,
+                          borderRadius: 4,
+                          display: 'grid',
+                          placeItems: 'center',
+                          color: 'primary.main',
+                          bgcolor: 'rgba(99,91,255,0.08)',
+                        }}
+                      >
+                        {item.icon}
+                      </Box>
 
-                        <Typography fontWeight={900}>{item.title}</Typography>
+                      <Typography fontWeight={900} variant="h6">
+                        {item.title}
+                      </Typography>
 
-                        <Typography variant="body2" color="text.secondary">
-                          {item.text}
-                        </Typography>
-                      </Stack>
-                    </CardContent>
-                  </Card>
-                </Grid>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ lineHeight: 1.45 }}
+                      >
+                        {item.text}
+                      </Typography>
+                    </Stack>
+                  </CardContent>
+                </Card>
               ))}
-            </Grid>
+            </Box>
           </Stack>
         </Grid>
 
@@ -165,8 +196,8 @@ const LoginPage = () => {
               backdropFilter: 'blur(20px)',
             }}
           >
-            <CardContent sx={{ p: { xs: 3, md: 4 } }}>
-              <Stack spacing={2.5}>
+            <CardContent sx={{ p: { xs: 3, md: 3.5 } }}>
+              <Stack spacing={2}>
                 <Box>
                   <Typography variant="h4">
                     Login

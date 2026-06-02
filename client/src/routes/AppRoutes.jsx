@@ -16,8 +16,8 @@ import PublicLayout from '../components/layout/PublicLayout';
 import UserShell from '../components/layout/UserShell';
 import AdminShell from '../components/layout/AdminShell';
 
-const getHomeRedirect = (user) => {
-  if (!user) return <Navigate to="/guest" replace />;
+const getDashboardRedirect = (user) => {
+  if (!user) return <Navigate to="/login" replace />;
 
   return user.role === 'admin' ? (
     <Navigate to="/admin" replace />
@@ -31,16 +31,15 @@ const AppRoutes = () => {
 
   return (
     <Routes>
-      <Route path="/" element={getHomeRedirect(user)} />
-
       <Route element={<PublicLayout />}>
-        <Route path="/guest" element={user ? getHomeRedirect(user) : <GuestPage />} />
+        <Route path='/' element={<GuestPage />} />
+        <Route path="/guest" element={<GuestPage />} />
 
         <Route
           path="/login"
           element={
             user ? (
-              getHomeRedirect(user)
+              getDashboardRedirect(user)
             ) : (
               <LoginPage />
             )
@@ -49,7 +48,7 @@ const AppRoutes = () => {
 
         <Route
           path="/register"
-          element={user ? getHomeRedirect(user) : <RegisterPage />}
+          element={user ? getDashboardRedirect(user) : <RegisterPage />}
         />
 
         <Route path="/verify-email" element={<VerifyEmailPage />} />
@@ -67,8 +66,9 @@ const AppRoutes = () => {
       <Route element={<ProtectedRoute />}>
         <Route element={<UserShell />}>
           <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/videos/:id" element={<VideoChatPage />} />
+          <Route path="/my-videos" element={<DashboardPage view="videos" />} />
         </Route>
+        <Route path="/videos/:id" element={<VideoChatPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

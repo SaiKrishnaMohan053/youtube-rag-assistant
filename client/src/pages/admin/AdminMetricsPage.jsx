@@ -183,47 +183,51 @@ const AdminMetricsPage = () => {
 
       {error && <Alert severity="error">{error}</Alert>}
 
-      <Grid container spacing={2.5}>
-        <Grid item xs={12} md={3}>
-          <InfoCard
-            title="Window"
-            value={metrics?.window || '24h'}
-            subtitle="Metrics time range"
-            icon={<TimelineOutlinedIcon />}
-            accent="#38bdf8"
-          />
-        </Grid>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: {
+            xs: '1fr',
+            sm: 'repeat(2, 1fr)',
+            md: 'repeat(4, 1fr)',
+          },
+          gap: 2.5,
+          width: '100%',
+          alignItems: 'stretch',
+        }}
+      >
+        <InfoCard
+          title="Window"
+          value={metrics?.window || '24h'}
+          subtitle="Metrics time range"
+          icon={<TimelineOutlinedIcon />}
+          accent="#38bdf8"
+        />
 
-        <Grid item xs={12} md={3}>
-          <InfoCard
-            title="Total Events"
-            value={totalEvents}
-            subtitle="Stored metric events"
-            icon={<QueryStatsOutlinedIcon />}
-            accent="#7c3aed"
-          />
-        </Grid>
+        <InfoCard
+          title="Total Events"
+          value={totalEvents}
+          subtitle="Stored metric events"
+          icon={<QueryStatsOutlinedIcon />}
+          accent="#7c3aed"
+        />
 
-        <Grid item xs={12} md={3}>
-          <InfoCard
-            title="Event Types"
-            value={byEvent.length}
-            subtitle="Unique metric names"
-            icon={<SpeedOutlinedIcon />}
-            accent="#22c55e"
-          />
-        </Grid>
+        <InfoCard
+          title="Event Types"
+          value={byEvent.length}
+          subtitle="Unique metric names"
+          icon={<SpeedOutlinedIcon />}
+          accent="#22c55e"
+        />
 
-        <Grid item xs={12} md={3}>
-          <InfoCard
-            title="Recent Errors"
-            value={recentErrors.length}
-            subtitle="Latest error records"
-            icon={<BugReportOutlinedIcon />}
-            accent="#ef4444"
-          />
-        </Grid>
-      </Grid>
+        <InfoCard
+          title="Recent Errors"
+          value={recentErrors.length}
+          subtitle="Latest error records"
+          icon={<BugReportOutlinedIcon />}
+          accent="#ef4444"
+        />
+      </Box>
 
       <DataTableCard
         title="Events by Count"
@@ -232,7 +236,7 @@ const AdminMetricsPage = () => {
         <TableContainer
           sx={{
             maxHeight: 420,
-            borderRadius: 4,
+            borderRadius: 1.5,
             border: '1px solid rgba(148,163,184,0.14)',
           }}
         >
@@ -284,7 +288,7 @@ const AdminMetricsPage = () => {
         <TableContainer
           sx={{
             maxHeight: 420,
-            borderRadius: 4,
+            borderRadius: 1.5,
             border: '1px solid rgba(148,163,184,0.14)',
           }}
         >
@@ -343,7 +347,7 @@ const AdminMetricsPage = () => {
         <TableContainer
           sx={{
             maxHeight: 420,
-            borderRadius: 4,
+            borderRadius: 1.5,
             border: '1px solid rgba(148,163,184,0.14)',
           }}
         >

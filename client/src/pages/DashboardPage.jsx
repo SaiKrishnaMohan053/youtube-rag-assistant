@@ -7,6 +7,7 @@ import {
   CardContent,
   CardMedia,
   Chip,
+  Divider,
   Grid,
   Stack,
   TextField,
@@ -45,7 +46,7 @@ const formatDate = (value) => {
   }).format(new Date(value));
 };
 
-const DashboardPage = () => {
+const DashboardPage = ({ view = 'dashboard' }) => {
   const [url, setUrl] = useState('');
   const [videos, setVideos] = useState([]);
   const [pageLoading, setPageLoading] = useState(true);
@@ -57,6 +58,8 @@ const DashboardPage = () => {
   const totalVideos = videos.length;
 
   const recentVideo = useMemo(() => videos?.[0], [videos]);
+  const isDashboardView = view === 'dashboard';
+  const visibleVideos = isDashboardView ? videos.slice(0, 2) : videos;
 
   const loadVideos = async () => {
     const response = await getVideosApi();
@@ -132,63 +135,83 @@ const DashboardPage = () => {
   }
 
   return (
-    <Stack spacing={4}>
+    <Stack spacing={2.5}>
       <Box>
         <Typography variant="overline" color="text.secondary">
           AI Video Workspace
         </Typography>
 
         <Typography variant="h3">
-          My Videos
+          {isDashboardView ? 'Dashboard' : 'My Videos'}
         </Typography>
 
-        <Typography color="text.secondary" sx={{ mt: 1, maxWidth: 720 }}>
-          Paste a YouTube URL, process the transcript, generate chunks, build embeddings,
-          and chat with your video using grounded RAG answers.
+        <Typography color="text.secondary" sx={{ mt: 1, maxWidth: 760 }}>
+          {isDashboardView
+            ? 'Process new videos, monitor your workspace, and continue from your recent AI-ready videos.'
+            : 'Browse all processed videos in your private AI video library.'}
         </Typography>
       </Box>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12} lg={8}>
-          <Card
-            sx={{
-              height: '100%',
-              overflow: 'hidden',
+      {isDashboardView && (
+        <Grid container spacing={3}>
+          <Grid item xs={12} lg={8}>
+            <Card
+              sx={{
+                height: '100%',
+                overflow: 'hidden',
               background:
                 'linear-gradient(135deg, rgba(99,91,255,0.12), rgba(0,194,255,0.08), #ffffff)',
             }}
           >
-            <CardContent sx={{ p: { xs: 3, md: 4 } }}>
-              <Stack spacing={3}>
-                <Stack direction="row" spacing={2} alignItems="center">
+            <CardContent sx={{ p: { xs: 3, md: 3.2 } }}>
+              <Stack spacing={2.4}>
+                <Stack
+                  direction="row"
+                  spacing={2}
+                  alignItems="flex-start"
+                >
                   <Box
                     sx={{
-                      width: 58,
-                      height: 58,
+                      width: 52,
+                      height: 52,
                       borderRadius: 4,
                       display: 'grid',
                       placeItems: 'center',
                       color: '#fff',
+                      flexShrink: 0,
                       background:
                         'linear-gradient(135deg, #635bff 0%, #00c2ff 100%)',
-                      boxShadow: '0 16px 35px rgba(99,91,255,0.28)',
+                      boxShadow: '0 14px 30px rgba(99,91,255,0.28)',
                     }}
                   >
-                    <AddCircleOutlineIcon fontSize="large" />
+                    <AddCircleOutlineIcon />
                   </Box>
 
-                  <Box>
-                    <Typography variant="h5">
+                  <Box sx={{ minWidth: 0 }}>
+                    <Typography
+                      variant="h5"
+                      sx={{
+                        lineHeight: 1.15,
+                        fontSize: { md: 30 },
+                      }}
+                    >
                       Process a new YouTube video
                     </Typography>
 
-                    <Typography color="text.secondary">
-                      Start the full pipeline: transcript, chunks, summary, embeddings, FAISS.
+                    <Typography
+                      color="text.secondary"
+                      sx={{
+                        mt: 0.5,
+                        lineHeight: 1.45,
+                        maxWidth: 640,
+                      }}
+                    >
+                      Paste a URL to create transcript chunks, summary, embeddings, and FAISS index.
                     </Typography>
                   </Box>
                 </Stack>
 
-                <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
+                <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems="center">
                   <TextField
                     fullWidth
                     label="YouTube URL"
@@ -198,7 +221,7 @@ const DashboardPage = () => {
                     disabled={loading}
                   />
 
-                  <LoadingButton loading={loading} onClick={processVideo}>
+                  <LoadingButton loading={loading} onClick={processVideo} sx={{ minWidth: 160, height: 56, whiteSpace: 'nowrap', px: 3, }}>
                     {loading ? 'Processing...' : 'Process Video'}
                   </LoadingButton>
                 </Stack>
@@ -210,13 +233,13 @@ const DashboardPage = () => {
                   </Stack>
                 )}
 
-                <Stack direction="row" spacing={1} flexWrap="wrap">
-                  <Chip label="Transcript extraction" />
-                  <Chip label="Chunking" />
-                  <Chip label="Summary" />
-                  <Chip label="Embeddings" />
-                  <Chip label="FAISS indexing" />
-                  <Chip label="RAG chat" color="primary" />
+                <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+                  <Chip size="small" label="Transcript extraction" />
+                  <Chip size='small' label="Chunking" />
+                  <Chip size="small" label="Summary" />
+                  <Chip size="small" label="Embeddings" />
+                  <Chip size="small" label="FAISS indexing" />
+                  <Chip size="small" label="RAG chat" color="primary" />
                 </Stack>
               </Stack>
             </CardContent>
@@ -227,51 +250,53 @@ const DashboardPage = () => {
           <Card sx={{ height: '100%' }}>
             <CardContent sx={{ p: { xs: 3, md: 4 } }}>
               <Stack spacing={3}>
-                <Stack direction="row" spacing={2} alignItems="center">
+                <Stack direction="row" spacing={2.5} alignItems="center">
                   <Box
                     sx={{
-                      width: 52,
-                      height: 52,
+                      width: 64,
+                      height: 64,
                       borderRadius: 4,
                       display: 'grid',
                       placeItems: 'center',
-                      bgcolor: 'rgba(99,91,255,0.1)',
-                      color: 'primary.main',
+                      color: '#fff',
+                      flexShrink: 0,
+                      background: 'linear-gradient(135deg, #635bff 0%, #00c2ff 100%)',
+                      boxShadow: '0 16px 35px rgba(99,91,255,0.28)',
                     }}
                   >
-                    <VideoLibraryOutlinedIcon />
+                    <AddCircleOutlineIcon />
                   </Box>
 
                   <Box>
-                    <Typography variant="h5">{totalVideos}</Typography>
+                    <Typography variant="h4" fontWeight={900}>{totalVideos}</Typography>
                     <Typography color="text.secondary">
                       Saved videos
                     </Typography>
                   </Box>
                 </Stack>
 
-                <Box
-                  sx={{
-                    p: 2,
-                    borderRadius: 4,
-                    bgcolor: '#f8fafc',
-                    border: '1px solid rgba(148,163,184,0.22)',
-                  }}
-                >
-                  <Typography fontWeight={800}>
-                    {recentVideo?.title || 'No videos yet'}
+                <Divider />
+
+                <Stack spacing={1.2}>
+                  <Typography fontWeight={900}>
+                    Workspace overview
                   </Typography>
 
-                  <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                    {recentVideo
-                      ? `Latest added: ${formatDate(recentVideo.createdAt)}`
-                      : 'Process your first video to start building your AI library.'}
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ lineHeight: 1.7 }}
+                  >
+                    Your private video library is ready for transcript summaries,
+                    embeddings, and RAG chat.
                   </Typography>
-                </Box>
+                </Stack>
 
-                <Stack spacing={1}>
-                  <Stack direction="row" justifyContent="space-between">
-                    <Typography color="text.secondary">Workspace status</Typography>
+                <Divider />
+
+                <Stack spacing={1.5}>
+                  <Stack direction="row" justifyContent="space-between" alignItems="center">
+                    <Typography color="text.secondary">status</Typography>
                     <Chip
                       size="small"
                       color={totalVideos > 0 ? 'success' : 'default'}
@@ -279,7 +304,7 @@ const DashboardPage = () => {
                     />
                   </Stack>
 
-                  <Stack direction="row" justifyContent="space-between">
+                  <Stack direction="row" justifyContent="space-between" alignItems="center">
                     <Typography color="text.secondary">Mode</Typography>
                     <Chip size="small" label="Private library" />
                   </Stack>
@@ -288,26 +313,37 @@ const DashboardPage = () => {
             </CardContent>
           </Card>
         </Grid>
-      </Grid>
+      </Grid>)}
 
-      <Stack spacing={2}>
+      <Stack spacing={1}>
         <Stack
           direction={{ xs: 'column', sm: 'row' }}
           justifyContent="space-between"
+          alignItems={{ xs: 'flex-start', sm: 'center' }}
           spacing={1}
         >
-          <Box>
-            <Typography variant="h4">
-              Video Library
-            </Typography>
+          {isDashboardView ? (
+            <Box>
+              <Typography variant="h4">
+                Recent Videos
+              </Typography>
 
-            <Typography color="text.secondary">
-              Open any indexed video and ask questions from its transcript context.
-            </Typography>
-          </Box>
+              <Typography color="text.secondary">
+                Your latest processed videos. Open any video to continue chatting.
+              </Typography>
+            </Box>
+          ) : (
+            <Box />
+          )}
+
+          {isDashboardView && videos.length > 2 && (
+            <Button component={RouterLink} to="/my-videos" variant="outlined">
+              View All Videos
+            </Button>
+          )}
         </Stack>
 
-        {videos.length === 0 ? (
+        {visibleVideos.length === 0 ? (
           <Card>
             <CardContent sx={{ p: { xs: 4, md: 6 } }}>
               <Stack spacing={2} alignItems="center" textAlign="center">
@@ -337,12 +373,12 @@ const DashboardPage = () => {
             </CardContent>
           </Card>
         ) : (
-          <Grid container spacing={3}>
-            {videos.map((video) => {
+          <Grid container spacing={2.5} justifyContent="flex-start" alignItems="stretch" sx={{ mt: 0 }}>
+            {visibleVideos.map((video) => {
               const thumbnailUrl = getVideoThumb(video);
 
               return (
-                <Grid item xs={12} md={6} xl={4} key={video._id}>
+                <Grid item xs={12} sm={6} lg={4} key={video._id}>
                   <Card
                     sx={{
                       height: '100%',
@@ -417,25 +453,51 @@ const DashboardPage = () => {
                     </CardContent>
 
                     <CardActions sx={{ p: 2, pt: 0 }}>
-                      <Stack direction="row" spacing={1.5} width="100%">
+                      <Stack direction="row" spacing={1.5} alignItems="center">
                         <Button
-                          fullWidth
                           variant="contained"
-                          size="small"
+                          size="medium"
                           startIcon={<ChatBubbleOutlineOutlinedIcon />}
                           component={RouterLink}
                           to={`/videos/${video._id}`}
+                          sx={{
+                            flex: 1,
+                            height: 48,
+                            borderRadius: 999,
+                            px: 3,
+                            fontWeight: 700,
+                            fontSize: '0.95rem',
+                            whiteSpace: 'nowrap',
+                            boxShadow: '0 10px 24px rgba(99,91,255,0.22)',
+                            '& .MuiButton-startIcon': {
+                              mr: 0.8,
+                            },
+                          }}
                         >
                           Open Chat
                         </Button>
 
-                        <LoadingButton
-                          loading={deletingId === video._id}
+                        <Button
+                          variant="outlined"
+                          color="error"
                           onClick={() => deleteVideo(video._id)}
-                          startIcon={<DeleteOutlineOutlinedIcon />}
+                          disabled={deletingId === video._id}
+                          sx={{
+                            minWidth: 52,
+                            width: 52,
+                            height: 48,
+                            borderRadius: 999,
+                            bgcolor: 'rgba(220,38,38,0.04)',
+                            borderColor: 'rgba(220,38,38,0.28)',
+                            color: 'error.main',
+                            '&:hover': {
+                              bgcolor: 'rgba(220,38,38,0.08)',
+                              borderColor: 'error.main',
+                            },
+                          }}
                         >
-                          {deletingId === video._id ? 'Deleting...' : 'Delete'}
-                        </LoadingButton>
+                          <DeleteOutlineOutlinedIcon />
+                        </Button>
                       </Stack>
                     </CardActions>
                   </Card>

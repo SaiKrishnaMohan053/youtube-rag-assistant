@@ -36,13 +36,14 @@ const navItems = [
   },
   {
     label: 'My Videos',
-    path: '/dashboard',
+    path: '/my-videos',
+    hash: '#videos',
     icon: <VideoLibraryOutlinedIcon />,
   },
 ];
 
 const SidebarContent = ({ user, location, onLogout, onClose }) => (
-  <Stack spacing={3} height="100%">
+  <Stack spacing={2.5} height="100%">
     <Stack direction="row" spacing={1.5} alignItems="center">
       <Box
         sx={{
@@ -52,14 +53,15 @@ const SidebarContent = ({ user, location, onLogout, onClose }) => (
           display: 'grid',
           placeItems: 'center',
           background: 'linear-gradient(135deg, #635bff 0%, #00c2ff 100%)',
+          boxShadow: '0 14px 32px rgba(0,194,255,0.18)',
         }}
       >
         <SmartToyOutlinedIcon />
       </Box>
 
-      <Box sx={{ flexGrow: 1 }}>
-        <Typography fontWeight={900}>YouTube RAG</Typography>
-        <Typography variant="caption" sx={{ color: '#94a3b8' }}>
+      <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+        <Typography fontWeight={900} noWrap>YouTube RAG</Typography>
+        <Typography variant="caption" sx={{ color: '#94a3b8' }} noWrap>
           Video Workspace
         </Typography>
       </Box>
@@ -73,10 +75,9 @@ const SidebarContent = ({ user, location, onLogout, onClose }) => (
 
     <Divider sx={{ borderColor: 'rgba(148,163,184,0.18)' }} />
 
-    <Stack spacing={1}>
+    <Stack spacing={0.8}>
       {navItems.map((item) => {
         const active = location.pathname === item.path;
-
         return (
           <Button
             key={item.label}
@@ -86,14 +87,26 @@ const SidebarContent = ({ user, location, onLogout, onClose }) => (
             fullWidth
             onClick={onClose}
             sx={{
+              minWidth: 48,
+              px: 2,
+              borderRadius: 3,
               justifyContent: 'flex-start',
+              fontWeight: 850,
               color: active ? '#fff' : '#cbd5e1',
               bgcolor: active ? 'rgba(99,91,255,0.22)' : 'transparent',
               border: active
-                ? '1px solid rgba(99,91,255,0.45)'
+                ? '1px solid rgba(99,91,255,0.48)'
                 : '1px solid transparent',
+              boxShadow: active
+                ? '0 12px 26px rgba(99,91,255,0.18)'
+                : 'none',
+              '& .MuiButton-startIcon': {
+                color: active ? '#fff' : '#94a3b8',
+              },
               '&:hover': {
-                bgcolor: 'rgba(255,255,255,0.08)',
+                bgcolor: active
+                  ? 'rgba(99,91,255,0.28)'
+                  : 'rgba(255,255,255,0.06)',
               },
             }}
           >
@@ -106,20 +119,21 @@ const SidebarContent = ({ user, location, onLogout, onClose }) => (
     <Box sx={{ flexGrow: 1 }} />
 
     <Box
+      spacing={1.5}
       sx={{
-        p: 2,
+        p: 1.5,
         borderRadius: 4,
         bgcolor: 'rgba(255,255,255,0.06)',
         border: '1px solid rgba(148,163,184,0.16)',
       }}
     >
-      <Stack direction="row" spacing={1.5} alignItems="center">
-        <Avatar sx={{ bgcolor: 'primary.main' }}>
+      <Stack direction="row" spacing={1.2} alignItems="center">
+        <Avatar sx={{ width: 42, height: 42, bgcolor: 'primary.main', fontWeight: 900 }}>
           {user?.name?.[0]?.toUpperCase() || 'U'}
         </Avatar>
 
         <Box sx={{ minWidth: 0 }}>
-          <Typography fontWeight={800} noWrap>
+          <Typography fontWeight={850} noWrap>
             {user?.name || 'User'}
           </Typography>
           <Typography variant="caption" sx={{ color: '#94a3b8' }} noWrap>
@@ -133,8 +147,12 @@ const SidebarContent = ({ user, location, onLogout, onClose }) => (
       startIcon={<LogoutOutlinedIcon />}
       onClick={onLogout}
       sx={{
+        minHeight: 42,
+        borderRadius: 3,
         color: '#fecaca',
         justifyContent: 'flex-start',
+        fontWeight: 800,
+        bgcolor: 'rgba(239,68,68,0.06)',
         '&:hover': {
           bgcolor: 'rgba(239,68,68,0.12)',
         },

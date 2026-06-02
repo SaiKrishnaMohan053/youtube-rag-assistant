@@ -71,55 +71,71 @@ const riskColor = (risk) => {
   return 'error';
 };
 
-const InfoCard = ({ title, value, subtitle, icon, accent = '#38bdf8' }) => (
-  <Card sx={{ ...panelSx, height: '100%' }}>
-    <CardContent>
-      <Stack spacing={2}>
-        {icon && (
-          <Box
-            sx={{
-              width: 48,
-              height: 48,
-              borderRadius: 4,
-              display: 'grid',
-              placeItems: 'center',
-              color: '#fff',
-              bgcolor: `${accent}26`,
-              border: `1px solid ${accent}55`,
-            }}
-          >
-            {icon}
-          </Box>
-        )}
+const InfoCard = ({ title, value, subtitle, icon, accent = '#38bdf8', valueFontSize }) => {
+  const valueText = String(value ?? '');
+  const isLongValue = valueText.length > 10;
 
-        <Box>
-          <Typography sx={{ color: '#94a3b8' }}>
-            {title}
-          </Typography>
-
-          <Typography
-            variant="h4"
-            fontWeight={950}
-            sx={{
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-            title={String(value)}
-          >
-            {value}
-          </Typography>
-
-          {subtitle && (
-            <Typography variant="body2" sx={{ color: '#94a3b8' }}>
-              {subtitle}
-            </Typography>
+  return (
+    <Card sx={{ ...panelSx, height: 185, overflow: 'hidden' }}>
+      <CardContent sx={{ p: 2.2, height: '100%' }}>
+        <Stack spacing={1.4} sx={{ height: '100%' }}>
+          {icon && (
+            <Box
+              sx={{
+                width: 42,
+                height: 42,
+                borderRadius: 3,
+                display: 'grid',
+                placeItems: 'center',
+                color: '#fff',
+                bgcolor: `${accent}26`,
+                border: `1px solid ${accent}55`,
+                flexShrink: 0,
+              }}
+            >
+              {icon}
+            </Box>
           )}
-        </Box>
-      </Stack>
-    </CardContent>
-  </Card>
-);
+
+          <Box sx={{ minWidth: 0 }}>
+            <Typography variant="body2" sx={{ color: '#94a3b8' }}>
+              {title}
+            </Typography>
+
+            <Typography
+              fontWeight={900}
+              title={valueText}
+              sx={{
+                mt: 0.3,
+                lineHeight: 1.15,
+                fontSize: valueFontSize || isLongValue ? '1.05rem' : '1.9rem',
+                wordBreak: 'break-word',
+                overflowWrap: 'anywhere',
+                whiteSpace: 'normal',
+              }}
+            >
+              {valueText}
+            </Typography>
+
+            {subtitle && (
+              <Typography
+                variant="caption"
+                sx={{
+                  color: '#94a3b8',
+                  display: 'block',
+                  mt: 0.5,
+                  lineHeight: 1.25,
+                }}
+              >
+                {subtitle}
+              </Typography>
+            )}
+          </Box>
+        </Stack>
+      </CardContent>
+    </Card>
+  );
+};
 
 const DataTableCard = ({ title, subtitle, children }) => (
   <Card sx={panelSx}>
@@ -292,155 +308,172 @@ const AdminEvalPage = () => {
 
             <Divider sx={{ borderColor: 'rgba(148,163,184,0.16)' }} />
 
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={5}>
-                <TextField
-                  fullWidth
-                  label="Mongo Video ID"
-                  value={videoId}
-                  onChange={(e) => setVideoId(e.target.value)}
-                  placeholder="Example: 686f2d9e7abf4c3a91e12345"
-                />
-              </Grid>
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: {
+                  xs: '1fr',
+                  md: '1fr 1fr 180px',
+                },
+                gap: 2,
+                alignItems: 'center',
+              }}
+            >
+              <TextField
+                fullWidth
+                label="Mongo Video ID"
+                value={videoId}
+                onChange={(e) => setVideoId(e.target.value)}
+                placeholder="Example: 686f2d9e7abf4c3a91e12345"
+              />
 
-              <Grid item xs={12} md={5}>
-                <TextField
-                  fullWidth
-                  label="Guest YouTube URL"
-                  value={guestUrl}
-                  onChange={(e) => setGuestUrl(e.target.value)}
-                  placeholder="https://www.youtube.com/watch?v=..."
-                />
-              </Grid>
+              <TextField
+                fullWidth
+                label="Guest YouTube URL"
+                value={guestUrl}
+                onChange={(e) => setGuestUrl(e.target.value)}
+                placeholder="https://www.youtube.com/watch?v=..."
+              />
 
-              <Grid item xs={12} md={2}>
-                <Button
-                  fullWidth
-                  size="large"
-                  variant="contained"
-                  onClick={handleRunEval}
-                  disabled={runLoading}
-                  sx={{ height: '100%' }}
-                >
-                  {runLoading ? 'Running...' : 'Run Eval'}
-                </Button>
-              </Grid>
-            </Grid>
+              <Button
+                fullWidth
+                size="large"
+                variant="contained"
+                onClick={handleRunEval}
+                disabled={runLoading}
+                sx={{
+                  height: 56,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {runLoading ? 'Running...' : 'Run Eval'}
+              </Button>
+            </Box>
           </Stack>
         </CardContent>
       </Card>
 
-      <Grid container spacing={2.5}>
-        <Grid item xs={12} md={2.4}>
-          <InfoCard
-            title="Reports"
-            value={stats?.reportCount || 0}
-            subtitle="Stored eval runs"
-            icon={<AssessmentOutlinedIcon />}
-            accent="#38bdf8"
-          />
-        </Grid>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: {
+            xs: '1fr',
+            sm: 'repeat(2,1fr)',
+            lg: 'repeat(5,1fr)',
+          },
+          gap: 2.5,
+          width: '100%',
+          alignItems: 'stretch',
+        }}
+      >
+        <InfoCard
+          title="Reports"
+          value={stats?.reportCount || 0}
+          subtitle="Stored eval runs"
+          icon={<AssessmentOutlinedIcon />}
+          accent="#38bdf8"
+        />
 
-        <Grid item xs={12} md={2.4}>
-          <InfoCard
-            title="Avg Pass Rate"
-            value={`${stats?.avgPassRate || 0}%`}
-            subtitle="Across reports"
-            icon={<FactCheckOutlinedIcon />}
-            accent="#22c55e"
-          />
-        </Grid>
+        <InfoCard
+          title="Avg Pass Rate"
+          value={`${stats?.avgPassRate || 0}%`}
+          subtitle="Across reports"
+          icon={<FactCheckOutlinedIcon />}
+          accent="#22c55e"
+        />
 
-        <Grid item xs={12} md={2.4}>
-          <InfoCard
-            title="Avg Latency"
-            value={`${stats?.avgLatencyMs || 0} ms`}
-            subtitle="Across eval cases"
-            icon={<SpeedOutlinedIcon />}
-            accent="#f59e0b"
-          />
-        </Grid>
+        <InfoCard
+          title="Avg Latency"
+          value={`${stats?.avgLatencyMs || 0} ms`}
+          subtitle="Across eval cases"
+          icon={<SpeedOutlinedIcon />}
+          accent="#f59e0b"
+          valueFontSize="1.9rem"
+        />
 
-        <Grid item xs={12} md={2.4}>
-          <InfoCard
-            title="Best Category"
-            value={stats?.bestCategory?.category || 'N/A'}
-            subtitle={
-              stats?.bestCategory
-                ? `Score ${stats.bestCategory.avgWeightedScore}`
-                : 'No data'
-            }
-            icon={<StarBorderOutlinedIcon />}
-            accent="#a855f7"
-          />
-        </Grid>
+        <InfoCard
+          title="Best Category"
+          value={stats?.bestCategory?.category || 'N/A'}
+          subtitle={
+            stats?.bestCategory
+              ? `Score ${stats.bestCategory.avgWeightedScore}`
+              : 'No data'
+          }
+          icon={<StarBorderOutlinedIcon />}
+          accent="#a855f7"
+        />
 
-        <Grid item xs={12} md={2.4}>
-          <InfoCard
-            title="Slowest Category"
-            value={stats?.slowestCategory?.category || 'N/A'}
-            subtitle={
-              stats?.slowestCategory
-                ? `${stats.slowestCategory.avgLatencyMs} ms`
-                : 'No data'
+        <InfoCard
+          title="Slowest Category"
+          value={stats?.slowestCategory?.category || 'N/A'}
+          subtitle={
+            stats?.slowestCategory
+              ? `${stats.slowestCategory.avgLatencyMs} ms`
+              : 'No data'
             }
             icon={<TimelineOutlinedIcon />}
             accent="#ef4444"
-          />
-        </Grid>
-      </Grid>
+        />
+      </Box>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
-          <Card sx={panelSx}>
-            <CardContent>
-              <Typography variant="h5" fontWeight={900} gutterBottom>
-                Grade Distribution
-              </Typography>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: {
+            xs: '1fr',
+            md: '1fr 1fr',
+          },
+          gap: 3,
+          width: '100%',
+          alignItems: 'stretch',
+        }}
+      >
+        <Card sx={{ ...panelSx, height: 120 }}>
+          <CardContent sx={{ p: 2.5 }}>
+            <Typography variant="h6" fontWeight={900} gutterBottom>
+              Grade Distribution
+            </Typography>
 
-              <Stack direction="row" spacing={1} flexWrap="wrap">
-                {Object.entries(gradeDistribution).map(([grade, count]) => (
-                  <Chip
-                    key={grade}
-                    label={`${grade}: ${count}`}
-                    color={gradeColor(grade)}
-                    sx={{ mb: 1 }}
-                  />
-                ))}
+            <Stack direction="row" spacing={1} flexWrap="wrap">
+              {Object.entries(gradeDistribution).map(([grade, count]) => (
+                <Chip
+                  key={grade}
+                  label={`${grade}: ${count}`}
+                  color={gradeColor(grade)}
+                  sx={{ mb: 1 }}
+                />
+              ))}
 
-                {!Object.keys(gradeDistribution).length && (
-                  <Typography sx={{ color: '#94a3b8' }}>No grades yet.</Typography>
-                )}
-              </Stack>
-            </CardContent>
-          </Card>
-        </Grid>
+              {!Object.keys(gradeDistribution).length && (
+                <Typography sx={{ color: '#94a3b8' }}>No grades yet.</Typography>
+              )}
+            </Stack>
+          </CardContent>
+        </Card>
 
-        <Grid item xs={12} md={6}>
-          <Card sx={panelSx}>
-            <CardContent>
-              <Typography variant="h5" fontWeight={900} gutterBottom>
-                Hallucination Risk
-              </Typography>
+        <Card sx={{ ...panelSx, height: 120 }}>
+          <CardContent sx={{ p: 2.5 }}>
+            <Typography variant="h6" fontWeight={900} gutterBottom>
+              Hallucination Risk
+            </Typography>
 
-              <Stack direction="row" spacing={1} flexWrap="wrap">
-                {Object.entries(hallucinationRiskTotals).map(([risk, count]) => (
-                  <Chip
-                    key={risk}
-                    label={`${risk}: ${count}`}
-                    color={riskColor(risk)}
-                    sx={{ mb: 1 }}
-                  />
-                ))}
+            <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" alignItems="center">
+              {Object.entries(hallucinationRiskTotals).map(([risk, count]) => (
+                <Chip
+                  key={risk}
+                  label={`${risk}: ${count}`}
+                  color={riskColor(risk)}
+                  sx={{ mb: 1 }}
+                />
+              ))}
 
-                {!Object.keys(hallucinationRiskTotals).length && (
-                  <Typography sx={{ color: '#94a3b8' }}>No risk data yet.</Typography>
-                )}
-              </Stack>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+              {!Object.keys(hallucinationRiskTotals).length && (
+                <Typography sx={{ color: '#94a3b8' }}>No risk data yet.</Typography>
+              )}
+            </Stack>
+          </CardContent>
+        </Card>
+      </Box>
 
       <DataTableCard
         title="Category Performance"
@@ -449,7 +482,7 @@ const AdminEvalPage = () => {
         <TableContainer
           sx={{
             maxHeight: 480,
-            borderRadius: 4,
+            borderRadius: 1.5,
             border: '1px solid rgba(148,163,184,0.14)',
           }}
         >
@@ -498,7 +531,7 @@ const AdminEvalPage = () => {
         <TableContainer
           sx={{
             maxHeight: 520,
-            borderRadius: 4,
+            borderRadius: 2,
             border: '1px solid rgba(148,163,184,0.14)',
           }}
         >
@@ -650,7 +683,7 @@ const AdminEvalPage = () => {
               <TableContainer
                 sx={{
                   maxHeight: 620,
-                  borderRadius: 4,
+                  borderRadius: 2,
                   border: '1px solid rgba(148,163,184,0.14)',
                 }}
               >

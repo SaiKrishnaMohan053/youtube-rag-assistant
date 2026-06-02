@@ -73,18 +73,20 @@ const panelSx = {
 const glassTableCellSx = {
   color: '#cbd5e1',
   borderColor: 'rgba(148,163,184,0.14)',
+  px: 1.5,
+  py: 1.5,
 };
 
 const InfoCard = ({ title, value, subtitle, icon, accent = '#7c3aed' }) => (
   <Card sx={{ ...panelSx, height: '100%' }}>
-    <CardContent>
-      <Stack spacing={2}>
+    <CardContent sx={{ p: 2.2 }}>
+      <Stack spacing={1.4}>
         <Stack direction="row" justifyContent="space-between" alignItems="center">
           <Box
             sx={{
-              width: 46,
-              height: 46,
-              borderRadius: 4,
+              width: 40,
+              height: 40,
+              borderRadius: 3,
               display: 'grid',
               placeItems: 'center',
               color: '#fff',
@@ -99,6 +101,7 @@ const InfoCard = ({ title, value, subtitle, icon, accent = '#7c3aed' }) => (
             size="small"
             label="Live"
             sx={{
+              height: 24,
               color: '#bbf7d0',
               bgcolor: 'rgba(34,197,94,0.12)',
               border: '1px solid rgba(34,197,94,0.22)',
@@ -107,16 +110,16 @@ const InfoCard = ({ title, value, subtitle, icon, accent = '#7c3aed' }) => (
         </Stack>
 
         <Box>
-          <Typography sx={{ color: '#94a3b8' }}>
+          <Typography variant="body2" sx={{ color: '#94a3b8' }}>
             {title}
           </Typography>
 
-          <Typography variant="h4" fontWeight={950}>
+          <Typography variant="h5" fontWeight={950}>
             {value}
           </Typography>
 
           {subtitle && (
-            <Typography variant="body2" sx={{ color: '#94a3b8' }}>
+            <Typography variant="caption" sx={{ color: '#94a3b8' }}>
               {subtitle}
             </Typography>
           )}
@@ -127,20 +130,33 @@ const InfoCard = ({ title, value, subtitle, icon, accent = '#7c3aed' }) => (
 );
 
 const ChartCard = ({ title, subtitle, children }) => (
-  <Card sx={{ ...panelSx, height: 400 }}>
-    <CardContent sx={{ height: '100%' }}>
-      <Stack spacing={0.5} sx={{ mb: 2 }}>
-        <Typography variant="h6" fontWeight={900}>
+  <Card sx={{ ...panelSx, height: 360 }}>
+    <CardContent sx={{ height: '100%', p: 2.5 }}>
+      <Box sx={{ height: 88 }}>
+        <Typography
+          variant="h6"
+          fontWeight={900}
+          sx={{
+            lineHeight: 1.15,
+          }}
+        >
           {title}
         </Typography>
+
         {subtitle && (
-          <Typography variant="body2" sx={{ color: '#94a3b8' }}>
+          <Typography
+            variant="body2"
+            sx={{
+              color: '#94a3b8',
+              mt: 0.8,
+            }}
+          >
             {subtitle}
           </Typography>
         )}
-      </Stack>
+      </Box>
 
-      <Box sx={{ height: 305 }}>
+      <Box sx={{ height: 220 }}>
         {children}
       </Box>
     </CardContent>
@@ -266,7 +282,7 @@ const AdminHomePage = () => {
   );
 
   return (
-    <Stack spacing={3}>
+    <Stack spacing={2.5} sx={{ maxWidth: 1480, mx: 'auto', width: '100%' }}>
       <Card
         sx={{
           ...panelSx,
@@ -274,7 +290,7 @@ const AdminHomePage = () => {
             'linear-gradient(135deg, rgba(124,58,237,0.22), rgba(6,182,212,0.1), rgba(15,23,42,0.92))',
         }}
       >
-        <CardContent sx={{ p: { xs: 3, md: 4 } }}>
+        <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
           <Stack
             direction={{ xs: 'column', md: 'row' }}
             justifyContent="space-between"
@@ -285,11 +301,11 @@ const AdminHomePage = () => {
                 AI Operations Center
               </Typography>
 
-              <Typography variant="h3" fontWeight={950}>
+              <Typography variant="h4" fontWeight={950}>
                 Admin Dashboard
               </Typography>
 
-              <Typography sx={{ color: '#cbd5e1', maxWidth: 820, mt: 1 }}>
+              <Typography sx={{ color: '#cbd5e1', maxWidth: 760, mt: 0.7 }}>
                 Monitor users, videos, chunks, summaries, embeddings, FAISS indexing,
                 eval quality, and system health from one control panel.
               </Typography>
@@ -297,8 +313,8 @@ const AdminHomePage = () => {
 
             <Stack direction="row" spacing={1} alignItems="flex-start">
               <Chip
-                label={health?.status || 'System'}
-                color={health?.status === 'ok' ? 'success' : 'warning'}
+                label={health?.status === 'ready' || health?.status === 'ok' ? 'Healthy' : 'Check'}
+                color={health?.status === 'ready' || health?.status === 'ok' ? 'success' : 'warning'}
               />
 
               <Button
@@ -317,142 +333,145 @@ const AdminHomePage = () => {
       {error && <Alert severity="error">{error}</Alert>}
       {successMessage && <Alert severity="success">{successMessage}</Alert>}
 
-      <Grid container spacing={2.5}>
-        <Grid item xs={12} sm={6} lg={2}>
-          <InfoCard
-            title="Users"
-            value={overview?.totalUsers || 0}
-            icon={<PeopleAltOutlinedIcon />}
-            accent="#38bdf8"
-          />
-        </Grid>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: {
+            xs: '1fr',
+            sm: 'repeat(2, 1fr)',
+            lg: 'repeat(6, 1fr)',
+          },
+          gap: 2.5,
+          width: '100%',
+        }}
+      >
+        <InfoCard
+          title="Users"
+          value={overview?.totalUsers || 0}
+          icon={<PeopleAltOutlinedIcon />}
+          accent="#38bdf8"
+        />
 
-        <Grid item xs={12} sm={6} lg={2}>
-          <InfoCard
-            title="Videos"
-            value={overview?.totalVideos || 0}
-            icon={<VideoLibraryOutlinedIcon />}
-            accent="#7c3aed"
-          />
-        </Grid>
+        <InfoCard
+          title="Videos"
+          value={overview?.totalVideos || 0}
+          icon={<VideoLibraryOutlinedIcon />}
+          accent="#7c3aed"
+        />
 
-        <Grid item xs={12} sm={6} lg={2}>
-          <InfoCard
-            title="Chunks"
-            value={overview?.totalChunks || 0}
-            icon={<StorageOutlinedIcon />}
-            accent="#06b6d4"
-          />
-        </Grid>
+        <InfoCard
+          title="Chunks"
+          value={overview?.totalChunks || 0}
+          icon={<StorageOutlinedIcon />}
+          accent="#06b6d4"
+        />
 
-        <Grid item xs={12} sm={6} lg={2}>
-          <InfoCard
-            title="Summaries"
-            value={overview?.summaries?.completed || 0}
-            subtitle="completed"
-            icon={<AutoAwesomeOutlinedIcon />}
-            accent="#f59e0b"
-          />
-        </Grid>
+        <InfoCard
+          title="Summaries"
+          value={overview?.summaries?.completed || 0}
+          subtitle="completed"
+          icon={<AutoAwesomeOutlinedIcon />}
+          accent="#f59e0b"
+        />
 
-        <Grid item xs={12} sm={6} lg={2}>
-          <InfoCard
-            title="Embeddings"
-            value={overview?.embeddings?.completed || 0}
-            subtitle="completed"
-            icon={<HubOutlinedIcon />}
-            accent="#22c55e"
-          />
-        </Grid>
+        <InfoCard
+          title="Embeddings"
+          value={overview?.embeddings?.completed || 0}
+          subtitle="completed"
+          icon={<HubOutlinedIcon />}
+          accent="#22c55e"
+        />
 
-        <Grid item xs={12} sm={6} lg={2}>
-          <InfoCard
-            title="System"
-            value={health?.status || 'N/A'}
-            icon={<HealthAndSafetyOutlinedIcon />}
-            accent="#ef4444"
-          />
-        </Grid>
-      </Grid>
+        <InfoCard
+          title="System"
+          value={health?.status || 'N/A'}
+          icon={<HealthAndSafetyOutlinedIcon />}
+          accent="#ef4444"
+        />
+      </Box>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12} lg={6}>
-          <ChartCard
-            title="Category Performance"
-            subtitle="Average weighted score by eval category"
-          >
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={categoryData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.18)" />
-                <XAxis dataKey="category" stroke="#94a3b8" />
-                <YAxis domain={[0, 1]} stroke="#94a3b8" />
-                <Tooltip
-                  contentStyle={{
-                    background: '#0f172a',
-                    border: '1px solid rgba(148,163,184,0.24)',
-                    borderRadius: 12,
-                    color: '#fff',
-                  }}
-                />
-                <Bar dataKey="avgWeightedScore" fill="#38bdf8" radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartCard>
-        </Grid>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: {
+            xs: '1fr',
+            lg: '2fr 1fr 1fr',
+          },
+          gap: 2.5,
+          width: '100%',
+        }}
+      >
+        <ChartCard
+           title="Category Performance"
+           subtitle="Average weighted score by eval category"
+        >
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={categoryData} margin={{ top: 10, right: 10, left: 0, bottom: 35 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.18)" />
+              <XAxis dataKey="category" stroke="#94a3b8" />
+              <YAxis domain={[0, 1]} stroke="#94a3b8" />
+              <Tooltip
+                contentStyle={{
+                  background: '#0f172a',
+                  border: '1px solid rgba(148,163,184,0.24)',
+                  borderRadius: 12,
+                  color: '#fff',
+                }}
+              />
+              <Bar dataKey="avgWeightedScore" fill="#38bdf8" radius={[8, 8, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartCard>
 
-        <Grid item xs={12} lg={3}>
-          <ChartCard title="Grades" subtitle="Eval grade distribution">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie data={gradeData} dataKey="value" outerRadius={105}>
-                  {gradeData.map((e, i) => (
-                    <Cell
-                      key={e.name}
-                      fill={GRADE_COLORS[i % GRADE_COLORS.length]}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{
-                    background: '#0f172a',
-                    border: '1px solid rgba(148,163,184,0.24)',
-                    borderRadius: 12,
-                    color: '#fff',
-                  }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </ChartCard>
-        </Grid>
+        <ChartCard title="Grades" subtitle="Eval grade distribution">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
+              <Pie data={gradeData} dataKey="value" outerRadius={78} cx="50%" cy="50%">
+                {gradeData.map((e, i) => (
+                  <Cell
+                    key={e.name}
+                    fill={GRADE_COLORS[i % GRADE_COLORS.length]}
+                  />
+                ))}
+              </Pie>
+              <Tooltip
+                contentStyle={{
+                  background: '#0f172a',
+                  border: '1px solid rgba(148,163,184,0.24)',
+                  borderRadius: 12,
+                  color: '#fff',
+                }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        </ChartCard>
 
-        <Grid item xs={12} lg={3}>
-          <ChartCard title="Hallucination Risk" subtitle="Risk totals">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie data={riskData} dataKey="value" outerRadius={105}>
-                  {riskData.map((e, i) => (
-                    <Cell
-                      key={e.name}
-                      fill={RISK_COLORS[i % RISK_COLORS.length]}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{
-                    background: '#0f172a',
-                    border: '1px solid rgba(148,163,184,0.24)',
-                    borderRadius: 12,
-                    color: '#fff',
-                  }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </ChartCard>
-        </Grid>
-      </Grid>
+        <ChartCard title="Hallucination Risk" subtitle="Risk totals">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
+              <Pie data={riskData} dataKey="value" outerRadius={78} cx="50%" cy="50%">
+                {riskData.map((e, i) => (
+                  <Cell
+                    key={e.name}
+                    fill={RISK_COLORS[i % RISK_COLORS.length]}
+                  />
+                ))}
+              </Pie>
+              <Tooltip
+                contentStyle={{
+                  background: '#0f172a',
+                  border: '1px solid rgba(148,163,184,0.24)',
+                  borderRadius: 12,
+                  color: '#fff',
+                }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        </ChartCard>
+      </Box>
 
       <Card sx={panelSx}>
-        <CardContent>
+        <CardContent sx={{ p: 2.5 }}>
           <Stack
             direction={{ xs: 'column', sm: 'row' }}
             justifyContent="space-between"
@@ -481,11 +500,12 @@ const AdminHomePage = () => {
           <TableContainer
             sx={{
               maxHeight: 480,
-              borderRadius: 4,
+              borderRadius: 2,
               border: '1px solid rgba(148,163,184,0.14)',
+              overflowX: 'auto',
             }}
           >
-            <Table stickyHeader>
+            <Table stickyHeader size='small' sx={{ minWidth: 980 }}>
               <TableHead>
                 <TableRow>
                   {['Name', 'Email', 'Role', 'Videos', 'Chunks', 'Actions'].map((head) => (
@@ -510,6 +530,8 @@ const AdminHomePage = () => {
                     key={user._id}
                     hover
                     sx={{
+                      px: 2.5,
+                      py: 1.4,
                       '&:hover td': {
                         bgcolor: 'rgba(255,255,255,0.035)',
                       },
@@ -535,8 +557,8 @@ const AdminHomePage = () => {
                     <TableCell sx={glassTableCellSx}>{user.chunkCount}</TableCell>
 
                     <TableCell sx={glassTableCellSx}>
-                      <Button variant="outlined" onClick={() => openUserVideos(user)}>
-                        View Videos
+                      <Button variant="outlined" onClick={() => openUserVideos(user)} sx={{ borderRadius: 999, px: 2.2, whiteSpace: 'nowrap', size: 'small'  }}>
+                        View
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -592,7 +614,7 @@ const AdminHomePage = () => {
           <TableContainer
             sx={{
               maxHeight: 560,
-              borderRadius: 4,
+              borderRadius: 2,
               border: '1px solid rgba(148,163,184,0.14)',
             }}
           >
@@ -700,6 +722,8 @@ const AdminHomePage = () => {
             bgcolor: '#0f172a',
             color: '#fff',
             border: '1px solid rgba(148,163,184,0.18)',
+            maxHeight: '88vh',
+            overflow: 'hidden',
           },
         }}
       >
@@ -720,7 +744,7 @@ const AdminHomePage = () => {
           </Stack>
         </DialogTitle>
 
-        <DialogContent>
+        <DialogContent sx={{ overflow: 'hidden', display: 'flex', flexDirection: 'column', pb: 2 }}>
           <Stack direction="row" spacing={1} sx={{ mb: 2 }} flexWrap="wrap">
             <Chip
               label={
@@ -740,8 +764,8 @@ const AdminHomePage = () => {
 
           <TableContainer
             sx={{
-              maxHeight: 620,
-              borderRadius: 4,
+              maxHeight: 'calc(88vh - 170px)',
+              borderRadius: 2,
               border: '1px solid rgba(148,163,184,0.14)',
             }}
           >

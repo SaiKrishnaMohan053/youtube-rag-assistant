@@ -123,10 +123,10 @@ const GuestPage = () => {
 
   return (
     <Box>
-      <Container maxWidth="xl" sx={{ py: { xs: 5, md: 8 } }}>
-        <Grid container spacing={4} alignItems="center">
+      <Container maxWidth="xl" sx={{ py: { xs: 3, md: 4 } }}>
+        <Grid container spacing={3} alignItems="center">
           <Grid item xs={12} lg={6}>
-            <Stack spacing={3}>
+            <Stack spacing={2.2}>
               <Stack direction="row" spacing={1} flexWrap="wrap">
                 <Chip
                   icon={<VerifiedOutlinedIcon />}
@@ -209,7 +209,7 @@ const GuestPage = () => {
           <Grid item xs={12} lg={6}>
             <Card
               sx={{
-                minHeight: 520,
+                minHeight: 460,
                 background:
                   'linear-gradient(145deg, rgba(15,23,42,0.96), rgba(30,41,59,0.94))',
                 color: '#fff',
@@ -227,7 +227,7 @@ const GuestPage = () => {
               />
 
               <CardContent sx={{ position: 'relative', p: { xs: 3, md: 4 } }}>
-                <Stack spacing={3}>
+                <Stack spacing={2.2}>
                   <Box>
                     <Typography variant="overline" sx={{ color: '#93c5fd' }}>
                       AI Workflow
@@ -242,7 +242,7 @@ const GuestPage = () => {
                       <Box
                         key={step}
                         sx={{
-                          p: 2,
+                          p: 1.5,
                           borderRadius: 4,
                           display: 'flex',
                           alignItems: 'center',
@@ -325,11 +325,11 @@ const GuestPage = () => {
           </Grid>
         </Grid>
 
-        <Grid container spacing={2.5} sx={{ mt: { xs: 5, md: 8 } }}>
+        <Grid container spacing={2.5} sx={{ mt: { xs: 1.5, md: 2.5 } }}>
           {featureCards.map((feature) => (
             <Grid item xs={12} md={4} key={feature.title}>
               <Card sx={{ height: '100%' }}>
-                <CardContent>
+                <CardContent sx={{ p: 3 }}>
                   <Stack spacing={2}>
                     <Box
                       sx={{
@@ -430,7 +430,7 @@ const GuestPage = () => {
                           key={item.id}
                           sx={{
                             p: 2,
-                            borderRadius: 4,
+                            borderRadius: 2,
                             bgcolor: '#f8fafc',
                             border: '1px solid rgba(148,163,184,0.24)',
                           }}
