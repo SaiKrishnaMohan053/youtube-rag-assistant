@@ -75,8 +75,8 @@ const LoginPage = () => {
   if (loading) return <PageLoader text="Signing you in..." />;
 
   return (
-    <Container maxWidth={false} disableGutters sx={{ minHeight: { xs: 'auto', md: 'calc(100vh - 72px)' }, display: 'flex', alignItems: 'center', px: { xs: 2, md: 4 }, py: { xs: 4, md: 3 } }}>
-      <Grid container spacing={{ xs: 4, md: 6 }} alignItems="center" justifyContent="space-between" sx={{ height: '100%' }}>
+    <Container maxWidth={false} disableGutters sx={{ minHeight: { xs: 'auto', md: 'calc(100vh - 72px)' }, display: 'flex', alignItems: 'center', px: { xs: 2, md: 4 }, py: { xs: 3, md: 3 } }}>
+      <Grid container spacing={{ xs: 3, md: 6 }} alignItems="center" justifyContent="space-between" sx={{ height: '100%' }}>
         <Grid item xs={12} md={6.6}>
           <Stack spacing={2.3}>
             <Chip
@@ -89,8 +89,8 @@ const LoginPage = () => {
             <Typography
               variant="h2"
               sx={{
-                fontSize: { xs: 40, md: 58, lg: 66 },
-                lineHeight: 0.95,
+                fontSize: { xs: 38, sm: 44, md: 58, lg: 66 },
+                lineHeight: { xs: 1.02, md: 0.95 },
                 maxWidth: 860,
               }}
             >
@@ -100,7 +100,7 @@ const LoginPage = () => {
             <Typography
               variant="h6"
               color="text.secondary"
-              sx={{ maxWidth: 760, lineHeight: 1.55 }}
+              sx={{ maxWidth: 760, lineHeight: { xs: 1.5, md: 1.55 }, fontSize: { xs: '1.05rem', md: '1.25rem' } }}
             >
               Sign in to access saved videos, summaries, chat history, FAISS indexes,
               and transcript-grounded AI answers.
@@ -108,7 +108,7 @@ const LoginPage = () => {
 
             <Box
               sx={{
-                display: 'grid',
+                display: { xs: 'none', md: 'grid' },
                 gridTemplateColumns: {
                   xs: '1fr',
                   md: 'repeat(3, 220px)',
@@ -196,10 +196,10 @@ const LoginPage = () => {
               backdropFilter: 'blur(20px)',
             }}
           >
-            <CardContent sx={{ p: { xs: 3, md: 3.5 } }}>
+            <CardContent sx={{ p: { xs: 2.5, md: 3.5 } }}>
               <Stack spacing={2}>
                 <Box>
-                  <Typography variant="h4">
+                  <Typography variant="h4" sx={{ fontSize: { xs: '2.25rem', md: '2.5rem' } }}>
                     Login
                   </Typography>
 
