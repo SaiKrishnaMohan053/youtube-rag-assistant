@@ -123,11 +123,11 @@ const GuestPage = () => {
 
   return (
     <Box>
-      <Container maxWidth="xl" sx={{ py: { xs: 3, md: 4 } }}>
+      <Container maxWidth="xl" sx={{ py: { xs: 2.5, md: 4 }, px: { xs: 2, md: 3 } }}>
         <Grid container spacing={3} alignItems="center">
           <Grid item xs={12} lg={6}>
             <Stack spacing={2.2}>
-              <Stack direction="row" spacing={1} flexWrap="wrap">
+              <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" justifyContent={{ xs: 'center', lg: 'flex-start' }}>
                 <Chip
                   icon={<VerifiedOutlinedIcon />}
                   label="Transcript-grounded AI"
@@ -141,8 +141,8 @@ const GuestPage = () => {
                 variant="h2"
                 sx={{
                   maxWidth: 760,
-                  fontSize: { xs: 42, md: 64 },
-                  lineHeight: 0.95,
+                  fontSize: { xs: 38, sm: 46, md: 64 },
+                  lineHeight: { xs: 1.02, md: 0.95 },
                 }}
               >
                 Turn YouTube videos into searchable AI knowledge.
@@ -151,7 +151,7 @@ const GuestPage = () => {
               <Typography
                 variant="h6"
                 color="text.secondary"
-                sx={{ maxWidth: 680, lineHeight: 1.7 }}
+                sx={{ maxWidth: 680, lineHeight: { xs: 1.55, md: 1.7 }, fontSize: { xs: '1.05rem', md: '1.25rem' } }}
               >
                 Paste a YouTube URL, generate a transcript-based summary, then ask
                 questions using a RAG workflow powered by chunks, embeddings, FAISS,
@@ -165,7 +165,7 @@ const GuestPage = () => {
                   backdropFilter: 'blur(20px)',
                 }}
               >
-                <CardContent>
+                <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
                   <Stack spacing={2}>
                     <Typography variant="h6">
                       Try the guest demo
@@ -232,7 +232,7 @@ const GuestPage = () => {
                     <Typography variant="overline" sx={{ color: '#93c5fd' }}>
                       AI Workflow
                     </Typography>
-                    <Typography variant="h4">
+                    <Typography variant="h4" sx={{ fontSize: { xs: '2rem', md: '2.125rem' } }}>
                       From video to RAG chat
                     </Typography>
                   </Box>
@@ -242,7 +242,7 @@ const GuestPage = () => {
                       <Box
                         key={step}
                         sx={{
-                          p: 1.5,
+                          p: { xs: 1.25, md: 1.5 },
                           borderRadius: 4,
                           display: 'flex',
                           alignItems: 'center',
@@ -329,7 +329,7 @@ const GuestPage = () => {
           {featureCards.map((feature) => (
             <Grid item xs={12} md={4} key={feature.title}>
               <Card sx={{ height: '100%' }}>
-                <CardContent sx={{ p: 3 }}>
+                <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
                   <Stack spacing={2}>
                     <Box
                       sx={{

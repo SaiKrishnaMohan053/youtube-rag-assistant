@@ -56,7 +56,7 @@ const PublicNavbar = () => {
               <Typography fontWeight={900} lineHeight={1}>
                 YouTube RAG
               </Typography>
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" color="text.secondary" sx={{ display: { xs: 'none', sm: 'block' } }}>
                 AI Video Intelligence
               </Typography>
             </Box>
