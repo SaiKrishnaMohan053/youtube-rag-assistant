@@ -23,7 +23,7 @@ const PublicNavbar = () => {
       }}
     >
       <Container maxWidth="xl">
-        <Toolbar disableGutters sx={{ minHeight: 72 }}>
+        <Toolbar disableGutters sx={{ minHeight: { xs: 64, sm: 72 } }}>
           <Stack
             direction="row"
             spacing={1.2}
@@ -38,9 +38,10 @@ const PublicNavbar = () => {
           >
             <Box
               sx={{
-                width: 42,
-                height: 42,
-                borderRadius: 3,
+                width: { xs: 40, sm: 42 },
+                height: { xs: 40, sm: 42 },
+                borderRadius: { xs: 2.5, sm: 3 },
+                flexShrink: 0,
                 display: 'grid',
                 placeItems: 'center',
                 color: '#fff',
@@ -53,7 +54,7 @@ const PublicNavbar = () => {
             </Box>
 
             <Box>
-              <Typography fontWeight={900} lineHeight={1}>
+              <Typography fontWeight={900} lineHeight={1} sx={{ fontSize: { xs: '1rem', sm: '1.05rem' }, whiteSpace: 'nowrap' }}>
                 YouTube RAG
               </Typography>
               <Typography variant="caption" color="text.secondary" sx={{ display: { xs: 'none', sm: 'block' } }}>
@@ -62,12 +63,12 @@ const PublicNavbar = () => {
             </Box>
           </Stack>
 
-          <Stack direction="row" spacing={1}>
-            <Button component={RouterLink} to="/login">
+          <Stack direction="row" spacing={{ xs: 0.5, sm: 1 }} alignItems="center">
+            <Button component={RouterLink} to="/login" sx={{ minWidth: { xs: 52, sm: 64 }, px: { xs: 1, sm: 2 }, fontSize: { xs: '0.85rem', sm: '0.95rem' } }}>
               Login
             </Button>
 
-            <Button variant="contained" component={RouterLink} to="/register">
+            <Button variant="contained" component={RouterLink} to="/register" sx={{ minWidth: { xs: 104, sm: 132 }, px: { xs: 1.5, sm: 2.5 }, fontSize: { xs: '0.85rem', sm: '0.95rem' }, borderRadius: 999, whiteSpace: 'nowrap' }}>
               Get Started
             </Button>
           </Stack>
