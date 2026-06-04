@@ -19,7 +19,7 @@ import StorageOutlinedIcon from '@mui/icons-material/StorageOutlined';
 import HubOutlinedIcon from '@mui/icons-material/HubOutlined';
 import VerifiedOutlinedIcon from '@mui/icons-material/VerifiedOutlined';
 import { Link as RouterLink } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 import LoadingButton from '../components/LoadingButton';
 import MarkdownAnswer from '../components/MarkdownAnswer';
@@ -61,6 +61,17 @@ const GuestPage = () => {
   const [loadingSummary, setLoadingSummary] = useState(false);
   const [loadingAnswer, setLoadingAnswer] = useState(false);
   const [error, setError] = useState('');
+
+  const summaryRef = useRef(null);
+
+  useEffect(() => {
+    if (!summary || !summaryRef.current) return;
+
+    summaryRef.current.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  }, [summary]);
 
   const generateSummary = async () => {
     if (!url.trim()) {
@@ -358,7 +369,7 @@ const GuestPage = () => {
         </Grid>
 
         {summary && (
-          <Grid container spacing={3} sx={{ mt: 4 }}>
+          <Grid ref={summaryRef} container spacing={3} sx={{ mt: 4, scrollMarginTop: { xs: 90, md: 100 } }}>
             <Grid item xs={12} lg={7}>
               <Card>
                 <CardContent>
