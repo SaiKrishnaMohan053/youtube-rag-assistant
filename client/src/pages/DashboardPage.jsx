@@ -185,13 +185,13 @@ const DashboardPage = ({ view = 'dashboard' }) => {
   }
 
   return (
-    <Stack spacing={2.5}>
+    <Stack spacing={2.5} sx={{ width: '100%', }}>
       <Box>
         <Typography variant="overline" color="text.secondary">
           AI Video Workspace
         </Typography>
 
-        <Typography variant="h3">
+        <Typography variant="h3" sx={{ fontSize: { xs: '3rem', md: '3.75rem' }, lineHeight: 1, }}>
           {isDashboardView ? 'Dashboard' : 'My Videos'}
         </Typography>
 
@@ -203,8 +203,18 @@ const DashboardPage = ({ view = 'dashboard' }) => {
       </Box>
 
       {isDashboardView && (
-        <Grid container spacing={3}>
-          <Grid item xs={12} lg={8}>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: '1fr',
+              lg: '2fr 1fr',
+            },
+            gap: 3,
+            width: '100%',
+          }}
+        >
+          <Box>
             <Card
               sx={{
                 height: '100%',
@@ -271,7 +281,7 @@ const DashboardPage = ({ view = 'dashboard' }) => {
                     disabled={loading}
                   />
 
-                  <LoadingButton loading={loading} onClick={processVideo} sx={{ minWidth: 160, height: 56, whiteSpace: 'nowrap', px: 3, }}>
+                  <LoadingButton loading={loading} onClick={processVideo} sx={{ width: { xs: '100%', md: 'auto' }, minWidth: { md: 160 }, height: 56, whiteSpace: 'nowrap', px: 3 }}>
                     {loading ? 'Processing...' : 'Process Video'}
                   </LoadingButton>
                 </Stack>
@@ -294,13 +304,13 @@ const DashboardPage = ({ view = 'dashboard' }) => {
               </Stack>
             </CardContent>
           </Card>
-        </Grid>
+        </Box>
 
-        <Grid item xs={12} lg={4}>
+        <Box>
           <Card sx={{ height: '100%' }}>
             <CardContent sx={{ p: { xs: 3, md: 4 } }}>
               <Stack spacing={3}>
-                <Stack direction="row" spacing={2.5} alignItems="center">
+                <Stack direction="row" spacing={2} alignItems="center" justifyContent="flex-start">
                   <Box
                     sx={{
                       width: 64,
@@ -318,7 +328,7 @@ const DashboardPage = ({ view = 'dashboard' }) => {
                   </Box>
 
                   <Box>
-                    <Typography variant="h4" fontWeight={900}>{totalVideos}</Typography>
+                    <Typography sx={{ fontSize: { xs: '2.5rem', md: '3rem' }, fontWeight: 900 }}>{totalVideos}</Typography>
                     <Typography color="text.secondary">
                       Saved videos
                     </Typography>
@@ -362,8 +372,8 @@ const DashboardPage = ({ view = 'dashboard' }) => {
               </Stack>
             </CardContent>
           </Card>
-        </Grid>
-      </Grid>)}
+        </Box>
+      </Box>)}
 
       <Stack spacing={1}>
         <Stack
@@ -423,16 +433,33 @@ const DashboardPage = ({ view = 'dashboard' }) => {
             </CardContent>
           </Card>
         ) : (
-          <Grid container spacing={2.5} justifyContent="flex-start" alignItems="stretch" sx={{ mt: 0 }}>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr',
+                sm: 'repeat(2, 1fr)',
+                lg: 'repeat(3, 1fr)',
+              },
+              gap: 2.5,
+              width: '100%',
+            }}
+          >
             {visibleVideos.map((video) => {
               const thumbnailUrl = getVideoThumb(video);
               const indexStatus = indexStatuses[video._id];
               const isIndexed = Boolean(indexStatus?.indexed);
               
               return (
-                <Grid item xs={12} sm={6} lg={4} key={video._id}>
+                <Box key={video._id}>
                   <Card
                     sx={{
+                      width: '100%',
+                      maxWidth: {
+                        xs: 420,
+                        md: '100%', 
+                      },
+                      mx: 'auto',
                       height: '100%',
                       display: 'flex',
                       flexDirection: 'column',
@@ -486,7 +513,8 @@ const DashboardPage = ({ view = 'dashboard' }) => {
                             WebkitLineClamp: 2,
                             WebkitBoxOrient: 'vertical',
                             overflow: 'hidden',
-                            minHeight: 56,
+                            minHeight: { xs: 48, md: 56 },
+                            fontSize: { xs: '1.3rem', md: '1.25rem' }
                           }}
                         >
                           {video.title || video.videoId}
@@ -496,7 +524,7 @@ const DashboardPage = ({ view = 'dashboard' }) => {
                           Added {formatDate(video.createdAt)}
                         </Typography>
 
-                        <Stack direction="row" spacing={1} flexWrap="wrap">
+                        <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
                           <Chip size="small" label="Transcript" />
                           <Chip size="small" label="Summary" />
                           <Chip size="small" label={isIndexed ? 'Indexed' : 'Index missing'} color={isIndexed ? 'success' : 'warning'} />
@@ -559,10 +587,10 @@ const DashboardPage = ({ view = 'dashboard' }) => {
                       </Stack>
                     </CardActions>
                   </Card>
-                </Grid>
+                </Box>
               );
             })}
-          </Grid>
+          </Box>
         )}
       </Stack>
     </Stack>
