@@ -140,6 +140,13 @@ const VideoChatPage = () => {
         },
       ]);
 
+      setTimeout(() => {
+        window.scrollTo({
+          top: document.body.scrollHeight,
+          behavior: 'smooth',
+        });
+      }, 100);
+
       setQuery('');
     } catch (apiError) {
       setError(apiError.response?.data?.message || 'Failed to ask question');
@@ -195,8 +202,23 @@ const VideoChatPage = () => {
           </Alert>
         )}
 
-        <Grid container spacing={2.5} alignItems="flex-start">
-          <Grid item xs={12} lg={3}>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: '1fr',
+              lg: '320px 1fr',
+            },
+            gap: 2.5,
+            width: '100%',
+          }}
+        >
+          <Box
+            sx={{
+              order: { xs: 2, lg: 1 },
+              minWidth: 0,
+            }}
+          >
             <Stack spacing={2}>
               <Card>
                 <Box
@@ -270,6 +292,10 @@ const VideoChatPage = () => {
                           justifyContent: 'flex-start',
                           textAlign: 'left',
                           borderRadius: 3,
+                          fontSize: {
+                            xs: '0.8rem',
+                            md: '0.875rem',
+                          }
                         }}
                       >
                         {item}
@@ -279,9 +305,14 @@ const VideoChatPage = () => {
                 </CardContent>
               </Card>
             </Stack>
-          </Grid>
+          </Box>
 
-          <Grid item xs={12} lg={9}>
+          <Box
+            sx={{
+              order: { xs: 1, lg: 2 },
+              minWidth: 0,
+            }}
+          >
             <Card
               sx={{
                 minHeight: { xs: 'auto', lg: 'calc(100vh - 150px)' },
@@ -335,7 +366,10 @@ const VideoChatPage = () => {
                 <Stack
                   spacing={2}
                   sx={{
-                    p: 3,
+                    p: {
+                      xs: 1.5,
+                      md: 3,
+                    },
                     flexGrow: 1,
                     overflowY: 'auto',
                     bgcolor: '#f8fafc',
@@ -378,7 +412,10 @@ const VideoChatPage = () => {
                         <Box
                           sx={{
                             alignSelf: 'flex-end',
-                            maxWidth: 680,
+                            maxWidth: {
+                              xs: '100%',
+                              md: 680,
+                            },
                             p: 2,
                             borderRadius: '22px 22px 6px 22px',
                             bgcolor: 'primary.main',
@@ -394,7 +431,10 @@ const VideoChatPage = () => {
                         <Box
                           sx={{
                             alignSelf: 'flex-start',
-                            maxWidth: 860,
+                            maxWidth: {
+                              xs: '100%',
+                              md: 860
+                            },
                             p: 2,
                             borderRadius: '22px 22px 22px 6px',
                             bgcolor: '#fff',
@@ -445,7 +485,10 @@ const VideoChatPage = () => {
 
                 <Box
                   sx={{
-                    p: 2.5,
+                    p: {
+                      xs: 1.5,
+                      md: 2.5,
+                    },
                     borderTop: '1px solid rgba(148,163,184,0.22)',
                     bgcolor: '#fff',
                   }}
@@ -472,8 +515,8 @@ const VideoChatPage = () => {
                 </Box>
               </CardContent>
             </Card>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       </Stack>
     </Box>
   );
