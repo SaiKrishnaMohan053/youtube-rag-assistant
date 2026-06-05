@@ -630,55 +630,57 @@ const AdminEvalPage = () => {
         <DialogContent>
           {selectedReport && (
             <Stack spacing={3}>
-              <Grid container spacing={2}>
-                <Grid item xs={12} md={3}>
-                  <InfoCard
-                    title="Pass Rate"
-                    value={`${selectedReport.passRate}%`}
-                    subtitle={`${selectedReport.passed}/${selectedReport.total} passed`}
-                    icon={<FactCheckOutlinedIcon />}
-                    accent="#22c55e"
-                  />
-                </Grid>
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: {
+                    xs: '1fr',
+                    md: 'repeat(4, 1fr)',
+                  },
+                  gap: 2,
+                  width: '100%',
+                }}
+              >
+                <InfoCard
+                  title="Pass Rate"
+                  value={`${selectedReport.passRate}%`}
+                  subtitle={`${selectedReport.passed}/${selectedReport.total} passed`}
+                  icon={<FactCheckOutlinedIcon />}
+                  accent="#22c55e"
+                />
 
-                <Grid item xs={12} md={3}>
-                  <InfoCard
-                    title="Video ID"
-                    value={selectedReport.videoId}
-                    subtitle="Evaluated video"
-                    icon={<AssessmentOutlinedIcon />}
-                    accent="#38bdf8"
-                  />
-                </Grid>
+                <InfoCard
+                  title="Video ID"
+                  value={selectedReport.videoId}
+                  subtitle="Evaluated video"
+                  icon={<AssessmentOutlinedIcon />}
+                  accent="#38bdf8"
+                />
 
-                <Grid item xs={12} md={3}>
-                  <InfoCard
-                    title="Generated"
-                    value={
-                      selectedReport.generatedAt
-                        ? new Date(selectedReport.generatedAt).toLocaleDateString()
-                        : 'N/A'
-                    }
-                    subtitle={
-                      selectedReport.generatedAt
-                        ? new Date(selectedReport.generatedAt).toLocaleTimeString()
-                        : ''
-                    }
-                    icon={<TimelineOutlinedIcon />}
-                    accent="#a855f7"
-                  />
-                </Grid>
+                <InfoCard
+                  title="Generated"
+                  value={
+                    selectedReport.generatedAt
+                      ? new Date(selectedReport.generatedAt).toLocaleDateString()
+                      : 'N/A'
+                  }
+                  subtitle={
+                    selectedReport.generatedAt
+                      ? new Date(selectedReport.generatedAt).toLocaleTimeString()
+                      : ''
+                  }
+                  icon={<TimelineOutlinedIcon />}
+                  accent="#a855f7"
+                />
 
-                <Grid item xs={12} md={3}>
-                  <InfoCard
-                    title="Failed"
-                    value={selectedReport.failed}
-                    subtitle="Failed eval cases"
-                    icon={<ReportProblemOutlinedIcon />}
-                    accent="#ef4444"
-                  />
-                </Grid>
-              </Grid>
+                <InfoCard
+                  title="Failed"
+                  value={selectedReport.failed}
+                  subtitle="Failed eval cases"
+                  icon={<ReportProblemOutlinedIcon />}
+                  accent="#ef4444"
+                />
+              </Box>
 
               <TableContainer
                 sx={{
