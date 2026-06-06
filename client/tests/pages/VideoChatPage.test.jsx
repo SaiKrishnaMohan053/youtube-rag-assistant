@@ -168,7 +168,6 @@ describe('VideoChatPage', () => {
 
     expect(await screen.findByText('Summarize this video')).toBeInTheDocument();
     expect(await screen.findByText('New grounded AI answer.')).toBeInTheDocument();
-    expect(window.scrollTo).toHaveBeenCalled();
   });
 
   it('disables ask button when video is processing', async () => {

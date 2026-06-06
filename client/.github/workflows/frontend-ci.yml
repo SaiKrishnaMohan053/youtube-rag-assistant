@@ -5,15 +5,15 @@ on:
     branches:
       - main
     paths:
-      - "client/**"
-      - ".github/workflows/frontend-ci.yml"
+      - 'client/**'
+      - '.github/workflows/frontend-ci.yml'
 
   pull_request:
     branches:
       - main
     paths:
-      - "client/**"
-      - ".github/workflows/frontend-ci.yml"
+      - 'client/**'
+      - '.github/workflows/frontend-ci.yml'
 
 jobs:
   frontend:
