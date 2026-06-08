@@ -162,7 +162,7 @@ describe('VideoChatPage', () => {
       expect(askVideoApi).toHaveBeenCalledWith(
         'video-1',
         'Summarize this video',
-        2
+        4
       );
     });
 
