@@ -128,7 +128,7 @@ const VideoChatPage = () => {
     try {
       const currentQuery = query.trim();
 
-      const response = await askVideoApi(id, currentQuery, 2);
+      const response = await askVideoApi(id, currentQuery, 4);
 
       setChats((prev) => [
         ...prev,
@@ -469,9 +469,26 @@ const VideoChatPage = () => {
                                       border: '1px solid rgba(148,163,184,0.2)',
                                     }}
                                   >
-                                    <Typography variant="body2">
-                                      {chunk.text}
-                                    </Typography>
+                                    <Stack spacing={0.75}>
+                                      <Stack direction="row" spacing={1} alignItems="center">
+                                        <Chip
+                                          size="small"
+                                          color="primary"
+                                          label={chunk.timestamp ? `[${chunk.timestamp}]` : `Source ${idx + 1}`}
+                                        />
+
+                                        {typeof chunk.score === 'number' && (
+                                          <Chip
+                                            size="small"
+                                            label={`Score ${chunk.score.toFixed(2)}`}
+                                          />
+                                        )}
+                                      </Stack>
+
+                                      <Typography variant="body2">
+                                        {chunk.text}
+                                      </Typography>
+                                    </Stack>
                                   </Box>
                                 ))}
                               </Stack>

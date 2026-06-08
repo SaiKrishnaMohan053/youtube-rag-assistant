@@ -22,7 +22,7 @@ export const getVideoApi = async (videoId) => (await axiosClient.get(`/videos/${
 export const getChatsApi = async (videoId) =>
   (await axiosClient.get(`/videos/${videoId}/chats`)).data;
 
-export const askVideoApi = async (videoId, query, topK = 6) =>
+export const askVideoApi = async (videoId, query, topK = 4) =>
   (await axiosClient.post(`/videos/${videoId}/ask`, { query, topK })).data;
 
 export const getVideoStatusApi = async (id) => {

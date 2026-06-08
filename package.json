@@ -15,7 +15,8 @@
     "format:check": "prettier --check \"**/*.{js,json,yml,yaml,md}\"",
     "format:python": "black services/embedding-service",
     "format:python:check": "black --check services/embedding-service",
-    "check": "node scripts/check-js.js"
+    "check": "node scripts/check-js.js",
+    "eval:rag": "node scripts/rag-eval.js"
   },
   "keywords": [],
   "author": "",

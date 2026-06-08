@@ -63,6 +63,12 @@ const TOPIC_OVERVIEW_PATTERNS = [
 const VIDEO_OVERVIEW_PATTERNS = [
   /what is this video about/i,
   /what is this video/i,
+  /what is the main point/i,
+  /main point/i,
+  /main idea/i,
+  /overall point/i,
+  /core message/i,
+  /central idea/i,
   /summari[sz]e/i,
   /summary/i,
   /overview/i,

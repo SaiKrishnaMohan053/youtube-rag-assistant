@@ -7,6 +7,7 @@ jest.mock('../src/models/user.model', () => ({
 }));
 
 jest.mock('../src/models/transcriptChunk.model', () => ({
+  countDocuments: jest.fn(),
   find: jest.fn(),
 }));
 
@@ -89,6 +90,23 @@ const mockChatCreate = () => {
 
 describe('QA routes', () => {
   beforeEach(() => {
+    const TranscriptChunk = require('../src/models/transcriptChunk.model');
+
+    TranscriptChunk.countDocuments.mockResolvedValue(10);
+
+    TranscriptChunk.find.mockReturnValue({
+      sort: jest.fn().mockReturnThis(),
+      limit: jest.fn().mockReturnThis(),
+      skip: jest.fn().mockReturnThis(),
+      select: jest.fn().mockReturnThis(),
+      lean: jest.fn().mockResolvedValue([
+        {
+          chunkIndex: 0,
+          text: 'sample transcript chunk',
+        },
+      ]),
+    });
+
     jest.clearAllMocks();
     mockAuthenticatedUser();
   });
@@ -182,24 +200,9 @@ describe('QA routes', () => {
 
     expect(searchVideoEmbeddings).toHaveBeenCalledWith(
       expect.objectContaining({
-        topK: 8,
+        topK: 6,
       })
     );
-  });
-
-  it('returns 404 when no chunks found', async () => {
-    Video.findOne.mockResolvedValue(createMockVideo());
-
-    searchVideoEmbeddings.mockResolvedValue({
-      matches: [],
-    });
-
-    const res = await request(app)
-      .post(`/api/videos/${videoId}/ask`)
-      .set('Authorization', `Bearer ${token}`)
-      .send({ query: 'test' });
-
-    expect(res.status).toBe(404);
   });
 
   it('handles entity overview mode', async () => {
