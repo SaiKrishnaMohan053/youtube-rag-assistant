@@ -76,4 +76,6 @@ userSchema.methods.createEmailVerificationToken = function createEmailVerificati
   return rawToken;
 };
 
+userSchema.index({ role: 1 });
+
 module.exports = mongoose.model('User', userSchema);

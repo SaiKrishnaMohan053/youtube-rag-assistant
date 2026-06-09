@@ -56,5 +56,6 @@ const transcriptChunkSchema = new mongoose.Schema(
 
 transcriptChunkSchema.index({ video: 1, chunkIndex: 1 }, { unique: true });
 transcriptChunkSchema.index({ user: 1, video: 1 });
+transcriptChunkSchema.index({ embeddingStatus: 1 });
 
 module.exports = mongoose.model('TranscriptChunk', transcriptChunkSchema);
