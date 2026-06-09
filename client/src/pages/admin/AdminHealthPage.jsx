@@ -19,7 +19,7 @@ import StorageOutlinedIcon from '@mui/icons-material/StorageOutlined';
 import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
 import SpeedOutlinedIcon from '@mui/icons-material/SpeedOutlined';
 
-import { getHealthLiveApi, getHealthStatusApi } from '../../api/adminApi';
+import { getHealthLiveApi, getHealthStatusApi, getHealthDeepApi } from '../../api/adminApi';
 
 const panelSx = {
   bgcolor: 'rgba(15,23,42,0.82)',
@@ -91,6 +91,8 @@ const InfoCard = ({ title, value, subtitle, icon, accent = '#38bdf8' }) => (
 const AdminHealthPage = () => {
   const [live, setLive] = useState(null);
   const [status, setStatus] = useState(null);
+  const [deepHealth, setDeepHealth] = useState(null);
+  const [deepLoading, setDeepLoading] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -114,6 +116,21 @@ const AdminHealthPage = () => {
       );
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchDeepHealth = async () => {
+    try {
+      setDeepLoading(true);
+      setError('');
+
+      const data = await getHealthDeepApi();
+      setDeepHealth(data);
+    } catch (err) {
+      setDeepHealth(err.response?.data?.data || null);
+      setError(err.response?.data?.message || err.message || 'Failed to fetch deep health');
+    } finally {
+      setDeepLoading(false);
     }
   };
 
@@ -219,8 +236,14 @@ const AdminHealthPage = () => {
 
         <InfoCard
           title="Embedding Service"
-          value={status?.embedding?.status || 'N/A'}
-          subtitle={status?.embedding?.healthy ? 'Healthy' : 'Not healthy'}
+          value={deepHealth?.embedding?.status || 'Not checked'}
+          subtitle={
+            deepHealth?.embedding?.healthy
+              ? 'Healthy'
+              : deepHealth?.embedding
+                ? 'Not healthy'
+                : 'Click check embedding'
+          }
           icon={<HealthAndSafetyOutlinedIcon />}
           accent="#7c3aed"
         />

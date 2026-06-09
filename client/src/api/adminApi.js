@@ -23,6 +23,11 @@ export const getHealthStatusApi = async () => {
   return data.data;
 };
 
+export const getHealthDeepApi = async () => {
+  const { data } = await axios.get(`${API_BASE_URL}/health/deep`);
+  return data.data;
+};
+
 export const getMetricsSummaryApi = async () => {
   const { data } = await axios.get(`${API_BASE_URL}/metrics/summary`, getAuthHeaders());
 
