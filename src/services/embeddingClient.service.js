@@ -5,7 +5,7 @@ const { logMetric, logError, getDurationMs } = require('../utils/logger');
 
 const client = axios.create({
   baseURL: env.embeddingServiceUrl,
-  timeout: 30000,
+  timeout: 5000,
 });
 
 const normalizeAxiosError = (error, fallbackMessage) => {

@@ -11,4 +11,8 @@ const metricLogSchema = new mongoose.Schema(
   { versionKey: false }
 );
 
+metricLogSchema.index({ event: 1, createdAt: -1 });
+metricLogSchema.index({ level: 1, createdAt: -1 });
+metricLogSchema.index({ event: 1, 'meta.durationMs': -1, createdAt: -1 });
+
 module.exports = mongoose.model('MetricLog', metricLogSchema);

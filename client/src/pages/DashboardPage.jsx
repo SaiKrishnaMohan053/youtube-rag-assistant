@@ -30,7 +30,6 @@ import {
   getVideosApi,
   processVideoApi,
   indexVideoApi,
-  getVideoIndexStatusApi,
 } from '../api/videoApi';
 
 const getVideoThumb = (video) =>
@@ -56,7 +55,6 @@ const DashboardPage = ({ view = 'dashboard' }) => {
   const [deletingId, setDeletingId] = useState(null);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-  const [indexStatuses, setIndexStatuses] = useState({});
   const [reindexingId, setReindexingId] = useState(null);
 
   const totalVideos = videos.length;
@@ -65,39 +63,11 @@ const DashboardPage = ({ view = 'dashboard' }) => {
   const isDashboardView = view === 'dashboard';
   const visibleVideos = isDashboardView ? videos.slice(0, 2) : videos;
 
-  const loadIndexStatuses = async (videoList) => {
-    const entries = await Promise.all(
-      videoList.map(async (video) => {
-        try {
-          const response = await getVideoIndexStatusApi(video._id);
-
-          return [
-            video._id,
-            response.data.indexStatus,
-          ];
-        } catch (_error) {
-          return [
-            video._id,
-            {
-              indexed: false,
-              indexFileExists: false,
-              metadataFileExists: false,
-              chunkCount: 0,
-            },
-          ];
-        }
-      })
-    );
-
-    setIndexStatuses(Object.fromEntries(entries));
-  };
-
   const loadVideos = async () => {
     const response = await getVideosApi();
     const videoList = response.data.videos || [];
 
-    setVideos(response.data.videos || []);
-    await loadIndexStatuses(videoList);
+    setVideos(videoList);
   };
 
   const reindexVideo = async (videoId) => {
@@ -447,8 +417,6 @@ const DashboardPage = ({ view = 'dashboard' }) => {
           >
             {visibleVideos.map((video) => {
               const thumbnailUrl = getVideoThumb(video);
-              const indexStatus = indexStatuses[video._id];
-              const isIndexed = Boolean(indexStatus?.indexed);
               
               return (
                 <Box key={video._id}>
@@ -527,7 +495,7 @@ const DashboardPage = ({ view = 'dashboard' }) => {
                         <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
                           <Chip size="small" label="Transcript" />
                           <Chip size="small" label="Summary" />
-                          <Chip size="small" label={isIndexed ? 'Indexed' : 'Index missing'} color={isIndexed ? 'success' : 'warning'} />
+                          <Chip size="small" label="Processed" color="primary" />
                         </Stack>
                       </Stack>
                     </CardContent>
@@ -555,7 +523,7 @@ const DashboardPage = ({ view = 'dashboard' }) => {
                             fullWidth
                             variant="outlined"
                             size="medium"
-                            disabled={isIndexed || reindexingId === video._id}
+                            disabled={reindexingId === video._id}
                             onClick={() => reindexVideo(video._id)}
                             sx={{
                               height: 44,

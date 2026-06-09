@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const ApiResponse = require('../utils/apiResponse');
 const asyncHandler = require('../utils/asyncHandler');
 const env = require('../config/env');
-const { getEmbeddingHealth } = require('../services/embeddingClient.service');
 
 const getMongoStatus = () => {
   const states = {
@@ -29,28 +28,7 @@ const getMemoryUsage = () => {
 const getHealthStatus = asyncHandler(async (_req, res) => {
   const mongoStatus = getMongoStatus();
 
-  let embedding = {
-    status: 'unknown',
-    healthy: false,
-  };
-
-  try {
-    const embeddingHealth = await getEmbeddingHealth();
-
-    embedding = {
-      status: 'connected',
-      healthy: true,
-      details: embeddingHealth,
-    };
-  } catch (error) {
-    embedding = {
-      status: 'unreachable',
-      healthy: false,
-      error: error.message,
-    };
-  }
-
-  const ready = mongoStatus === 'connected' && embedding.healthy;
+  const ready = mongoStatus === 'connected';
 
   return res.status(ready ? 200 : 503).json(
     new ApiResponse(ready ? 200 : 503, ready ? 'Service is healthy' : 'Service is degraded', {
@@ -62,7 +40,6 @@ const getHealthStatus = asyncHandler(async (_req, res) => {
       database: {
         mongo: mongoStatus,
       },
-      embedding,
       llm: {
         provider: env.llmProvider,
         model: env.llmProvider === 'openai' ? env.openaiModel : env.ollamaModel,
