@@ -51,51 +51,29 @@ const getHealthStatus = asyncHandler(async (_req, res) => {
 });
 
 const getDeepHealthStatus = asyncHandler(async (_req, res) => {
-  const mongoStatus = getMongoStatus();
-
-  let embedding = {
-    status: 'unknown',
-    healthy: false,
-  };
-
   try {
     const embeddingHealth = await getEmbeddingHealth();
 
-    embedding = {
-      status: 'connected',
-      healthy: true,
-      details: embeddingHealth,
-    };
+    return res.status(200).json(
+      new ApiResponse(200, 'Embedding service is healthy', {
+        embedding: {
+          status: 'connected',
+          healthy: true,
+          details: embeddingHealth,
+        },
+      })
+    );
   } catch (error) {
-    embedding = {
-      status: 'unreachable',
-      healthy: false,
-      error: error.message,
-    };
+    return res.status(503).json(
+      new ApiResponse(503, 'Embedding service is unreachable', {
+        embedding: {
+          status: 'unreachable',
+          healthy: false,
+          error: error.message,
+        },
+      })
+    );
   }
-
-  const ready = mongoStatus === 'connected' && embedding.healthy;
-
-  return res.status(ready ? 200 : 503).json(
-    new ApiResponse(
-      ready ? 200 : 503,
-      ready ? 'Deep health check passed' : 'Deep health check degraded',
-      {
-        status: ready ? 'ready' : 'degraded',
-        timestamp: new Date().toISOString(),
-        uptimeSeconds: Math.round(process.uptime()),
-        database: {
-          mongo: mongoStatus,
-        },
-        embedding,
-        llm: {
-          provider: env.llmProvider,
-          model: env.llmProvider === 'openai' ? env.openaiModel : env.ollamaModel,
-        },
-        memory: getMemoryUsage(),
-      }
-    )
-  );
 });
 
 const getLiveStatus = asyncHandler(async (_req, res) => {
