@@ -92,7 +92,6 @@ const AdminHealthPage = () => {
   const [live, setLive] = useState(null);
   const [status, setStatus] = useState(null);
   const [deepHealth, setDeepHealth] = useState(null);
-  const [deepLoading, setDeepLoading] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -101,13 +100,15 @@ const AdminHealthPage = () => {
       setLoading(true);
       setError('');
 
-      const [liveData, statusData] = await Promise.all([
+      const [liveData, statusData, deepData] = await Promise.all([
         getHealthLiveApi(),
         getHealthStatusApi(),
+        getHealthDeepApi(),
       ]);
 
       setLive(liveData);
       setStatus(statusData);
+      setDeepHealth(deepData);
     } catch (err) {
       setError(
         err.response?.data?.message ||
@@ -116,21 +117,6 @@ const AdminHealthPage = () => {
       );
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchDeepHealth = async () => {
-    try {
-      setDeepLoading(true);
-      setError('');
-
-      const data = await getHealthDeepApi();
-      setDeepHealth(data);
-    } catch (err) {
-      setDeepHealth(err.response?.data?.data || null);
-      setError(err.response?.data?.message || err.message || 'Failed to fetch deep health');
-    } finally {
-      setDeepLoading(false);
     }
   };
 
@@ -236,13 +222,11 @@ const AdminHealthPage = () => {
 
         <InfoCard
           title="Embedding Service"
-          value={deepHealth?.embedding?.status || 'Not checked'}
+          value={deepHealth?.embedding?.status || 'unknown'}
           subtitle={
             deepHealth?.embedding?.healthy
               ? 'Healthy'
-              : deepHealth?.embedding
-                ? 'Not healthy'
-                : 'Click check embedding'
+              : 'Unreachable'
           }
           icon={<HealthAndSafetyOutlinedIcon />}
           accent="#7c3aed"
