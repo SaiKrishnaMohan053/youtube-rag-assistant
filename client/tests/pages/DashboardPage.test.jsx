@@ -12,7 +12,6 @@ import {
   getVideosApi,
   processVideoApi,
   indexVideoApi,
-  getVideoIndexStatusApi,
 } from '../../src/api/videoApi';
 
 vi.mock('../../src/api/videoApi', () => ({
@@ -21,7 +20,6 @@ vi.mock('../../src/api/videoApi', () => ({
   getVideosApi: vi.fn(),
   processVideoApi: vi.fn(),
   indexVideoApi: vi.fn(),
-  getVideoIndexStatusApi: vi.fn(),
 }));
 
 const mockVideos = [
@@ -56,17 +54,6 @@ const mockVideosApiSuccess = (videos = mockVideos) => {
       videos,
     },
   });
-
-  getVideoIndexStatusApi.mockResolvedValue({
-    data: {
-      indexStatus: {
-        indexed: true,
-        indexFileExists: true,
-        metadataFileExists: true,
-        chunkCount: 10,
-      },
-    },
-  });
 };
 
 describe('DashboardPage', () => {
@@ -89,7 +76,6 @@ describe('DashboardPage', () => {
     expect(screen.getByText('Node Backend Guide')).toBeInTheDocument();
 
     expect(getVideosApi).toHaveBeenCalledTimes(1);
-    expect(getVideoIndexStatusApi).toHaveBeenCalledTimes(2);
   });
 
   it('shows empty state when no videos exist', async () => {
@@ -200,31 +186,15 @@ describe('DashboardPage', () => {
     expect(deleteVideoApi).not.toHaveBeenCalled();
   });
 
-  it('reindexes video when index is missing', async () => {
+  it('reindexes video', async () => {
     const user = userEvent.setup();
 
-    getVideosApi.mockResolvedValue({
-      data: {
-        videos: [mockVideos[0]],
-      },
-    });
-
-    getVideoIndexStatusApi.mockResolvedValue({
-      data: {
-        indexStatus: {
-          indexed: false,
-          indexFileExists: false,
-          metadataFileExists: false,
-          chunkCount: 0,
-        },
-      },
-    });
-
+    mockVideosApiSuccess([mockVideos[0]]);
     indexVideoApi.mockResolvedValue({});
 
     renderDashboardPage();
 
-    expect(await screen.findByText('Index missing')).toBeInTheDocument();
+    expect(await screen.findByText('Processed')).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /re-index/i }));
 
@@ -233,16 +203,6 @@ describe('DashboardPage', () => {
     });
 
     expect(await screen.findByText('Video re-indexed successfully')).toBeInTheDocument();
-  });
-
-  it('disables reindex button when index exists', async () => {
-    mockVideosApiSuccess([mockVideos[0]]);
-
-    renderDashboardPage();
-
-    expect(await screen.findByText('Indexed')).toBeInTheDocument();
-
-    expect(screen.getByRole('button', { name: /re-index/i })).toBeDisabled();
   });
 
   it('renders my videos view heading', async () => {
