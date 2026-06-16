@@ -45,11 +45,11 @@ The system consists of three main services:
 
 ### Core Workflows
 
-* Guest video summarization
-* Authenticated video processing and RAG Q&A
-* AI-powered content generation (notes, posts, blogs)
-* Admin monitoring dashboard
-* Evaluation and metrics dashboard
+- Guest video summarization
+- Authenticated video processing and RAG Q&A
+- AI-powered content generation (notes, posts, blogs)
+- Admin monitoring dashboard
+- Evaluation and metrics dashboard
 
 ---
 
@@ -57,11 +57,11 @@ The system consists of three main services:
 
 Detailed technical documentation is available in the `docs/` folder:
 
-* `docs/ARCHITECTURE.md` — Full system architecture and design decisions
-* `docs/API.md` — Complete API documentation
-* `docs/EVALUATION.md` — RAG evaluation methodology and benchmarks
-* `docs/MONITORING.md` — Metrics, logging, and observability
-* `docs/ENVIRONMENT.md` — Complete environment configuration
+- `docs/ARCHITECTURE.md` — Full system architecture and design decisions
+- `docs/API.md` — Complete API documentation
+- `docs/EVALUATION.md` — RAG evaluation methodology and benchmarks
+- `docs/MONITORING.md` — Metrics, logging, and observability
+- `docs/ENVIRONMENT.md` — Complete environment configuration
 
 ---
 
@@ -69,58 +69,58 @@ Detailed technical documentation is available in the `docs/` folder:
 
 ### Authentication & Access
 
-* Local email/password authentication with hashed credentials
-* Email verification workflow
-* Google OAuth login
-* JWT-based session management
-* Role-based access control for `user` and `admin` workflows
+- Local email/password authentication with hashed credentials
+- Email verification workflow
+- Google OAuth login
+- JWT-based session management
+- Role-based access control for `user` and `admin` workflows
 
 ### Video Processing Pipeline
 
-* YouTube URL parsing and transcript extraction via Supadata
-* Timestamp-aware transcript chunking with overlap
-* Transcript persistence in MongoDB
-* Background summary generation and embedding indexing
-* Processing status tracking and cleanup workflows
+- YouTube URL parsing and transcript extraction via Supadata
+- Timestamp-aware transcript chunking with overlap
+- Transcript persistence in MongoDB
+- Background summary generation and embedding indexing
+- Processing status tracking and cleanup workflows
 
 ### RAG Question Answering
 
-* Intent-aware query routing
-* Video, topic, and entity overview responses
-* Timestamp-based answers
-* Grounded transcript-only question answering
-* Chat history persistence with supporting chunk references
+- Intent-aware query routing
+- Video, topic, and entity overview responses
+- Timestamp-based answers
+- Grounded transcript-only question answering
+- Chat history persistence with supporting chunk references
 
 ### Hybrid Retrieval
 
-* Semantic vector search using FAISS
-* LLM-assisted query expansion
-* Keyword-based transcript retrieval
-* Entity-aware and topic-aware retrieval
-* Hybrid ranking with automatic re-indexing fallback
+- Semantic vector search using FAISS
+- LLM-assisted query expansion
+- Keyword-based transcript retrieval
+- Entity-aware and topic-aware retrieval
+- Hybrid ranking with automatic re-indexing fallback
 
 ### AI Content Generation
 
 Generate structured outputs from video content, including:
 
-* Detailed notes and study notes
-* LinkedIn posts and tweet threads
-* Blog outlines
-* Action items and key takeaways
+- Detailed notes and study notes
+- LinkedIn posts and tweet threads
+- Blog outlines
+- Action items and key takeaways
 
 ### Monitoring & Reliability
 
-* Structured JSON logging and request metrics
-* API latency and retrieval performance monitoring
-* LLM and embedding service health checks
-* Admin dashboard for metrics, health, and system inspection
+- Structured JSON logging and request metrics
+- API latency and retrieval performance monitoring
+- LLM and embedding service health checks
+- Admin dashboard for metrics, health, and system inspection
 
 ### Evaluation Framework
 
-* Automated RAG benchmark cases
-* Relevance, groundedness, and completeness scoring
-* Hallucination risk detection
-* Latency tracking and regression monitoring
+- Automated RAG benchmark cases
+- Relevance, groundedness, and completeness scoring
+- Hallucination risk detection
+- Latency tracking and regression monitoring
 
 ---
 
@@ -128,41 +128,41 @@ Generate structured outputs from video content, including:
 
 ### Frontend
 
-| Area | Technology |
-| --- | --- |
-| Framework | React |
-| Build Tool | Vite |
-| UI | Material UI |
-| Routing | React Router |
-| HTTP Client | Axios |
-| Markdown Rendering | react-markdown |
-| Tests | Vitest / React Testing Library style test setup |
+| Area               | Technology                                      |
+| ------------------ | ----------------------------------------------- |
+| Framework          | React                                           |
+| Build Tool         | Vite                                            |
+| UI                 | Material UI                                     |
+| Routing            | React Router                                    |
+| HTTP Client        | Axios                                           |
+| Markdown Rendering | react-markdown                                  |
+| Tests              | Vitest / React Testing Library style test setup |
 
 ### Backend
 
-| Area | Technology |
-| --- | --- |
-| Runtime | Node.js |
-| API Framework | Express.js |
-| Database | MongoDB |
-| ODM | Mongoose |
-| Auth | JWT, bcryptjs, Google OAuth |
-| Security / HTTP | Helmet, CORS, Morgan |
-| LLM Providers | OpenAI Responses API, Ollama |
-| Email | Brevo SMTP API integration through HTTP |
-| Tests | Jest, Supertest |
+| Area            | Technology                              |
+| --------------- | --------------------------------------- |
+| Runtime         | Node.js                                 |
+| API Framework   | Express.js                              |
+| Database        | MongoDB                                 |
+| ODM             | Mongoose                                |
+| Auth            | JWT, bcryptjs, Google OAuth             |
+| Security / HTTP | Helmet, CORS, Morgan                    |
+| LLM Providers   | OpenAI Responses API, Ollama            |
+| Email           | Brevo SMTP API integration through HTTP |
+| Tests           | Jest, Supertest                         |
 
 ### Python Embedding Service
 
-| Area | Technology |
-| --- | --- |
-| API Framework | FastAPI |
-| Server | Uvicorn |
-| Embeddings | OpenAI `text-embedding-3-small` |
-| Vector Search | FAISS CPU |
-| Numerics | NumPy |
-| Validation | Pydantic |
-| Tests | Pytest |
+| Area          | Technology                      |
+| ------------- | ------------------------------- |
+| API Framework | FastAPI                         |
+| Server        | Uvicorn                         |
+| Embeddings    | OpenAI `text-embedding-3-small` |
+| Vector Search | FAISS CPU                       |
+| Numerics      | NumPy                           |
+| Validation    | Pydantic                        |
+| Tests         | Pytest                          |
 
 ---
 
@@ -221,10 +221,10 @@ The React frontend provides separate interfaces for public users, authenticated 
 
 Core UI areas include:
 
-* **Public Interface** — Guest summarization, login, and registration
-* **User Dashboard** — Video management and chat workflows
-* **Video Chat Interface** — Interactive RAG-based Q&A
-* **Admin Dashboard** — Metrics, health checks, and evaluation tools
+- **Public Interface** — Guest summarization, login, and registration
+- **User Dashboard** — Video management and chat workflows
+- **Video Chat Interface** — Interactive RAG-based Q&A
+- **Admin Dashboard** — Metrics, health checks, and evaluation tools
 
 The frontend uses protected routes and role-based access control to isolate user and admin workflows.
 
@@ -289,13 +289,13 @@ The application uses a hybrid retrieval pipeline to fetch the most relevant tran
 
 ### Retrieval Components
 
-* **Vector Search** — Uses semantic embeddings and FAISS to retrieve semantically similar transcript chunks
-* **Query Expansion** — Uses an LLM to expand queries and improve retrieval recall
-* **Keyword Search** — Captures exact phrase matches that semantic search may miss
-* **Entity-Aware Retrieval** — Prioritizes chunks mentioning people, companies, products, or organizations
-* **Topic-Aware Retrieval** — Retrieves topic-relevant chunks with neighboring context
-* **Auto Re-Indexing** — Automatically rebuilds missing or outdated vector indexes
-* **Merge and Rank** — Combines retrieval results using hybrid scoring
+- **Vector Search** — Uses semantic embeddings and FAISS to retrieve semantically similar transcript chunks
+- **Query Expansion** — Uses an LLM to expand queries and improve retrieval recall
+- **Keyword Search** — Captures exact phrase matches that semantic search may miss
+- **Entity-Aware Retrieval** — Prioritizes chunks mentioning people, companies, products, or organizations
+- **Topic-Aware Retrieval** — Retrieves topic-relevant chunks with neighboring context
+- **Auto Re-Indexing** — Automatically rebuilds missing or outdated vector indexes
+- **Merge and Rank** — Combines retrieval results using hybrid scoring
 
 This hybrid retrieval design improves precision, recall, and grounding quality compared to semantic search alone.
 
@@ -321,12 +321,12 @@ Stored for Retrieval
 
 Each processed video generates:
 
-* Short video overview
-* Detailed summary
-* Main topics
-* Key takeaways
-* Entity-level insights
-* Topic-level summaries
+- Short video overview
+- Detailed summary
+- Main topics
+- Key takeaways
+- Entity-level insights
+- Topic-level summaries
 
 These summaries power overview queries, topic exploration, entity explanations, and content generation workflows.
 
@@ -363,23 +363,23 @@ The platform includes structured monitoring and observability to track system he
 
 ### Metrics Tracked
 
-* API request latency and error rates
-* Video processing performance
-* Embedding generation and vector search health
-* Retrieval quality and supporting chunk scores
-* LLM response latency and token usage
-* Guest session activity
-* Evaluation run results
+- API request latency and error rates
+- Video processing performance
+- Embedding generation and vector search health
+- Retrieval quality and supporting chunk scores
+- LLM response latency and token usage
+- Guest session activity
+- Evaluation run results
 
 ### Monitoring Capabilities
 
 The system captures structured JSON logs for:
 
-* HTTP requests
-* Background jobs
-* Retrieval pipeline stages
-* LLM generation
-* Error handling and failures
+- HTTP requests
+- Background jobs
+- Retrieval pipeline stages
+- LLM generation
+- Error handling and failures
 
 Metrics can optionally be persisted to MongoDB for historical analysis and dashboard visualization.
 
@@ -395,23 +395,23 @@ The platform includes an automated evaluation framework to measure retrieval qua
 
 The system evaluates multiple query types, including:
 
-* Video overview
-* Specific question answering
-* Topic-based queries
-* Entity-based queries
-* Timestamp queries
-* Action/content generation
-* Guest summary and guest Q&A
+- Video overview
+- Specific question answering
+- Topic-based queries
+- Entity-based queries
+- Timestamp queries
+- Action/content generation
+- Guest summary and guest Q&A
 
 ### Evaluation Metrics
 
 Each evaluation run measures:
 
-* **Relevance** — How well the answer matches the question
-* **Groundedness / Faithfulness** — Whether the answer is supported by retrieved transcript context
-* **Completeness** — Whether important details are included
-* **Latency** — End-to-end response time
-* **Hallucination Risk** — Probability of unsupported AI output
+- **Relevance** — How well the answer matches the question
+- **Groundedness / Faithfulness** — Whether the answer is supported by retrieved transcript context
+- **Completeness** — Whether important details are included
+- **Latency** — End-to-end response time
+- **Hallucination Risk** — Probability of unsupported AI output
 
 Evaluation reports are persisted for performance tracking, regression detection, and benchmarking across model or retrieval changes.
 
@@ -427,7 +427,9 @@ This evaluation layer enables systematic improvement of retrieval precision, ans
 git clone https://github.com/SaiKrishnaMohan053/youtube-rag-assistant.git
 cd youtube-rag-assistant
 ```
+
 Prerequisites:
+
 - Node.js 18+
 - Python 3.10+
 - MongoDB
@@ -473,9 +475,9 @@ pip install -r requirements.txt
 
 Create `.env` files for:
 
-* Backend
-* Frontend
-* Python embedding service
+- Backend
+- Frontend
+- Python embedding service
 
 See `docs/ENVIRONMENT.md` for full environment configuration.
 
@@ -532,8 +534,8 @@ npm run dev
 
 This starts:
 
-* Backend API
-* Python embedding service
+- Backend API
+- Python embedding service
 
 using `concurrently`.
 
@@ -551,11 +553,11 @@ npm test
 
 Uses **Jest + Supertest** for:
 
-* Authentication
-* API routes
-* Retrieval pipeline
-* RAG workflows
-* Middleware and utilities
+- Authentication
+- API routes
+- Retrieval pipeline
+- RAG workflows
+- Middleware and utilities
 
 ### Frontend Tests
 
@@ -566,10 +568,10 @@ npm test
 
 Uses **Vitest** for:
 
-* UI components
-* Routing
-* Auth state management
-* Page workflows
+- UI components
+- Routing
+- Auth state management
+- Page workflows
 
 ### Python Service Tests
 
@@ -579,9 +581,9 @@ pytest services/embedding-service/tests
 
 Uses **Pytest** for:
 
-* Embedding generation
-* FAISS indexing
-* Semantic search validation
+- Embedding generation
+- FAISS indexing
+- Semantic search validation
 
 ---
 

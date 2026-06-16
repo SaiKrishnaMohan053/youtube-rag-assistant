@@ -40,22 +40,22 @@ This improves:
 
 The system supports three user types:
 
-| User Type | Supported Workflow |
-| --- | --- |
-| Guest | Temporary video summary and follow-up Q&A |
-| Authenticated User | Saved videos, transcript processing, RAG Q&A, chat history |
-| Admin | User inspection, video inspection, chunk inspection, metrics, health, evaluations |
+| User Type          | Supported Workflow                                                                |
+| ------------------ | --------------------------------------------------------------------------------- |
+| Guest              | Temporary video summary and follow-up Q&A                                         |
+| Authenticated User | Saved videos, transcript processing, RAG Q&A, chat history                        |
+| Admin              | User inspection, video inspection, chunk inspection, metrics, health, evaluations |
 
 ### 1.4 Separate responsibilities across services
 
 The architecture is split into clear service boundaries:
 
-| Service | Responsibility |
-| --- | --- |
-| React Frontend | User experience, routing, dashboards, chat UI |
-| Node.js Backend | API orchestration, business logic, RAG workflow, auth, admin, metrics |
-| Python Embedding Service | Embeddings, FAISS indexing, semantic search |
-| MongoDB | Application state, transcripts, chunks, chats, metrics, evaluations |
+| Service                  | Responsibility                                                        |
+| ------------------------ | --------------------------------------------------------------------- |
+| React Frontend           | User experience, routing, dashboards, chat UI                         |
+| Node.js Backend          | API orchestration, business logic, RAG workflow, auth, admin, metrics |
+| Python Embedding Service | Embeddings, FAISS indexing, semantic search                           |
+| MongoDB                  | Application state, transcripts, chunks, chats, metrics, evaluations   |
 
 ### 1.5 Make the system measurable and improvable
 
@@ -136,12 +136,12 @@ The frontend provides separate interfaces for public users, authenticated users,
 
 ### Main UI areas
 
-| Area | Purpose |
-| --- | --- |
-| Public Interface | Guest summarization, login, registration, email verification |
-| User Dashboard | Video management, processing state, saved videos |
-| Video Chat Interface | RAG Q&A, content generation, supporting context |
-| Admin Dashboard | Platform inspection, health, metrics, evaluations |
+| Area                 | Purpose                                                      |
+| -------------------- | ------------------------------------------------------------ |
+| Public Interface     | Guest summarization, login, registration, email verification |
+| User Dashboard       | Video management, processing state, saved videos             |
+| Video Chat Interface | RAG Q&A, content generation, supporting context              |
+| Admin Dashboard      | Platform inspection, health, metrics, evaluations            |
 
 ### Frontend architecture pattern
 
@@ -460,14 +460,14 @@ This improves:
 
 Before retrieval, the backend classifies the question.
 
-| Intent | Strategy |
-| --- | --- |
-| `VIDEO_OVERVIEW` | Use saved structured summary |
-| `ENTITY_OVERVIEW` | Use entity-specific summary and/or entity retrieval |
-| `TOPIC_OVERVIEW` | Use topic summary and topic retrieval |
-| `TIMESTAMP_QUERY` | Retrieve chunks with timestamp metadata |
+| Intent              | Strategy                                              |
+| ------------------- | ----------------------------------------------------- |
+| `VIDEO_OVERVIEW`    | Use saved structured summary                          |
+| `ENTITY_OVERVIEW`   | Use entity-specific summary and/or entity retrieval   |
+| `TOPIC_OVERVIEW`    | Use topic summary and topic retrieval                 |
+| `TIMESTAMP_QUERY`   | Retrieve chunks with timestamp metadata               |
 | `ACTION_EXTRACTION` | Use summaries + grounded chunks for structured output |
-| `SPECIFIC_QA` | Use hybrid retrieval and grounded prompt |
+| `SPECIFIC_QA`       | Use hybrid retrieval and grounded prompt              |
 
 This avoids treating every question the same way.
 
@@ -484,14 +484,14 @@ Examples:
 
 The retrieval system combines multiple methods instead of depending on vector search alone.
 
-| Method | Purpose |
-| --- | --- |
-| Vector Search | Finds semantically similar transcript chunks |
-| Keyword Search | Finds exact phrase matches |
-| Query Expansion | Improves recall with related search terms |
+| Method           | Purpose                                                                |
+| ---------------- | ---------------------------------------------------------------------- |
+| Vector Search    | Finds semantically similar transcript chunks                           |
+| Keyword Search   | Finds exact phrase matches                                             |
+| Query Expansion  | Improves recall with related search terms                              |
 | Entity Retrieval | Improves questions about people, companies, products, or organizations |
-| Topic Retrieval | Improves broad topic questions |
-| Auto Re-Indexing | Rebuilds missing FAISS indexes from stored chunks |
+| Topic Retrieval  | Improves broad topic questions                                         |
+| Auto Re-Indexing | Rebuilds missing FAISS indexes from stored chunks                      |
 
 Hybrid retrieval improves both precision and recall by combining semantic understanding with exact-match evidence.
 
@@ -577,14 +577,14 @@ MongoDB stores application state and long-lived data.
 
 ## 6.1 Core Collections
 
-| Collection | Purpose |
-| --- | --- |
-| `Users` | Accounts, auth provider, roles, verification state |
-| `Videos` | Video metadata, transcript, processing status, structured summary |
-| `TranscriptChunks` | Timestamp-aware chunks used for retrieval |
-| `ChatMessages` | User questions, generated answers, supporting chunks |
-| `MetricLogs` | Structured operational and performance logs |
-| `EvalReports` | Saved evaluation runs and benchmark reports |
+| Collection         | Purpose                                                           |
+| ------------------ | ----------------------------------------------------------------- |
+| `Users`            | Accounts, auth provider, roles, verification state                |
+| `Videos`           | Video metadata, transcript, processing status, structured summary |
+| `TranscriptChunks` | Timestamp-aware chunks used for retrieval                         |
+| `ChatMessages`     | User questions, generated answers, supporting chunks              |
+| `MetricLogs`       | Structured operational and performance logs                       |
+| `EvalReports`      | Saved evaluation runs and benchmark reports                       |
 
 ---
 
@@ -613,9 +613,9 @@ User
 
 The system stores two video identifiers:
 
-| Identifier | Purpose |
-| --- | --- |
-| YouTube video ID | Identifies the original YouTube source |
+| Identifier          | Purpose                                                         |
+| ------------------- | --------------------------------------------------------------- |
+| YouTube video ID    | Identifies the original YouTube source                          |
 | MongoDB video `_id` | Used internally for ownership, chunks, chats, and FAISS indexes |
 
 The MongoDB video `_id` is used for FAISS indexing.
@@ -636,17 +636,17 @@ Controllers handle HTTP-level concerns:
 - Call services
 - Return API responses
 
-| Controller | Responsibility |
-| --- | --- |
-| `auth.controller.js` | Register, login, Google auth, email verification |
-| `video.controller.js` | Process videos and manage video records |
-| `chunk.controller.js` | Create and retrieve chunks |
-| `qa.controller.js` | RAG Q&A orchestration |
-| `guest.controller.js` | Guest summaries and guest Q&A |
-| `admin.controller.js` | Admin inspection workflows |
-| `metrics.controller.js` | Metrics dashboard data |
-| `health.controller.js` | Health and readiness checks |
-| `eval.controller.js` | Evaluation execution and reports |
+| Controller              | Responsibility                                   |
+| ----------------------- | ------------------------------------------------ |
+| `auth.controller.js`    | Register, login, Google auth, email verification |
+| `video.controller.js`   | Process videos and manage video records          |
+| `chunk.controller.js`   | Create and retrieve chunks                       |
+| `qa.controller.js`      | RAG Q&A orchestration                            |
+| `guest.controller.js`   | Guest summaries and guest Q&A                    |
+| `admin.controller.js`   | Admin inspection workflows                       |
+| `metrics.controller.js` | Metrics dashboard data                           |
+| `health.controller.js`  | Health and readiness checks                      |
+| `eval.controller.js`    | Evaluation execution and reports                 |
 
 ---
 
@@ -654,21 +654,21 @@ Controllers handle HTTP-level concerns:
 
 Services contain business logic and integrations.
 
-| Service | Responsibility |
-| --- | --- |
-| `transcript.service.js` | Fetch and format YouTube transcripts |
-| `chunk.service.js` | Create timestamp-aware transcript chunks |
-| `summary.service.js` | Generate structured video summaries |
-| `llm.service.js` | Abstract OpenAI/Ollama generation |
-| `embeddingClient.service.js` | Communicate with Python embedding service |
-| `ragRetrieval.service.js` | Hybrid retrieval orchestration |
-| `queryExpansion.service.js` | LLM-assisted query expansion |
-| `entityRetrieval.service.js` | Entity-aware retrieval |
-| `topicRetrieval.service.js` | Topic-aware retrieval |
-| `timestamp.service.js` | Timestamp-oriented answer support |
-| `action.service.js` | Notes, posts, outlines, action items |
-| `guestSession.service.js` | Temporary guest sessions |
-| `videoProcessingJob.service.js` | Background post-chunk processing |
+| Service                         | Responsibility                            |
+| ------------------------------- | ----------------------------------------- |
+| `transcript.service.js`         | Fetch and format YouTube transcripts      |
+| `chunk.service.js`              | Create timestamp-aware transcript chunks  |
+| `summary.service.js`            | Generate structured video summaries       |
+| `llm.service.js`                | Abstract OpenAI/Ollama generation         |
+| `embeddingClient.service.js`    | Communicate with Python embedding service |
+| `ragRetrieval.service.js`       | Hybrid retrieval orchestration            |
+| `queryExpansion.service.js`     | LLM-assisted query expansion              |
+| `entityRetrieval.service.js`    | Entity-aware retrieval                    |
+| `topicRetrieval.service.js`     | Topic-aware retrieval                     |
+| `timestamp.service.js`          | Timestamp-oriented answer support         |
+| `action.service.js`             | Notes, posts, outlines, action items      |
+| `guestSession.service.js`       | Temporary guest sessions                  |
+| `videoProcessingJob.service.js` | Background post-chunk processing          |
 
 ---
 
@@ -676,13 +676,13 @@ Services contain business logic and integrations.
 
 Middleware handles cross-cutting concerns.
 
-| Middleware | Responsibility |
-| --- | --- |
-| Auth middleware | Validates JWT and attaches user |
-| Admin middleware | Restricts admin-only routes |
-| Error middleware | Normalizes API errors |
-| Not found middleware | Handles unknown routes |
-| Request logger | Captures request metrics |
+| Middleware           | Responsibility                  |
+| -------------------- | ------------------------------- |
+| Auth middleware      | Validates JWT and attaches user |
+| Admin middleware     | Restricts admin-only routes     |
+| Error middleware     | Normalizes API errors           |
+| Not found middleware | Handles unknown routes          |
+| Request logger       | Captures request metrics        |
 
 ---
 
@@ -690,15 +690,15 @@ Middleware handles cross-cutting concerns.
 
 The backend exposes REST API groups.
 
-| API Group | Purpose |
-| --- | --- |
-| `/api/auth` | Authentication and identity |
-| `/api/videos` | Video processing, chunking, indexing, RAG Q&A |
-| `/api/guest` | Public guest summary and temporary Q&A |
-| `/api/admin` | Admin platform inspection |
-| `/api/metrics` | Metrics summary and observability |
-| `/api/evals` | RAG evaluation runs and reports |
-| `/api/health` | Liveness, readiness, and deep service checks |
+| API Group      | Purpose                                       |
+| -------------- | --------------------------------------------- |
+| `/api/auth`    | Authentication and identity                   |
+| `/api/videos`  | Video processing, chunking, indexing, RAG Q&A |
+| `/api/guest`   | Public guest summary and temporary Q&A        |
+| `/api/admin`   | Admin platform inspection                     |
+| `/api/metrics` | Metrics summary and observability             |
+| `/api/evals`   | RAG evaluation runs and reports               |
+| `/api/health`  | Liveness, readiness, and deep service checks  |
 
 Detailed request and response examples are documented in `docs/API.md`.
 
@@ -771,28 +771,28 @@ The evaluation system checks:
 
 ## 10.2 Evaluation Categories
 
-| Category | Purpose |
-| --- | --- |
-| Video overview | Tests summary-based answers |
-| Specific Q&A | Tests grounded retrieval and answer quality |
-| Topic overview | Tests topic-aware retrieval |
-| Entity overview | Tests entity-aware retrieval |
-| Timestamp query | Tests timestamp correctness |
-| Action extraction | Tests content generation workflows |
-| Guest summary | Tests public summary flow |
-| Guest Q&A | Tests temporary guest transcript context |
+| Category          | Purpose                                     |
+| ----------------- | ------------------------------------------- |
+| Video overview    | Tests summary-based answers                 |
+| Specific Q&A      | Tests grounded retrieval and answer quality |
+| Topic overview    | Tests topic-aware retrieval                 |
+| Entity overview   | Tests entity-aware retrieval                |
+| Timestamp query   | Tests timestamp correctness                 |
+| Action extraction | Tests content generation workflows          |
+| Guest summary     | Tests public summary flow                   |
+| Guest Q&A         | Tests temporary guest transcript context    |
 
 ## 10.3 Evaluation Metrics
 
-| Metric | Meaning |
-| --- | --- |
-| Relevance | Answer matches the user question |
-| Groundedness | Answer is supported by retrieved transcript context |
-| Completeness | Answer includes important details |
-| Latency | End-to-end response time |
-| Hallucination Risk | Likelihood of unsupported output |
-| Intent Pass/Fail | Whether routing matched expected mode |
-| Mode Pass/Fail | Whether response type matched expected workflow |
+| Metric             | Meaning                                             |
+| ------------------ | --------------------------------------------------- |
+| Relevance          | Answer matches the user question                    |
+| Groundedness       | Answer is supported by retrieved transcript context |
+| Completeness       | Answer includes important details                   |
+| Latency            | End-to-end response time                            |
+| Hallucination Risk | Likelihood of unsupported output                    |
+| Intent Pass/Fail   | Whether routing matched expected mode               |
+| Mode Pass/Fail     | Whether response type matched expected workflow     |
 
 Evaluation reports are stored in MongoDB so the system can be benchmarked across prompt, retrieval, and model changes.
 
@@ -913,14 +913,14 @@ This separation improves:
 
 Potential bottlenecks include:
 
-| Area | Bottleneck |
-| --- | --- |
+| Area            | Bottleneck                                             |
+| --------------- | ------------------------------------------------------ |
 | Background jobs | In-process jobs can be interrupted if backend restarts |
-| Guest sessions | In-memory sessions are lost on restart |
-| FAISS files | Local index files are tied to service storage |
-| LLM calls | Latency and cost increase with usage |
-| MongoDB | Large transcripts and chunks increase storage needs |
-| Metrics | Persistent logs can grow quickly |
+| Guest sessions  | In-memory sessions are lost on restart                 |
+| FAISS files     | Local index files are tied to service storage          |
+| LLM calls       | Latency and cost increase with usage                   |
+| MongoDB         | Large transcripts and chunks increase storage needs    |
+| Metrics         | Persistent logs can grow quickly                       |
 
 ---
 

@@ -17,31 +17,31 @@ The evaluation system is designed to answer critical questions about the platfor
 
 ### Routing Quality
 
-* Did the intent router classify the user question correctly?
-* Was the correct answer workflow selected?
+- Did the intent router classify the user question correctly?
+- Was the correct answer workflow selected?
 
 ### Retrieval Quality
 
-* Did retrieval return relevant transcript chunks?
-* Were the most useful chunks ranked near the top?
+- Did retrieval return relevant transcript chunks?
+- Were the most useful chunks ranked near the top?
 
 ### Generation Quality
 
-* Did the LLM generate a relevant answer?
-* Was the answer grounded in transcript context?
+- Did the LLM generate a relevant answer?
+- Was the answer grounded in transcript context?
 
 ### Production Quality
 
-* Was latency acceptable?
-* Were responses stable and consistent?
+- Was latency acceptable?
+- Were responses stable and consistent?
 
 The evaluation framework helps detect regressions after:
 
-* Prompt changes
-* Retrieval tuning
-* Model upgrades
-* Infrastructure changes
-* Feature additions
+- Prompt changes
+- Retrieval tuning
+- Model upgrades
+- Infrastructure changes
+- Feature additions
 
 ---
 
@@ -91,9 +91,9 @@ What is this video about?
 
 Validates:
 
-* Summary generation quality
-* Overview completeness
-* Main takeaway coverage
+- Summary generation quality
+- Overview completeness
+- Main takeaway coverage
 
 ---
 
@@ -109,9 +109,9 @@ What did the speaker say about pricing?
 
 Validates:
 
-* Retrieval relevance
-* Ranking quality
-* Grounded answer generation
+- Retrieval relevance
+- Ranking quality
+- Grounded answer generation
 
 ---
 
@@ -127,9 +127,9 @@ Explain the AI regulation section.
 
 Validates:
 
-* Topic retrieval
-* Topic summary quality
-* Context completeness
+- Topic retrieval
+- Topic summary quality
+- Context completeness
 
 ---
 
@@ -145,9 +145,9 @@ What did Elon Musk discuss?
 
 Validates:
 
-* Entity extraction
-* Entity retrieval
-* Entity summarization
+- Entity extraction
+- Entity retrieval
+- Entity summarization
 
 ---
 
@@ -163,9 +163,9 @@ When did they discuss GPU costs?
 
 Validates:
 
-* Timestamp extraction
-* Timestamp accuracy
-* Correct transcript chunk selection
+- Timestamp extraction
+- Timestamp accuracy
+- Correct transcript chunk selection
 
 ---
 
@@ -185,9 +185,9 @@ Generate LinkedIn post
 
 Validates:
 
-* Structured output formatting
-* Coverage of important content
-* Practical usefulness
+- Structured output formatting
+- Coverage of important content
+- Practical usefulness
 
 ---
 
@@ -197,9 +197,9 @@ Tests public no-auth workflow.
 
 Validates:
 
-* Guest transcript processing
-* Summary generation
-* Temporary session creation
+- Guest transcript processing
+- Summary generation
+- Temporary session creation
 
 ---
 
@@ -209,9 +209,9 @@ Tests temporary guest transcript context.
 
 Validates:
 
-* Guest retrieval quality
-* Session handling
-* Response grounding
+- Guest retrieval quality
+- Session handling
+- Response grounding
 
 ---
 
@@ -227,9 +227,9 @@ Measures how well the answer addresses the user question.
 
 Questions:
 
-* Did the answer actually answer the question?
-* Was the response on-topic?
-* Did it avoid irrelevant details?
+- Did the answer actually answer the question?
+- Was the response on-topic?
+- Did it avoid irrelevant details?
 
 Score range:
 
@@ -240,8 +240,8 @@ Score range:
 
 Examples:
 
-* High relevance → directly answers user question
-* Low relevance → generic or unrelated answer
+- High relevance → directly answers user question
+- Low relevance → generic or unrelated answer
 
 ---
 
@@ -251,17 +251,17 @@ Measures whether the answer is supported by retrieved transcript context.
 
 Questions:
 
-* Is every important claim supported by evidence?
-* Did the model invent information?
-* Does answer align with transcript?
+- Is every important claim supported by evidence?
+- Did the model invent information?
+- Does answer align with transcript?
 
 This is one of the most important metrics in RAG systems.
 
 High groundedness means:
 
-* Low hallucination risk
-* High trustworthiness
-* Better user confidence
+- Low hallucination risk
+- High trustworthiness
+- Better user confidence
 
 ---
 
@@ -271,9 +271,9 @@ Measures whether important details are missing.
 
 Questions:
 
-* Did answer include major points?
-* Did it miss critical context?
-* Was summary sufficiently informative?
+- Did answer include major points?
+- Did it miss critical context?
+- Was summary sufficiently informative?
 
 Examples:
 
@@ -297,11 +297,11 @@ Measures end-to-end response speed.
 
 Includes:
 
-* Routing time
-* Retrieval time
-* Prompt construction
-* LLM generation
-* Response serialization
+- Routing time
+- Retrieval time
+- Prompt construction
+- LLM generation
+- Response serialization
 
 Latency matters because even accurate AI feels poor if too slow.
 
@@ -313,10 +313,10 @@ Measures probability of unsupported AI output.
 
 Indicators of hallucination:
 
-* Named entities absent from transcript
-* Unsupported numbers/statistics
-* External facts not present in context
-* Confident unsupported claims
+- Named entities absent from transcript
+- Unsupported numbers/statistics
+- External facts not present in context
+- Confident unsupported claims
 
 Risk levels:
 
@@ -367,10 +367,10 @@ Final weighted scores are converted into grades.
 
 Interpretation:
 
-* **A** → Production ready
-* **B** → Good quality, minor issues
-* **C** → Acceptable but improvement needed
-* **D/F** → Significant issues
+- **A** → Production ready
+- **B** → Good quality, minor issues
+- **C** → Acceptable but improvement needed
+- **D/F** → Significant issues
 
 # 7. Intent Validation
 
@@ -394,9 +394,9 @@ This would fail intent validation.
 
 Intent validation helps detect routing regressions after:
 
-* Router rule changes
-* New intent additions
-* Prompt modifications
+- Router rule changes
+- New intent additions
+- Prompt modifications
 
 Why it matters:
 
@@ -421,9 +421,9 @@ Examples:
 
 Mode validation ensures:
 
-* Correct prompt templates
-* Correct retrieval strategy
-* Correct output formatting
+- Correct prompt templates
+- Correct retrieval strategy
+- Correct output formatting
 
 ---
 
@@ -441,9 +441,9 @@ Generated Answer
 
 Judge evaluates:
 
-* Are claims supported?
-* Are unsupported facts present?
-* Is answer faithful to transcript?
+- Are claims supported?
+- Are unsupported facts present?
+- Is answer faithful to transcript?
 
 Output example:
 
@@ -560,15 +560,15 @@ Evaluations are currently manually triggered.
 
 Recommended evaluation improvements:
 
-* Larger benchmark dataset
-* Human rating workflows
-* Golden answer comparisons
-* Retrieval precision@K measurement
-* Recall measurement
-* Mean Reciprocal Rank (MRR)
-* Citation accuracy scoring
-* Automated CI/CD regression checks
-* Model-to-model benchmark comparisons
+- Larger benchmark dataset
+- Human rating workflows
+- Golden answer comparisons
+- Retrieval precision@K measurement
+- Recall measurement
+- Mean Reciprocal Rank (MRR)
+- Citation accuracy scoring
+- Automated CI/CD regression checks
+- Model-to-model benchmark comparisons
 
 Future advanced evaluation categories:
 
@@ -576,26 +576,26 @@ Future advanced evaluation categories:
 
 Measure:
 
-* Precision
-* Recall
-* Ranking quality
+- Precision
+- Recall
+- Ranking quality
 
 ### Generation Evaluation
 
 Measure:
 
-* Faithfulness
-* Helpfulness
-* Conciseness
-* Style consistency
+- Faithfulness
+- Helpfulness
+- Conciseness
+- Style consistency
 
 ### End-to-End Product Evaluation
 
 Measure:
 
-* User task success
-* Satisfaction
-* Engagement
+- User task success
+- Satisfaction
+- Engagement
 
 ---
 
@@ -605,11 +605,11 @@ The evaluation framework ensures the RAG system remains measurable, reliable, an
 
 It evaluates:
 
-* Routing correctness
-* Retrieval quality
-* Generation quality
-* Groundedness
-* Hallucination risk
-* Production latency
+- Routing correctness
+- Retrieval quality
+- Generation quality
+- Groundedness
+- Hallucination risk
+- Production latency
 
 This framework helps transform YouTube RAG Assistant from a simple AI demo into a production-aware AI application with measurable quality standards.

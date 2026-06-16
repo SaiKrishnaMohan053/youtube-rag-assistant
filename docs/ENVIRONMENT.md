@@ -9,9 +9,9 @@ This document describes all environment variables required to run YouTube RAG As
 
 The application consists of three independently configurable services:
 
-* Frontend (React + Vite)
-* Backend API (Node.js + Express)
-* Python Embedding Service (FastAPI + FAISS)
+- Frontend (React + Vite)
+- Backend API (Node.js + Express)
+- Python Embedding Service (FastAPI + FAISS)
 
 Each service maintains its own environment configuration.
 
@@ -31,14 +31,14 @@ production
 
 Environment configuration controls:
 
-* Ports
-* Database connections
-* Authentication secrets
-* AI provider selection
-* External API credentials
-* Email services
-* Logging behavior
-* Evaluation configuration
+- Ports
+- Database connections
+- Authentication secrets
+- AI provider selection
+- External API credentials
+- Email services
+- Logging behavior
+- Evaluation configuration
 
 ---
 
@@ -239,9 +239,9 @@ This variable allows frontend deployments to target different backend environmen
 
 Examples:
 
-* Local backend
-* Staging backend
-* Production backend
+- Local backend
+- Staging backend
+- Production backend
 
 ---
 
@@ -288,10 +288,10 @@ videoMongoId.metadata.json
 
 These files contain:
 
-* FAISS index vectors
-* Chunk metadata
-* Model information
-* Chunk count
+- FAISS index vectors
+- Chunk metadata
+- Model information
+- Chunk count
 
 ---
 
@@ -338,9 +338,9 @@ FAISS_INDEX_DIR=./vector_store
 
 Development priorities:
 
-* Easy debugging
-* Local service communication
-* Fast iteration
+- Easy debugging
+- Local service communication
+- Fast iteration
 
 ---
 
@@ -350,22 +350,22 @@ Recommended production configuration:
 
 ### Security
 
-* Use strong JWT secrets
-* Rotate API keys
-* Restrict CORS
-* Never expose secrets to frontend
+- Use strong JWT secrets
+- Rotate API keys
+- Restrict CORS
+- Never expose secrets to frontend
 
 ### Reliability
 
-* Use managed MongoDB clusters
-* Use persistent vector storage
-* Enable metrics persistence
+- Use managed MongoDB clusters
+- Use persistent vector storage
+- Enable metrics persistence
 
 ### Scalability
 
-* Externalize configuration using deployment secrets
-* Use separate dev/staging/prod environments
-* Configure provider-specific rate limits
+- Externalize configuration using deployment secrets
+- Use separate dev/staging/prod environments
+- Configure provider-specific rate limits
 
 ---
 
@@ -373,11 +373,11 @@ Recommended production configuration:
 
 Sensitive values include:
 
-* JWT secrets
-* Database URIs
-* API keys
-* OAuth credentials
-* Email provider credentials
+- JWT secrets
+- Database URIs
+- API keys
+- OAuth credentials
+- Email provider credentials
 
 Best practices:
 
@@ -397,9 +397,9 @@ services/embedding-service/.env
 
 Examples:
 
-* [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/?utm_source=chatgpt.com)
-* [HashiCorp Vault](https://www.vaultproject.io/?utm_source=chatgpt.com)
-* [Docker Secrets](https://docs.docker.com/engine/swarm/secrets/?utm_source=chatgpt.com)
+- [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/?utm_source=chatgpt.com)
+- [HashiCorp Vault](https://www.vaultproject.io/?utm_source=chatgpt.com)
+- [Docker Secrets](https://docs.docker.com/engine/swarm/secrets/?utm_source=chatgpt.com)
 
 ---
 
@@ -411,22 +411,22 @@ Common setup issues:
 
 Symptoms:
 
-* Backend startup failure
-* Database connection errors
+- Backend startup failure
+- Database connection errors
 
 ### Missing OpenAI Key
 
 Symptoms:
 
-* Embedding failures
-* LLM generation failures
+- Embedding failures
+- LLM generation failures
 
 ### Wrong Embedding Service URL
 
 Symptoms:
 
-* Search failures
-* Indexing failures
+- Search failures
+- Indexing failures
 
 Example:
 
@@ -438,8 +438,8 @@ ECONNREFUSED http://localhost:8001
 
 Symptoms:
 
-* CORS errors
-* Failed API requests
+- CORS errors
+- Failed API requests
 
 ---
 
@@ -449,13 +449,13 @@ The environment configuration system enables YouTube RAG Assistant to run consis
 
 Configuration is separated across:
 
-* Frontend
-* Backend
-* Python embedding service
+- Frontend
+- Backend
+- Python embedding service
 
 This separation improves:
 
-* Security
-* Deployment flexibility
-* Service isolation
-* Operational reliability
+- Security
+- Deployment flexibility
+- Service isolation
+- Operational reliability

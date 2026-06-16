@@ -17,27 +17,27 @@ The monitoring framework answers critical operational questions:
 
 ### Availability
 
-* Is the backend healthy?
-* Is the embedding service reachable?
-* Is MongoDB connected?
+- Is the backend healthy?
+- Is the embedding service reachable?
+- Is MongoDB connected?
 
 ### Performance
 
-* Which routes are slow?
-* Which workflows have high latency?
-* Where is time being spent?
+- Which routes are slow?
+- Which workflows have high latency?
+- Where is time being spent?
 
 ### Reliability
 
-* Which requests fail?
-* Which background jobs fail?
-* Are vector indexes healthy?
+- Which requests fail?
+- Which background jobs fail?
+- Are vector indexes healthy?
 
 ### AI Quality Observability
 
-* Are retrieval scores degrading?
-* Is LLM latency increasing?
-* Are hallucination risks increasing?
+- Are retrieval scores degrading?
+- Is LLM latency increasing?
+- Are hallucination risks increasing?
 
 Monitoring is especially important in RAG systems because failures can occur in multiple layers:
 
@@ -90,11 +90,11 @@ Why structured logs?
 
 Because structured logs enable:
 
-* Easier debugging
-* Machine-readable analytics
-* Dashboard aggregation
-* Filtering by event type
-* Historical analysis
+- Easier debugging
+- Machine-readable analytics
+- Dashboard aggregation
+- Filtering by event type
+- Historical analysis
 
 Example structured log:
 
@@ -131,13 +131,13 @@ Every HTTP request is monitored.
 
 Captured metrics include:
 
-* HTTP method
-* Route
-* Response status
-* Success / failure
-* Request duration
-* User type
-* User ID (when available)
+- HTTP method
+- Route
+- Response status
+- Success / failure
+- Request duration
+- User type
+- User ID (when available)
 
 Example:
 
@@ -151,9 +151,9 @@ Example:
 
 This helps identify:
 
-* Slow endpoints
-* Error-prone routes
-* Traffic patterns
+- Slow endpoints
+- Error-prone routes
+- Traffic patterns
 
 ---
 
@@ -163,25 +163,25 @@ Video processing is monitored because transcript ingestion is the first major st
 
 Tracked events include:
 
-* Video processing started
-* Transcript fetch success / failure
-* Chunk generation completed
-* Processing duration
-* Duplicate video detection
+- Video processing started
+- Transcript fetch success / failure
+- Chunk generation completed
+- Processing duration
+- Duplicate video detection
 
 Important metrics:
 
-* Transcript fetch latency
-* Transcript size
-* Chunk count
-* Processing success rate
+- Transcript fetch latency
+- Transcript size
+- Chunk count
+- Processing success rate
 
 Common failure scenarios:
 
-* Invalid YouTube URL
-* Transcript unavailable
-* Transcript provider timeout
-* Duplicate video submission
+- Invalid YouTube URL
+- Transcript unavailable
+- Transcript provider timeout
+- Duplicate video submission
 
 Monitoring this stage helps identify ingestion bottlenecks early.
 
@@ -193,9 +193,9 @@ After transcript chunking, the system runs asynchronous background jobs.
 
 Jobs monitored:
 
-* Summary generation
-* Embedding generation
-* Vector index creation
+- Summary generation
+- Embedding generation
+- Vector index creation
 
 Execution flow:
 
@@ -209,11 +209,11 @@ Chunks Created
 
 Tracked metrics:
 
-* Job start time
-* Job completion time
-* Job failure count
-* Total duration
-* Error messages
+- Job start time
+- Job completion time
+- Job failure count
+- Total duration
+- Error messages
 
 Important because failures here directly affect RAG readiness.
 
@@ -235,19 +235,19 @@ The Python embedding service is a critical dependency.
 
 Monitored operations:
 
-* Health checks
-* Embedding generation
-* Index creation
-* Semantic search
-* Index deletion
+- Health checks
+- Embedding generation
+- Index creation
+- Semantic search
+- Index deletion
 
 Key metrics:
 
-* Embedding latency
-* Index build time
-* Search latency
-* Index availability
-* Failure count
+- Embedding latency
+- Index build time
+- Search latency
+- Index availability
+- Failure count
 
 Example metrics:
 
@@ -261,10 +261,10 @@ Example metrics:
 
 Common failure scenarios:
 
-* Embedding API failure
-* Missing FAISS index
-* Corrupted metadata file
-* Timeout during vector search
+- Embedding API failure
+- Missing FAISS index
+- Corrupted metadata file
+- Timeout during vector search
 
 Monitoring ensures vector infrastructure remains reliable.
 
@@ -292,13 +292,13 @@ Merge & Rank
 
 Tracked metrics:
 
-* Query expansion success
-* Expanded term count
-* Vector match count
-* Keyword match count
-* Supporting chunk count
-* Retrieval latency
-* Average retrieval score
+- Query expansion success
+- Expanded term count
+- Vector match count
+- Keyword match count
+- Supporting chunk count
+- Retrieval latency
+- Average retrieval score
 
 Example:
 
@@ -312,10 +312,10 @@ Example:
 
 Low retrieval scores may indicate:
 
-* Poor chunking
-* Weak embeddings
-* Missing index
-* Bad ranking
+- Poor chunking
+- Weak embeddings
+- Missing index
+- Bad ranking
 
 Retrieval monitoring is one of the most important observability layers in a RAG system.
 
@@ -329,12 +329,12 @@ Each generation call is monitored.
 
 Tracked metrics:
 
-* Provider
-* Model
-* Prompt size
-* Answer size
-* Generation latency
-* Success / failure
+- Provider
+- Model
+- Prompt size
+- Answer size
+- Generation latency
+- Success / failure
 
 Example:
 
@@ -352,9 +352,9 @@ Why this matters:
 
 Large prompts can cause:
 
-* Higher latency
-* Higher cost
-* Increased timeout risk
+- Higher latency
+- Higher cost
+- Increased timeout risk
 
 LLM monitoring helps optimize prompt efficiency and cost.
 
@@ -366,19 +366,19 @@ Guest workflows are monitored separately.
 
 Tracked metrics:
 
-* Guest summaries generated
-* Guest Q&A requests
-* Session creation
-* Session expiration
-* Invalid session access
+- Guest summaries generated
+- Guest Q&A requests
+- Session creation
+- Session expiration
+- Invalid session access
 
 Important because guest traffic can be abused more easily than authenticated traffic.
 
 Future production improvements:
 
-* Rate limiting
-* Abuse detection
-* Anonymous traffic analytics
+- Rate limiting
+- Abuse detection
+- Anonymous traffic analytics
 
 ---
 
@@ -396,12 +396,12 @@ Health endpoints:
 
 Health checks validate:
 
-* Backend availability
-* MongoDB connectivity
-* Environment configuration
-* LLM provider configuration
-* Embedding service connectivity
-* Memory usage
+- Backend availability
+- MongoDB connectivity
+- Environment configuration
+- LLM provider configuration
+- Embedding service connectivity
+- Memory usage
 
 Health status levels:
 
@@ -446,11 +446,11 @@ Stored fields:
 
 Benefits of persistence:
 
-* Historical analysis
-* Dashboard summaries
-* Trend analysis
-* Regression detection
-* Failure investigation
+- Historical analysis
+- Dashboard summaries
+- Trend analysis
+- Regression detection
+- Failure investigation
 
 Without persistence, logs remain console-only.
 
@@ -462,18 +462,18 @@ Admins can inspect operational metrics via dashboard APIs.
 
 Dashboard provides visibility into:
 
-* Event counts
-* Recent failures
-* Slowest routes
-* Error distribution
-* Health summaries
+- Event counts
+- Recent failures
+- Slowest routes
+- Error distribution
+- Health summaries
 
 Example questions admins can answer:
 
-* Which route is slowest?
-* Are embedding failures increasing?
-* Are RAG responses getting slower?
-* Did deployment increase error rates?
+- Which route is slowest?
+- Are embedding failures increasing?
+- Are RAG responses getting slower?
+- Did deployment increase error rates?
 
 This helps convert raw logs into actionable operational insights.
 
@@ -534,9 +534,9 @@ Metrics are internal only.
 
 Future integrations:
 
-* [Datadog](https://www.datadoghq.com?utm_source=chatgpt.com)
-* [Grafana](https://grafana.com?utm_source=chatgpt.com)
-* [Prometheus](https://prometheus.io?utm_source=chatgpt.com)
+- [Datadog](https://www.datadoghq.com?utm_source=chatgpt.com)
+- [Grafana](https://grafana.com?utm_source=chatgpt.com)
+- [Prometheus](https://prometheus.io?utm_source=chatgpt.com)
 
 ### No Distributed Tracing
 
@@ -552,15 +552,15 @@ No automated alerts for failures or latency spikes.
 
 Recommended monitoring upgrades:
 
-* Real-time dashboards
-* Alerting system
-* Distributed tracing
-* Retrieval quality trend charts
-* LLM cost tracking
-* Token usage monitoring
-* Per-user analytics
-* Production SLA dashboards
-* Automated anomaly detection
+- Real-time dashboards
+- Alerting system
+- Distributed tracing
+- Retrieval quality trend charts
+- LLM cost tracking
+- Token usage monitoring
+- Per-user analytics
+- Production SLA dashboards
+- Automated anomaly detection
 
 Advanced AI monitoring:
 
@@ -568,17 +568,17 @@ Advanced AI monitoring:
 
 Track:
 
-* Precision
-* Recall
-* Ranking drift
+- Precision
+- Recall
+- Ranking drift
 
 ### Generation Observability
 
 Track:
 
-* Hallucination trends
-* Citation quality
-* Answer consistency
+- Hallucination trends
+- Citation quality
+- Answer consistency
 
 ---
 
@@ -588,13 +588,13 @@ The monitoring framework provides operational visibility across every critical l
 
 It monitors:
 
-* API performance
-* Video processing
-* Background jobs
-* Embedding infrastructure
-* Retrieval quality
-* LLM performance
-* Health status
-* Failure patterns
+- API performance
+- Video processing
+- Background jobs
+- Embedding infrastructure
+- Retrieval quality
+- LLM performance
+- Health status
+- Failure patterns
 
 This observability layer helps ensure YouTube RAG Assistant remains reliable, debuggable, and production-aware as the system scales.

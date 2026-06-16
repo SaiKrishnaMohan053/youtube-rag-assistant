@@ -1,6 +1,6 @@
 > This document primarily describes the current implementation in the repository.  
 > Sections explicitly labeled **Future Improvements**, **Recommendations**, or **Production Enhancements** describe proposed upgrades that are not yet implemented.
- 
+
 # API Documentation
 
 ## YouTube RAG Assistant
@@ -89,9 +89,9 @@ Errors are returned in a normalized format:
 
 The backend uses two video identifiers:
 
-| Identifier | Usage |
-| --- | --- |
-| YouTube video ID | Identifies the source video on YouTube |
+| Identifier          | Usage                                                                        |
+| ------------------- | ---------------------------------------------------------------------------- |
+| YouTube video ID    | Identifies the source video on YouTube                                       |
 | MongoDB video `_id` | Used for backend routes, ownership checks, chunks, chats, and FAISS indexing |
 
 For authenticated video routes, `:id` generally refers to the MongoDB video `_id`.
@@ -151,13 +151,13 @@ Base path:
 /api/auth
 ```
 
-| Method | Endpoint | Access | Purpose |
-| --- | --- | --- | --- |
-| `POST` | `/register` | Public | Register a local user and send verification email |
-| `GET` | `/verify-email?token=...` | Public | Verify local user email |
-| `POST` | `/login` | Public | Login with email and password |
-| `POST` | `/google` | Public | Login or register with Google credential |
-| `GET` | `/me` | Authenticated | Get current authenticated user |
+| Method | Endpoint                  | Access        | Purpose                                           |
+| ------ | ------------------------- | ------------- | ------------------------------------------------- |
+| `POST` | `/register`               | Public        | Register a local user and send verification email |
+| `GET`  | `/verify-email?token=...` | Public        | Verify local user email                           |
+| `POST` | `/login`                  | Public        | Login with email and password                     |
+| `POST` | `/google`                 | Public        | Login or register with Google credential          |
+| `GET`  | `/me`                     | Authenticated | Get current authenticated user                    |
 
 ---
 
@@ -332,21 +332,21 @@ Base path:
 
 All video APIs require authentication unless explicitly stated otherwise.
 
-| Method | Endpoint | Purpose |
-| --- | --- | --- |
-| `GET` | `/embedding-health` | Check Python embedding service through backend |
-| `POST` | `/process` | Process YouTube URL and save transcript |
-| `GET` | `/` | List current user videos |
-| `GET` | `/:id` | Get one video |
-| `GET` | `/:id/status` | Get video readiness status |
-| `POST` | `/:id/chunks` | Create transcript chunks and start background jobs |
-| `GET` | `/:id/chunks` | Get transcript chunks |
-| `POST` | `/:id/index` | Manually index chunks into FAISS |
-| `GET` | `/:id/index/status` | Get FAISS index status |
-| `POST` | `/:id/search` | Run direct semantic search |
-| `POST` | `/:id/ask` | Ask routed RAG question |
-| `GET` | `/:id/chats` | Get chat history |
-| `DELETE` | `/:id` | Delete video and related data |
+| Method   | Endpoint            | Purpose                                            |
+| -------- | ------------------- | -------------------------------------------------- |
+| `GET`    | `/embedding-health` | Check Python embedding service through backend     |
+| `POST`   | `/process`          | Process YouTube URL and save transcript            |
+| `GET`    | `/`                 | List current user videos                           |
+| `GET`    | `/:id`              | Get one video                                      |
+| `GET`    | `/:id/status`       | Get video readiness status                         |
+| `POST`   | `/:id/chunks`       | Create transcript chunks and start background jobs |
+| `GET`    | `/:id/chunks`       | Get transcript chunks                              |
+| `POST`   | `/:id/index`        | Manually index chunks into FAISS                   |
+| `GET`    | `/:id/index/status` | Get FAISS index status                             |
+| `POST`   | `/:id/search`       | Run direct semantic search                         |
+| `POST`   | `/:id/ask`          | Ask routed RAG question                            |
+| `GET`    | `/:id/chats`        | Get chat history                                   |
+| `DELETE` | `/:id`              | Delete video and related data                      |
 
 ---
 
@@ -694,14 +694,14 @@ POST /api/videos/:id/ask
 
 #### Supported Modes
 
-| Mode | Meaning |
-| --- | --- |
-| `summary` | Full video overview answer |
-| `entity_overview` | Entity-focused answer |
-| `topic_overview` | Topic-focused answer |
-| `timestamp_query` | Timestamp-focused answer |
+| Mode                | Meaning                        |
+| ------------------- | ------------------------------ |
+| `summary`           | Full video overview answer     |
+| `entity_overview`   | Entity-focused answer          |
+| `topic_overview`    | Topic-focused answer           |
+| `timestamp_query`   | Timestamp-focused answer       |
 | `action_extraction` | Notes/posts/blog/action output |
-| `qa` | Specific grounded Q&A |
+| `qa`                | Specific grounded Q&A          |
 
 ---
 
@@ -770,10 +770,10 @@ Base path:
 
 Guest APIs are public and do not persist video or chat history in MongoDB.
 
-| Method | Endpoint | Purpose |
-| --- | --- | --- |
-| `POST` | `/summary` | Generate temporary summary from YouTube URL |
-| `POST` | `/ask` | Ask temporary follow-up question using guest session |
+| Method | Endpoint   | Purpose                                              |
+| ------ | ---------- | ---------------------------------------------------- |
+| `POST` | `/summary` | Generate temporary summary from YouTube URL          |
+| `POST` | `/ask`     | Ask temporary follow-up question using guest session |
 
 ---
 
@@ -862,13 +862,13 @@ Base path:
 
 All admin routes require admin access.
 
-| Method | Endpoint | Purpose |
-| --- | --- | --- |
-| `GET` | `/overview` | Platform totals and processing state |
-| `GET` | `/users` | List users with usage counts |
-| `GET` | `/users/:userId/videos` | Inspect videos for a user |
-| `GET` | `/videos/:videoId/chunks` | Inspect chunks and index status |
-| `POST` | `/videos/:videoId/index` | Trigger indexing for a video |
+| Method | Endpoint                  | Purpose                              |
+| ------ | ------------------------- | ------------------------------------ |
+| `GET`  | `/overview`               | Platform totals and processing state |
+| `GET`  | `/users`                  | List users with usage counts         |
+| `GET`  | `/users/:userId/videos`   | Inspect videos for a user            |
+| `GET`  | `/videos/:videoId/chunks` | Inspect chunks and index status      |
+| `POST` | `/videos/:videoId/index`  | Trigger indexing for a video         |
 
 ---
 
@@ -983,9 +983,9 @@ Base path:
 
 All metrics routes require admin access.
 
-| Method | Endpoint | Purpose |
-| --- | --- | --- |
-| `GET` | `/summary` | Fetch recent platform metrics summary |
+| Method | Endpoint   | Purpose                               |
+| ------ | ---------- | ------------------------------------- |
+| `GET`  | `/summary` | Fetch recent platform metrics summary |
 
 ---
 
@@ -1031,12 +1031,12 @@ Base path:
 
 All evaluation routes require admin access.
 
-| Method | Endpoint | Purpose |
-| --- | --- | --- |
-| `GET` | `/stats` | Aggregated evaluation statistics |
-| `GET` | `/reports` | List saved evaluation reports |
-| `GET` | `/reports/:fileName` | Fetch one saved evaluation report |
-| `POST` | `/run` | Run evaluation suite |
+| Method | Endpoint             | Purpose                           |
+| ------ | -------------------- | --------------------------------- |
+| `GET`  | `/stats`             | Aggregated evaluation statistics  |
+| `GET`  | `/reports`           | List saved evaluation reports     |
+| `GET`  | `/reports/:fileName` | Fetch one saved evaluation report |
+| `POST` | `/run`               | Run evaluation suite              |
 
 ---
 
@@ -1125,11 +1125,11 @@ Base path:
 /api/health
 ```
 
-| Method | Endpoint | Access | Purpose |
-| --- | --- | --- | --- |
-| `GET` | `/live` | Public | Basic liveness check |
-| `GET` | `/status` | Public | Backend readiness and dependency status |
-| `GET` | `/deep` | Public | Embedding service connectivity check |
+| Method | Endpoint  | Access | Purpose                                 |
+| ------ | --------- | ------ | --------------------------------------- |
+| `GET`  | `/live`   | Public | Basic liveness check                    |
+| `GET`  | `/status` | Public | Backend readiness and dependency status |
+| `GET`  | `/deep`   | Public | Embedding service connectivity check    |
 
 ---
 
@@ -1200,14 +1200,14 @@ http://localhost:8001
 
 These endpoints are primarily used by the backend service.
 
-| Method | Endpoint | Purpose |
-| --- | --- | --- |
-| `GET` | `/health` | Service health and embedding model info |
-| `POST` | `/embed` | Generate embeddings for raw texts |
-| `POST` | `/index-video` | Build FAISS index for one video |
-| `POST` | `/search` | Search FAISS index for one video |
-| `GET` | `/videos/{video_id}/index/status` | Check index status |
-| `DELETE` | `/videos/{video_id}/index` | Delete index and metadata |
+| Method   | Endpoint                          | Purpose                                 |
+| -------- | --------------------------------- | --------------------------------------- |
+| `GET`    | `/health`                         | Service health and embedding model info |
+| `POST`   | `/embed`                          | Generate embeddings for raw texts       |
+| `POST`   | `/index-video`                    | Build FAISS index for one video         |
+| `POST`   | `/search`                         | Search FAISS index for one video        |
+| `GET`    | `/videos/{video_id}/index/status` | Check index status                      |
+| `DELETE` | `/videos/{video_id}/index`        | Delete index and metadata               |
 
 ---
 
@@ -1368,16 +1368,16 @@ DELETE /videos/{video_id}/index
 
 ### Common Status Codes
 
-| Status Code | Meaning |
-| --- | --- |
-| `200` | Request completed successfully |
-| `201` | Resource created successfully |
-| `400` | Invalid request or missing fields |
-| `401` | Missing or invalid authentication |
-| `403` | Authenticated but not authorized |
-| `404` | Resource not found |
-| `409` | Duplicate or conflicting resource |
-| `500` | Internal server error |
+| Status Code | Meaning                           |
+| ----------- | --------------------------------- |
+| `200`       | Request completed successfully    |
+| `201`       | Resource created successfully     |
+| `400`       | Invalid request or missing fields |
+| `401`       | Missing or invalid authentication |
+| `403`       | Authenticated but not authorized  |
+| `404`       | Resource not found                |
+| `409`       | Duplicate or conflicting resource |
+| `500`       | Internal server error             |
 
 ### Example Validation Error
 
