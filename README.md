@@ -1,66 +1,587 @@
 # YouTube RAG Assistant
 
-> Full-stack Retrieval-Augmented Generation assistant for YouTube videos.  
-> Process transcripts, generate embeddings, run semantic search, and ask grounded AI questions with persistent chat history.
+> Full-stack YouTube intelligence platform built with Retrieval-Augmented Generation (RAG).
+> It transforms long-form YouTube videos into searchable knowledge through transcript processing, hybrid retrieval, semantic search, grounded AI generation, and intent-aware question answering.
+
+---
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Demo](#demo)
+- [Documentation](#documentation)
+- [Implemented Features](#implemented-features)
+- [Tech Stack](#tech-stack)
+- [System Architecture](#system-architecture)
+- [RAG Pipeline](#rag-pipeline)
+- [Intent Routing](#intent-routing)
+- [Retrieval System](#retrieval-system)
+- [Summary Generation](#summary-generation)
+- [Action / Content Generation](#action--content-generation)
+- [Monitoring and Metrics](#monitoring-and-metrics)
+- [Evaluation Framework](#evaluation-framework)
+- [Installation](#installation)
+- [Running Locally](#running-locally)
+- [Testing](#testing)
+- [Folder Structure](#folder-structure)
+- [Roadmap](#roadmap)
+- [Author](#author)
 
 ---
 
 ## Overview
 
-**YouTube RAG Assistant** is a multi-service application that turns YouTube transcripts into a searchable knowledge base for each user.
+YouTube RAG Assistant transforms long-form YouTube videos into searchable knowledge using transcript processing, hybrid retrieval, intent-aware routing, and grounded AI generation.
 
-The system lets users:
+The system consists of three main services:
 
-- register and authenticate with JWT or Google OAuth
-- submit YouTube video URLs for transcript processing
-- chunk transcripts with timestamps and overlap support
-- generate embeddings through a Python FastAPI service
-- store per-video FAISS indexes for semantic retrieval
-- ask grounded questions using OpenAI or Ollama
-- persist chat history and processed video metadata in MongoDB
+1. **Frontend** — Built with React for guest, user, and admin workflows
+2. **Backend API** — Built with Node.js and Express.js for RAG orchestration and business logic
+3. **Embedding Service** — Built with FastAPI and FAISS for semantic retrieval
+
+---
+
+## Demo
+
+### Core Workflows
+
+* Guest video summarization
+* Authenticated video processing and RAG Q&A
+* AI-powered content generation (notes, posts, blogs)
+* Admin monitoring dashboard
+* Evaluation and metrics dashboard
+
+---
+
+## Documentation
+
+Detailed technical documentation is available in the `docs/` folder:
+
+* `docs/ARCHITECTURE.md` — Full system architecture and design decisions
+* `docs/API.md` — Complete API documentation
+* `docs/EVALUATION.md` — RAG evaluation methodology and benchmarks
+* `docs/MONITORING.md` — Metrics, logging, and observability
+* `docs/ENVIRONMENT.md` — Complete environment configuration
+
+---
+
+## Implemented Features
+
+### Authentication & Access
+
+* Local email/password authentication with hashed credentials
+* Email verification workflow
+* Google OAuth login
+* JWT-based session management
+* Role-based access control for `user` and `admin` workflows
+
+### Video Processing Pipeline
+
+* YouTube URL parsing and transcript extraction via Supadata
+* Timestamp-aware transcript chunking with overlap
+* Transcript persistence in MongoDB
+* Background summary generation and embedding indexing
+* Processing status tracking and cleanup workflows
+
+### RAG Question Answering
+
+* Intent-aware query routing
+* Video, topic, and entity overview responses
+* Timestamp-based answers
+* Grounded transcript-only question answering
+* Chat history persistence with supporting chunk references
+
+### Hybrid Retrieval
+
+* Semantic vector search using FAISS
+* LLM-assisted query expansion
+* Keyword-based transcript retrieval
+* Entity-aware and topic-aware retrieval
+* Hybrid ranking with automatic re-indexing fallback
+
+### AI Content Generation
+
+Generate structured outputs from video content, including:
+
+* Detailed notes and study notes
+* LinkedIn posts and tweet threads
+* Blog outlines
+* Action items and key takeaways
+
+### Monitoring & Reliability
+
+* Structured JSON logging and request metrics
+* API latency and retrieval performance monitoring
+* LLM and embedding service health checks
+* Admin dashboard for metrics, health, and system inspection
+
+### Evaluation Framework
+
+* Automated RAG benchmark cases
+* Relevance, groundedness, and completeness scoring
+* Hallucination risk detection
+* Latency tracking and regression monitoring
 
 ---
 
 ## Tech Stack
 
-| Layer                 | Technology                                       |
-| --------------------- | ------------------------------------------------ |
-| **Frontend**          | React 18, Vite, Material UI, React Router, Axios |
-| **Backend API**       | Node.js, Express.js, Mongoose, JWT, bcryptjs     |
-| **Database**          | MongoDB                                          |
-| **Embedding Service** | Python, FastAPI, Uvicorn, NumPy                  |
-| **Vector Search**     | FAISS CPU                                        |
-| **AI Providers**      | OpenAI Embeddings, OpenAI Chat, Ollama           |
-| **Auth & Email**      | Google OAuth, Nodemailer                         |
-| **Testing & Quality** | Jest, Supertest, Pytest, Prettier, Black         |
+### Frontend
+
+| Area | Technology |
+| --- | --- |
+| Framework | React |
+| Build Tool | Vite |
+| UI | Material UI |
+| Routing | React Router |
+| HTTP Client | Axios |
+| Markdown Rendering | react-markdown |
+| Tests | Vitest / React Testing Library style test setup |
+
+### Backend
+
+| Area | Technology |
+| --- | --- |
+| Runtime | Node.js |
+| API Framework | Express.js |
+| Database | MongoDB |
+| ODM | Mongoose |
+| Auth | JWT, bcryptjs, Google OAuth |
+| Security / HTTP | Helmet, CORS, Morgan |
+| LLM Providers | OpenAI Responses API, Ollama |
+| Email | Brevo SMTP API integration through HTTP |
+| Tests | Jest, Supertest |
+
+### Python Embedding Service
+
+| Area | Technology |
+| --- | --- |
+| API Framework | FastAPI |
+| Server | Uvicorn |
+| Embeddings | OpenAI `text-embedding-3-small` |
+| Vector Search | FAISS CPU |
+| Numerics | NumPy |
+| Validation | Pydantic |
+| Tests | Pytest |
 
 ---
 
-## Architecture Flow
+## System Architecture
+
+```text id="th8eza"
+User / Guest / Admin
+        |
+        v
+React + Vite Frontend
+        |
+        v
+Node.js / Express Backend API
+        |
+        +--> Authentication & Authorization
+        |       +--> Local / Google OAuth
+        |       +--> JWT Protection
+        |       +--> Role-Based Access
+        |
+        +--> Video Processing Pipeline
+        |       +--> YouTube Transcript Fetch
+        |       +--> Chunk Generation
+        |       +--> Background Processing
+        |
+        +--> RAG Orchestration
+        |       +--> Intent Routing
+        |       +--> Hybrid Retrieval
+        |       +--> Prompt Engineering
+        |       +--> LLM Generation
+        |
+        +--> Admin / Metrics / Health / Evaluation
+        |
+        v
+MongoDB
+        |
+        +--> Users
+        +--> Videos
+        +--> Transcript Chunks
+        +--> Chat History
+        +--> Metric Logs
+        +--> Eval Reports
+        |
+        v
+Python FastAPI Embedding Service
+        |
+        +--> OpenAI Embeddings
+        +--> FAISS Indexing
+        +--> Semantic Search
+```
+
+The system is built as a multi-service architecture with three core layers:
+
+### Frontend Layer
+
+The React frontend provides separate interfaces for public users, authenticated users, and administrators.
+
+Core UI areas include:
+
+* **Public Interface** — Guest summarization, login, and registration
+* **User Dashboard** — Video management and chat workflows
+* **Video Chat Interface** — Interactive RAG-based Q&A
+* **Admin Dashboard** — Metrics, health checks, and evaluation tools
+
+The frontend uses protected routes and role-based access control to isolate user and admin workflows.
+
+### Backend Layer
+
+The Node.js + Express.js backend acts as the orchestration layer for authentication, video processing, retrieval, prompt construction, AI response generation, and system observability.
+
+### Embedding Layer
+
+A dedicated Python microservice built with FastAPI handles embedding generation, vector indexing, and semantic retrieval using FAISS.
+
+Each processed video maintains its own vector index, enabling efficient video-level semantic search. Embeddings are normalized so similarity search behaves like cosine similarity, improving retrieval quality.
+
+This architecture separates application logic, AI orchestration, and vector search workloads, improving modularity, scalability, and maintainability.
+
+---
+
+## RAG Pipeline
+
+The platform uses an intent-aware Retrieval-Augmented Generation (RAG) pipeline to generate grounded responses from video transcripts.
 
 ```text
-YouTube Video URL
-  ->
-Video ID Extraction
-  ->
-Transcript Fetch (Supadata)
-  ->
-MongoDB Storage
-  ->
-Transcript Chunking
-  ->
-Embedding Service (FastAPI)
-  ->
-OpenAI Embeddings
-  ->
-FAISS Per-Video Index
-  ->
-Semantic Retrieval
-  ->
-OpenAI / Ollama Answer Generation
-  ->
-Persistent Chat History
+User Question
+    |
+    v
+Question Router
+    |
+    +--> VIDEO_OVERVIEW      -> Summary-based answer
+    +--> ENTITY_OVERVIEW     -> Entity-focused answer
+    +--> TOPIC_OVERVIEW      -> Topic-focused answer
+    +--> TIMESTAMP_QUERY     -> Timestamp retrieval
+    +--> ACTION_EXTRACTION   -> Content generation workflow
+    +--> SPECIFIC_QA         -> Hybrid retrieval + grounded answer generation
 ```
+
+The pipeline ensures responses are generated using transcript-grounded context rather than generic model knowledge, reducing hallucinations and improving answer reliability.
+
+---
+
+## Intent Routing
+
+The application uses a rule-based intent router to classify user queries and select the most appropriate retrieval and response strategy before RAG execution.
+
+### Supported Intents
+
+| Intent              | Purpose                                                                           |
+| ------------------- | --------------------------------------------------------------------------------- |
+| `VIDEO_OVERVIEW`    | Provides a high-level summary and key takeaways of the video                      |
+| `ENTITY_OVERVIEW`   | Explains what a specific person or entity discussed                               |
+| `TOPIC_OVERVIEW`    | Summarizes major points related to a specific topic                               |
+| `SPECIFIC_QA`       | Handles detailed grounded question answering using transcript retrieval           |
+| `ACTION_EXTRACTION` | Generates structured outputs such as notes, blog outlines, posts, or action items |
+| `TIMESTAMP_QUERY`   | Returns when a topic or discussion occurred in the video                          |
+
+This routing layer improves answer quality by matching each query with the most relevant retrieval strategy.
+
+---
+
+## Retrieval System
+
+The application uses a hybrid retrieval pipeline to fetch the most relevant transcript context before answer generation.
+
+### Retrieval Components
+
+* **Vector Search** — Uses semantic embeddings and FAISS to retrieve semantically similar transcript chunks
+* **Query Expansion** — Uses an LLM to expand queries and improve retrieval recall
+* **Keyword Search** — Captures exact phrase matches that semantic search may miss
+* **Entity-Aware Retrieval** — Prioritizes chunks mentioning people, companies, products, or organizations
+* **Topic-Aware Retrieval** — Retrieves topic-relevant chunks with neighboring context
+* **Auto Re-Indexing** — Automatically rebuilds missing or outdated vector indexes
+* **Merge and Rank** — Combines retrieval results using hybrid scoring
+
+This hybrid retrieval design improves precision, recall, and grounding quality compared to semantic search alone.
+
+---
+
+## Summary Generation
+
+The platform automatically generates structured summaries after transcript chunking to improve retrieval quality and reduce response latency.
+
+### Summary Pipeline
+
+```text
+Transcript Chunks
+    ↓
+Noise Filtering
+    ↓
+Section-Level Summaries
+    ↓
+Final Structured Video Summary
+    ↓
+Stored for Retrieval
+```
+
+Each processed video generates:
+
+* Short video overview
+* Detailed summary
+* Main topics
+* Key takeaways
+* Entity-level insights
+* Topic-level summaries
+
+These summaries power overview queries, topic exploration, entity explanations, and content generation workflows.
+
+This summary-first design reduces LLM cost and improves response speed for high-level queries.
+
+---
+
+## Action / Content Generation
+
+Beyond question answering, the platform can transform video content into reusable structured outputs using grounded AI generation.
+
+### Supported Output Types
+
+| Output Type      | Description                               |
+| ---------------- | ----------------------------------------- |
+| `DETAILED_NOTES` | Comprehensive notes covering key concepts |
+| `STUDY_NOTES`    | Revision-friendly learning notes          |
+| `LINKEDIN_POST`  | Professional social media content         |
+| `TWEET_THREAD`   | Multi-post thread summarization           |
+| `BLOG_OUTLINE`   | Structured article or blog outline        |
+| `ACTION_ITEMS`   | Tasks and actionable recommendations      |
+| `KEY_TAKEAWAYS`  | Important insights and conclusions        |
+| `GENERIC_NOTES`  | General-purpose summarized notes          |
+
+Generated outputs are grounded using summaries and transcript context to ensure relevance and reduce hallucinations.
+
+This enables users to repurpose long-form video content into practical, shareable formats with minimal manual effort.
+
+---
+
+## Monitoring and Metrics
+
+The platform includes structured monitoring and observability to track system health, performance, and AI quality across the entire RAG pipeline.
+
+### Metrics Tracked
+
+* API request latency and error rates
+* Video processing performance
+* Embedding generation and vector search health
+* Retrieval quality and supporting chunk scores
+* LLM response latency and token usage
+* Guest session activity
+* Evaluation run results
+
+### Monitoring Capabilities
+
+The system captures structured JSON logs for:
+
+* HTTP requests
+* Background jobs
+* Retrieval pipeline stages
+* LLM generation
+* Error handling and failures
+
+Metrics can optionally be persisted to MongoDB for historical analysis and dashboard visualization.
+
+This monitoring layer helps identify bottlenecks, detect failures early, and evaluate production RAG performance over time.
+
+---
+
+## Evaluation Framework
+
+The platform includes an automated evaluation framework to measure retrieval quality, answer quality, and end-to-end RAG performance.
+
+### Evaluation Coverage
+
+The system evaluates multiple query types, including:
+
+* Video overview
+* Specific question answering
+* Topic-based queries
+* Entity-based queries
+* Timestamp queries
+* Action/content generation
+* Guest summary and guest Q&A
+
+### Evaluation Metrics
+
+Each evaluation run measures:
+
+* **Relevance** — How well the answer matches the question
+* **Groundedness / Faithfulness** — Whether the answer is supported by retrieved transcript context
+* **Completeness** — Whether important details are included
+* **Latency** — End-to-end response time
+* **Hallucination Risk** — Probability of unsupported AI output
+
+Evaluation reports are persisted for performance tracking, regression detection, and benchmarking across model or retrieval changes.
+
+This evaluation layer enables systematic improvement of retrieval precision, answer quality, and production reliability.
+
+---
+
+## Installation
+
+### 1. Clone Repository
+
+```bash id="3w4b4m"
+git clone https://github.com/SaiKrishnaMohan053/youtube-rag-assistant.git
+cd youtube-rag-assistant
+```
+Prerequisites:
+- Node.js 18+
+- Python 3.10+
+- MongoDB
+
+### 2. Install Backend Dependencies
+
+```bash id="rppwfk"
+npm install
+```
+
+### 3. Install Frontend Dependencies
+
+```bash id="s4zmyc"
+cd client
+npm install
+cd ..
+```
+
+### 4. Install Python Embedding Service Dependencies
+
+```bash id="4t5m4o"
+cd services/embedding-service
+python -m venv .venv
+```
+
+Activate virtual environment and install dependencies:
+
+**Windows**
+
+```powershell id="5c4y7w"
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+```
+
+**macOS / Linux**
+
+```bash id="v8afq2"
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+### 5. Environment Setup
+
+Create `.env` files for:
+
+* Backend
+* Frontend
+* Python embedding service
+
+See `docs/ENVIRONMENT.md` for full environment configuration.
+
+---
+
+## Running Locally
+
+### Start MongoDB
+
+Use local MongoDB:
+
+```bash id="eg28xv"
+mongod
+```
+
+Or use MongoDB Atlas by updating `MONGODB_URI`.
+
+### Start Python Embedding Service
+
+```bash id="32v0kr"
+uvicorn app:app --reload --port 8001
+```
+
+### Start Backend API
+
+```bash id="v98yq3"
+npm run dev:api
+```
+
+Backend runs at:
+
+```text id="b5n6sj"
+http://localhost:5000
+```
+
+### Start Frontend
+
+```bash id="4gw1p8"
+cd client
+npm run dev
+```
+
+Frontend runs at:
+
+```text id="8hwp3r"
+http://localhost:5173
+```
+
+### Start Full Development Environment
+
+```bash id="u6y0tu"
+npm run dev
+```
+
+This starts:
+
+* Backend API
+* Python embedding service
+
+using `concurrently`.
+
+---
+
+## Testing
+
+The project includes automated test coverage across frontend, backend, and the Python embedding service.
+
+### Backend Tests
+
+```bash id="xv0wwb"
+npm test
+```
+
+Uses **Jest + Supertest** for:
+
+* Authentication
+* API routes
+* Retrieval pipeline
+* RAG workflows
+* Middleware and utilities
+
+### Frontend Tests
+
+```bash id="o2bnmx"
+cd client
+npm test
+```
+
+Uses **Vitest** for:
+
+* UI components
+* Routing
+* Auth state management
+* Page workflows
+
+### Python Service Tests
+
+```bash id="7gjg7q"
+pytest services/embedding-service/tests
+```
+
+Uses **Pytest** for:
+
+* Embedding generation
+* FAISS indexing
+* Semantic search validation
 
 ---
 
@@ -68,401 +589,45 @@ Persistent Chat History
 
 ```text
 youtube-rag-assistant/
-|
-|-- client/
-|   |-- src/
-|   |   |-- api/
-|   |   |-- components/
-|   |   |-- context/
-|   |   |-- hooks/
-|   |   |-- pages/
-|   |   |-- routes/
-|   |   `-- App.jsx
-|   `-- package.json
-|
-|-- services/
-|   `-- embedding-service/
-|       |-- app.py
-|       |-- requirements.txt
-|       |-- tests/
-|       `-- vector_store/
-|
-|-- src/
-|   |-- config/
-|   |-- controllers/
-|   |-- middleware/
-|   |-- models/
-|   |-- routes/
-|   |-- services/
-|   |-- utils/
-|   |-- app.js
-|   `-- server.js
-|
-|-- scripts/
-|-- tests/
-|-- .github/workflows/
-|-- .env.example
-|-- package.json
-`-- README.md
+├── client/                     # React frontend
+├── src/                        # Node.js backend
+│   ├── controllers/
+│   ├── models/
+│   ├── routes/
+│   ├── services/
+│   └── utils/
+├── services/
+│   └── embedding-service/      # FastAPI + FAISS service
+├── docs/
+├── tests/
+└── README.md
 ```
-
----
-
-## Core Modules
-
-| File / Module                             | Purpose                                                                 |
-| ----------------------------------------- | ----------------------------------------------------------------------- |
-| `src/services/transcript.service.js`      | Fetches transcript data from Supadata.                                  |
-| `src/services/chunk.service.js`           | Splits transcripts into timestamp-aware chunks.                         |
-| `src/services/embeddingClient.service.js` | Sends chunk data to the embedding service.                              |
-| `src/services/llm.service.js`             | Routes answer generation to OpenAI or Ollama.                           |
-| `src/controllers/video.controller.js`     | Handles video processing, listing, retrieval, and deletion.             |
-| `src/controllers/qa.controller.js`        | Runs RAG Q&A and returns chat responses.                                |
-| `services/embedding-service/app.py`       | Generates embeddings, builds FAISS indexes, and performs vector search. |
-
----
-
-## Environment Variables
-
-Create a root `.env` file before running the project.
-
-```bash
-PORT=5000
-NODE_ENV=development
-
-MONGODB_URI=mongodb://127.0.0.1:27017/youtube_rag_assistant
-
-JWT_SECRET=replace_with_strong_secret
-JWT_EXPIRES_IN=7d
-
-EMBEDDING_SERVICE_URL=http://localhost:8001
-
-LLM_PROVIDER=openai
-
-OPENAI_API_KEY=your_openai_api_key
-OPENAI_MODEL=gpt-4.1-mini
-
-OLLAMA_BASE_URL=http://localhost:11434
-OLLAMA_MODEL=llama3
-OLLAMA_TIMEOUT_MS=120000
-
-SUPADATA_API_KEY=your_supadata_key
-
-CLIENT_URL=http://localhost:5173
-GOOGLE_CLIENT_ID=your_google_client_id
-
-SMTP_HOST=
-SMTP_PORT=587
-SMTP_USER=
-SMTP_PASS=
-EMAIL_FROM=YouTube RAG Assistant <no-reply@example.com>
-```
-
-Notes:
-
-- `PORT`, `MONGODB_URI`, `NODE_ENV`, `JWT_SECRET`, `JWT_EXPIRES_IN`, and `EMBEDDING_SERVICE_URL` are required.
-- If `LLM_PROVIDER=openai`, `OPENAI_API_KEY` is required.
-- If `LLM_PROVIDER=ollama`, `OLLAMA_BASE_URL` is required.
-- `GOOGLE_CLIENT_ID` and SMTP settings are optional, but needed for Google OAuth and email verification flows.
-
----
-
-## Installation
-
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/SaiKrishnaMohan053/youtube-rag-assistant.git
-cd youtube-rag-assistant
-```
-
-### 2. Install Root Dependencies
-
-```bash
-npm install
-```
-
-### 3. Install Frontend Dependencies
-
-```bash
-cd client
-npm install
-cd ..
-```
-
-### 4. Create the Environment File
-
-Windows PowerShell:
-
-```powershell
-Copy-Item .env.example .env
-```
-
-macOS / Linux:
-
-```bash
-cp .env.example .env
-```
-
-### 5. Set Up the Python Embedding Service
-
-```bash
-cd services/embedding-service
-python -m venv .venv
-```
-
-Windows:
-
-```powershell
-.\.venv\Scripts\activate
-pip install -r requirements.txt
-```
-
-macOS / Linux:
-
-```bash
-source .venv/bin/activate
-pip install -r requirements.txt
-```
-
-Return to the repository root after setup.
-
----
-
-## Running the Project
-
-Make sure these dependencies are available first:
-
-- MongoDB
-- Python virtual environment inside `services/embedding-service/.venv`
-- OpenAI API key or Ollama runtime
-- Supadata API key
-
-### Start MongoDB
-
-```bash
-mongod
-```
-
-Or use MongoDB Atlas.
-
-### Start Backend API + Embedding Service
-
-From the root folder:
-
-```bash
-npm run dev
-```
-
-This starts:
-
-- Backend API at `http://localhost:5000`
-- Embedding service at `http://localhost:8001`
-
-Note:
-
-- `npm run dev:embedding` uses `services/embedding-service/.venv/Scripts/python.exe`, so the current script is Windows-oriented.
-
-### Start the Frontend
-
-In a separate terminal:
-
-```bash
-cd client
-npm run dev
-```
-
-Frontend URL:
-
-`http://localhost:5173`
-
----
-
-## REST API Endpoints
-
-Base API URL:
-
-`http://localhost:5000/api`
-
-### Health
-
-| Method | Endpoint  | Description               |
-| ------ | --------- | ------------------------- |
-| `GET`  | `/health` | Backend API health check. |
-
-### Authentication
-
-| Method | Endpoint             | Description                         |
-| ------ | -------------------- | ----------------------------------- |
-| `POST` | `/auth/register`     | Register a new user.                |
-| `GET`  | `/auth/verify-email` | Verify email with token.            |
-| `POST` | `/auth/login`        | Login with email and password.      |
-| `POST` | `/auth/google`       | Login with Google OAuth credential. |
-| `GET`  | `/auth/me`           | Get logged-in user profile.         |
-
-### Videos, Chunks, Search, and Q&A
-
-All routes below require JWT authentication.
-
-| Method   | Endpoint                   | Description                                        |
-| -------- | -------------------------- | -------------------------------------------------- |
-| `POST`   | `/videos/process`          | Process a YouTube URL and create the video record. |
-| `GET`    | `/videos`                  | Get all videos for the logged-in user.             |
-| `GET`    | `/videos/:id`              | Get one processed video.                           |
-| `DELETE` | `/videos/:id`              | Delete video, chunks, chats, and FAISS index.      |
-| `POST`   | `/videos/:id/chunks`       | Create transcript chunks for a video.              |
-| `GET`    | `/videos/:id/chunks`       | Get transcript chunks.                             |
-| `GET`    | `/videos/embedding-health` | Check embedding service health through backend.    |
-| `POST`   | `/videos/:id/index`        | Generate embeddings and build the FAISS index.     |
-| `POST`   | `/videos/:id/search`       | Run semantic search on the indexed transcript.     |
-| `POST`   | `/videos/:id/ask`          | Ask a grounded question about the video.           |
-| `GET`    | `/videos/:id/chats`        | Fetch persistent chat history for a video.         |
-
-### Embedding Service
-
-Base URL:
-
-`http://localhost:8001`
-
-| Method   | Endpoint                  | Description                                  |
-| -------- | ------------------------- | -------------------------------------------- |
-| `GET`    | `/health`                 | Embedding service health check.              |
-| `POST`   | `/embed`                  | Generate embeddings for raw text.            |
-| `POST`   | `/index-video`            | Build a FAISS index for a video.             |
-| `POST`   | `/search`                 | Search a video index by semantic similarity. |
-| `DELETE` | `/videos/:video_id/index` | Delete a stored FAISS index.                 |
-
----
-
-## Example Workflow
-
-```text
-1. Register or log in
-2. Submit a YouTube URL
-3. Create transcript chunks
-4. Index embeddings
-5. Open the video chat page
-6. Ask questions or request a summary
-7. Review grounded answers with retrieved transcript support
-```
-
----
-
-## Available Scripts
-
-### Root Scripts
-
-| Command                       | Description                                       |
-| ----------------------------- | ------------------------------------------------- |
-| `npm run dev`                 | Start backend API and embedding service together. |
-| `npm run dev:api`             | Start backend API only.                           |
-| `npm run dev:embedding`       | Start embedding service only.                     |
-| `npm start`                   | Start backend in production mode.                 |
-| `npm test`                    | Run backend Jest tests.                           |
-| `npm run test:watch`          | Run Jest in watch mode.                           |
-| `npm run format`              | Format JS, JSON, YAML, and Markdown files.        |
-| `npm run format:check`        | Check formatting with Prettier.                   |
-| `npm run format:python`       | Format Python files with Black.                   |
-| `npm run format:python:check` | Check Python formatting with Black.               |
-| `npm run audit`               | Run `npm audit` with high severity threshold.     |
-| `npm run check`               | Run project JS checks from `scripts/check-js.js`. |
-
-### Frontend Scripts
-
-Run these inside `client/`.
-
-| Command           | Description                           |
-| ----------------- | ------------------------------------- |
-| `npm run dev`     | Start Vite dev server.                |
-| `npm run build`   | Build the frontend for production.    |
-| `npm run preview` | Preview the production build locally. |
-
----
-
-## Testing
-
-### Backend
-
-```bash
-npm test
-```
-
-### Python Embedding Service
-
-```bash
-pytest services/embedding-service/tests
-```
-
-### Formatting Checks
-
-```bash
-npm run format:check
-black --check services/embedding-service
-```
-
----
-
-## RAG Behavior
-
-### Standard Q&A Mode
-
-- retrieves the most relevant transcript chunks
-- builds a grounded prompt from transcript context
-- generates concise answers from the selected LLM provider
-- returns supporting transcript chunks with the answer
-
-Fallback behavior:
-
-`I don't have enough transcript context to answer that.`
-
-### Summary Mode
-
-Summary mode is triggered for prompts such as:
-
-- summarize
-- overview
-- key points
-- what is this video about
-
-In summary mode, the application samples transcript sections, removes low-signal content, and returns a more structured summary response.
-
----
-
-## Operational Notes
-
-- MongoDB stores users, videos, transcript chunks, and chat history.
-- FAISS indexes are stored locally under the embedding service.
-- Some YouTube videos may not expose transcripts.
-- For question answering, use this order: process video -> create chunks -> index embeddings -> ask question.
-
----
-
-## Production Recommendations
-
-- move MongoDB to Atlas or another managed deployment
-- use persistent storage for FAISS indexes
-- configure HTTPS and strict secret management
-- add rate limiting and better request validation
-- introduce background jobs for indexing
-- add monitoring, retries, and caching
 
 ---
 
 ## Roadmap
 
-- streaming AI responses
-- background processing queues
-- Redis caching
-- multi-video search
-- citation highlighting
-- real-time indexing progress
-- vector database migration
+Possible next improvements based on the current architecture:
+
+- Add streaming LLM responses
+- Add multi-video search
+- Replace in-process background jobs with a queue system
+- Add retry logic for summary and embedding jobs
+- Add per-user rate limits
+- Add Redis caching
+- Add citation highlighting in the frontend
+- Add transcript-side highlighting for supporting chunks
+- Add production dashboard charts for metrics
+- Add cost tracking for LLM and embeddings
+- Add persistent guest sessions if needed
+- Add role management UI for admins
+- Add deployment-specific configs for Render/Railway/Fly.io/AWS
 
 ---
 
 ## License
 
-ISC License
+ISC
 
 ---
 
