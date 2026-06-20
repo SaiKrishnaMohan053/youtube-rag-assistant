@@ -2,7 +2,6 @@ const TranscriptChunk = require('../models/transcriptChunk.model');
 const { generateAndSaveVideoSummary } = require('./summary.service');
 const { indexVideoEmbeddings } = require('./embeddingClient.service');
 const { logInfo, logError, logMetric, getDurationMs } = require('../utils/logger');
-const { stat } = require('node:fs');
 
 const buildEmbeddingPayload = ({ video, chunks }) => ({
   videoId: video._id.toString(),
@@ -47,7 +46,11 @@ const runVideoPostChunkJobs = async ({ video, userId }) => {
 
     const embeddingStartedAt = Date.now();
 
-    await indexVideoEmbeddings(payload);
+    await indexVideoEmbeddings(payload, {
+      waitForReady: true,
+      maxAttempts: 10,
+      delayMs: 5000,
+    });
 
     logMetric('video.embedding_job.completed', {
       ...baseMeta,

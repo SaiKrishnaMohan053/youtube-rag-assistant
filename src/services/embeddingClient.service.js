@@ -19,6 +19,41 @@ const normalizeAxiosError = (error, fallbackMessage) => {
   return new ApiError(500, fallbackMessage);
 };
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const waitForEmbeddingServiceReady = async ({ maxAttempts = 8, delayMs = 5000 } = {}) => {
+  let lastError = null;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      const health = await getEmbeddingHealth();
+
+      logMetric('embedding.wait.ready', {
+        attempt,
+        maxAttempts,
+        status: 'success',
+      });
+
+      return health;
+    } catch (error) {
+      lastError = error;
+
+      logError('embedding.wait.retry', {
+        attempt,
+        maxAttempts,
+        delayMs,
+        error: error.message,
+      });
+
+      if (attempt < maxAttempts) {
+        await sleep(delayMs);
+      }
+    }
+  }
+
+  throw lastError || new ApiError(503, 'Embedding service is not ready');
+};
+
 const getEmbeddingHealth = async () => {
   const startedAt = Date.now();
 
@@ -38,10 +73,16 @@ const getEmbeddingHealth = async () => {
   }
 };
 
-const indexVideoEmbeddings = async (payload) => {
+const indexVideoEmbeddings = async (payload, options) => {
   const startedAt = Date.now();
 
   try {
+    if (options.waitForReady) {
+      await waitForEmbeddingServiceReady({
+        maxAttempts: options.maxAttempts || 8,
+        delayMs: options.delayMs || 5000,
+      });
+    }
     const { data } = await client.post('/index-video', payload);
 
     logMetric('embedding.index.completed', {
@@ -99,6 +140,7 @@ const getVideoIndexStatus = async (videoId) => {
 
 module.exports = {
   getEmbeddingHealth,
+  waitForEmbeddingServiceReady,
   indexVideoEmbeddings,
   searchVideoEmbeddings,
   getVideoIndexStatus,
