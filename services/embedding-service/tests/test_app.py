@@ -23,8 +23,39 @@ def load_app_with_test_embeddings():
     return module
 
 
-def test_health_endpoint():
-    app_module = load_app_with_test_embeddings()
+def load_app_without_test_embeddings():
+    os.environ.pop("EMBEDDING_TEST_MODE", None)
+
+    module_name = "embedding_app"
+    if module_name in sys.modules:
+        del sys.modules[module_name]
+
+    app_path = Path(__file__).resolve().parents[1] / "app.py"
+    spec = importlib.util.spec_from_file_location(module_name, app_path)
+    module = importlib.util.module_from_spec(spec)
+
+    assert spec.loader is not None
+
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_health_endpoint_requires_openai_key(monkeypatch):
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+
+    app_module = load_app_without_test_embeddings()
+    client = TestClient(app_module.app)
+
+    res = client.get("/health")
+
+    assert res.status_code == 500
+    assert "OPENAI_API_KEY" in res.json()["detail"]
+
+
+def test_health_endpoint_success_with_openai_key(monkeypatch):
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+
+    app_module = load_app_without_test_embeddings()
     client = TestClient(app_module.app)
 
     res = client.get("/health")
