@@ -11,6 +11,10 @@ const {
   getVideoIndexStatus,
 } = require('../services/embeddingClient.service');
 const { logInfo, logError } = require('../utils/logger');
+const {
+  setVideoEmbeddingStatus,
+  setVideoAndChunksEmbeddingStatus,
+} = require('../services/videoProcessingJob.service');
 
 const findOwnedVideo = async (videoIdParam, userId) => {
   if (!mongoose.Types.ObjectId.isValid(videoIdParam)) {
@@ -79,17 +83,11 @@ const indexVideo = asyncHandler(async (req, res) => {
   };
 
   try {
+    await setVideoEmbeddingStatus(video._id, 'processing');
+
     const serviceResponse = await indexVideoEmbeddings(payload);
 
-    await TranscriptChunk.updateMany(
-      { video: video._id },
-      {
-        $set: {
-          embeddingStatus: 'completed',
-          embeddingError: null,
-        },
-      }
-    );
+    await setVideoAndChunksEmbeddingStatus(video._id, 'completed');
 
     logInfo('video.index.completed', {
       userId: req.user._id.toString(),
@@ -106,15 +104,7 @@ const indexVideo = asyncHandler(async (req, res) => {
       })
     );
   } catch (error) {
-    await TranscriptChunk.updateMany(
-      { video: video._id },
-      {
-        $set: {
-          embeddingStatus: 'failed',
-          embeddingError: error.message,
-        },
-      }
-    );
+    await setVideoAndChunksEmbeddingStatus(video._id, 'failed', error.message);
 
     logError('video.index.failed', {
       userId: req.user._id.toString(),
@@ -150,17 +140,10 @@ const adminIndexVideo = asyncHandler(async (req, res) => {
   };
 
   try {
+    await setVideoEmbeddingStatus(video._id, 'processing');
     const serviceResponse = await indexVideoEmbeddings(payload);
 
-    await TranscriptChunk.updateMany(
-      { video: video._id },
-      {
-        $set: {
-          embeddingStatus: 'completed',
-          embeddingError: null,
-        },
-      }
-    );
+    await setVideoAndChunksEmbeddingStatus(video._id, 'completed');
 
     logInfo('admin.video.index.completed', {
       adminId: req.user._id.toString(),
@@ -178,15 +161,7 @@ const adminIndexVideo = asyncHandler(async (req, res) => {
       })
     );
   } catch (error) {
-    await TranscriptChunk.updateMany(
-      { video: video._id },
-      {
-        $set: {
-          embeddingStatus: 'failed',
-          embeddingError: error.message,
-        },
-      }
-    );
+    await setVideoAndChunksEmbeddingStatus(video._id, 'failed', error.message);
 
     logError('admin.video.index.failed', {
       adminId: req.user._id.toString(),

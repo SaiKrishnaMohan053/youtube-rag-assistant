@@ -1,3 +1,4 @@
+const Video = require('../models/video.model');
 const TranscriptChunk = require('../models/transcriptChunk.model');
 const { generateAndSaveVideoSummary } = require('./summary.service');
 const { indexVideoEmbeddings } = require('./embeddingClient.service');
@@ -13,6 +14,37 @@ const buildEmbeddingPayload = ({ video, chunks }) => ({
     endTime: chunk.endTime,
   })),
 });
+
+const buildVideoEmbeddingUpdate = (status, error = null) => {
+  const update = {
+    embeddingStatus: status,
+    embeddingError: error,
+  };
+
+  if (status === 'processing') update.indexedAt = null;
+  if (status === 'completed') update.indexedAt = new Date();
+
+  return update;
+};
+
+const buildChunkEmbeddingUpdate = (status, error = null) => ({
+  embeddingStatus: status,
+  embeddingError: error,
+});
+
+const setVideoEmbeddingStatus = async (videoId, status, error = null) => {
+  await Video.updateOne({ _id: videoId }, { $set: buildVideoEmbeddingUpdate(status, error) });
+};
+
+const setVideoAndChunksEmbeddingStatus = async (videoId, status, error = null) => {
+  await Promise.all([
+    Video.updateOne({ _id: videoId }, { $set: buildVideoEmbeddingUpdate(status, error) }),
+    TranscriptChunk.updateMany(
+      { video: videoId },
+      { $set: buildChunkEmbeddingUpdate(status, error) }
+    ),
+  ]);
+};
 
 const runVideoPostChunkJobs = async ({ video, userId }) => {
   const startedAt = Date.now();
@@ -59,15 +91,7 @@ const runVideoPostChunkJobs = async ({ video, userId }) => {
       status: 'success',
     });
 
-    await TranscriptChunk.updateMany(
-      { video: video._id },
-      {
-        $set: {
-          embeddingStatus: 'completed',
-          embeddingError: null,
-        },
-      }
-    );
+    await setVideoAndChunksEmbeddingStatus(video._id, 'completed');
 
     logMetric('video.post_chunk_jobs.completed', {
       ...baseMeta,
@@ -78,14 +102,10 @@ const runVideoPostChunkJobs = async ({ video, userId }) => {
       status: 'success',
     });
   } catch (error) {
-    await TranscriptChunk.updateMany(
-      { video: video._id },
-      {
-        $set: {
-          embeddingStatus: 'failed',
-          embeddingError: error.message || 'Background processing failed',
-        },
-      }
+    await setVideoAndChunksEmbeddingStatus(
+      video._id,
+      'failed',
+      error.message || 'Background processing failed'
     );
 
     logError('video.post_chunk_jobs.failed', {
@@ -117,4 +137,6 @@ const startVideoPostChunkJobs = ({ video, userId }) => {
 module.exports = {
   startVideoPostChunkJobs,
   runVideoPostChunkJobs,
+  setVideoEmbeddingStatus,
+  setVideoAndChunksEmbeddingStatus,
 };

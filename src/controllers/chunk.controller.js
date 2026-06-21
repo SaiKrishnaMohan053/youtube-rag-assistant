@@ -6,7 +6,10 @@ const ApiResponse = require('../utils/apiResponse');
 const ApiError = require('../utils/apiError');
 const { chunkTranscriptText } = require('../services/chunk.service');
 const { logInfo } = require('../utils/logger');
-const { startVideoPostChunkJobs } = require('../services/videoProcessingJob.service');
+const {
+  startVideoPostChunkJobs,
+  setVideoEmbeddingStatus,
+} = require('../services/videoProcessingJob.service');
 
 const getOwnedVideo = async (videoIdParam, userId) => {
   if (!mongoose.Types.ObjectId.isValid(videoIdParam)) {
@@ -52,6 +55,8 @@ const createVideoChunks = asyncHandler(async (req, res) => {
   }));
 
   await TranscriptChunk.insertMany(docs);
+
+  await setVideoEmbeddingStatus(video._id, 'processing');
 
   startVideoPostChunkJobs({
     video,

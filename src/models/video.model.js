@@ -81,6 +81,20 @@ const videoSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    embeddingStatus: {
+      type: String,
+      enum: ['pending', 'processing', 'completed', 'failed'],
+      default: 'pending',
+      index: true,
+    },
+    embeddingError: {
+      type: String,
+      default: null,
+    },
+    indexedAt: {
+      type: Date,
+      default: null,
+    },
     summary: {
       type: videoSummarySchema,
       default: () => ({}),

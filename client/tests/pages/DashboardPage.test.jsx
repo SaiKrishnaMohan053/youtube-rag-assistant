@@ -28,12 +28,14 @@ const mockVideos = [
     videoId: 'abc123',
     title: 'React RAG Tutorial',
     createdAt: '2026-06-01T10:00:00.000Z',
+    embeddingStatus: 'completed',
   },
   {
     _id: 'video-2',
     videoId: 'xyz789',
     title: 'Node Backend Guide',
     createdAt: '2026-06-02T10:00:00.000Z',
+    embeddingStatus: 'processing',
   },
 ];
 
@@ -194,7 +196,7 @@ describe('DashboardPage', () => {
 
     renderDashboardPage();
 
-    expect(await screen.findByText('Processed')).toBeInTheDocument();
+    expect((await screen.findAllByText('AI Ready')).length).toBeGreaterThan(0);
 
     await user.click(screen.getByRole('button', { name: /re-index/i }));
 

@@ -47,6 +47,27 @@ const formatDate = (value) => {
   }).format(new Date(value));
 };
 
+const getVideoStatusChip = (video) => {
+  if (video.embeddingStatus === 'completed') {
+    return {
+      label: 'AI Ready',
+      color: 'success',
+    };
+  }
+
+  if (video.embeddingStatus === 'failed') {
+    return {
+      label: 'Index Failed',
+      color: 'error',
+    };
+  }
+
+  return {
+    label: 'Processing',
+    color: 'warning',
+  };
+};
+
 const DashboardPage = ({ view = 'dashboard' }) => {
   const [url, setUrl] = useState('');
   const [videos, setVideos] = useState([]);
@@ -416,6 +437,7 @@ const DashboardPage = ({ view = 'dashboard' }) => {
             }}
           >
             {visibleVideos.map((video) => {
+              const statusChip = getVideoStatusChip(video);
               const thumbnailUrl = getVideoThumb(video);
               
               return (
@@ -456,8 +478,8 @@ const DashboardPage = ({ view = 'dashboard' }) => {
                       <Chip
                         size="small"
                         icon={<AutoAwesomeOutlinedIcon />}
-                        label="AI Ready"
-                        color="primary"
+                        label={statusChip.label}
+                        color={statusChip.color}
                         sx={{
                           position: 'absolute',
                           top: 14,
@@ -495,7 +517,7 @@ const DashboardPage = ({ view = 'dashboard' }) => {
                         <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
                           <Chip size="small" label="Transcript" />
                           <Chip size="small" label="Summary" />
-                          <Chip size="small" label="Processed" color="primary" />
+                          <Chip size="small" label={statusChip.label} color={statusChip.color} />
                         </Stack>
                       </Stack>
                     </CardContent>
