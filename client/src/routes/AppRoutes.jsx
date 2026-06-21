@@ -26,14 +26,19 @@ const getDashboardRedirect = (user) => {
   );
 };
 
+const getPublicLanding = (user) => {
+  if (user) return getDashboardRedirect(user);
+  return <GuestPage />;
+};
+
 const AppRoutes = () => {
   const { user } = useAuth();
 
   return (
     <Routes>
       <Route element={<PublicLayout />}>
-        <Route path='/' element={<GuestPage />} />
-        <Route path="/guest" element={<GuestPage />} />
+        <Route path='/' element={getPublicLanding(user)} />
+        <Route path="/guest" element={getPublicLanding(user)} />
 
         <Route
           path="/login"
