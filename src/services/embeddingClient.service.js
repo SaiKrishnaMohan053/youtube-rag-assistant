@@ -73,7 +73,7 @@ const getEmbeddingHealth = async () => {
   }
 };
 
-const indexVideoEmbeddings = async (payload, options) => {
+const indexVideoEmbeddings = async (payload, options = {}) => {
   const startedAt = Date.now();
 
   try {
@@ -95,7 +95,7 @@ const indexVideoEmbeddings = async (payload, options) => {
     return data;
   } catch (error) {
     logError('embedding.index.failed', {
-      duration: getDurationMs(startedAt),
+      durationMs: getDurationMs(startedAt),
       videoId: payload.videoId,
       chunkCount: payload.chunks.length || 0,
       error: error.message,
