@@ -5,7 +5,7 @@ const { logMetric, logError, getDurationMs } = require('../utils/logger');
 
 const client = axios.create({
   baseURL: env.embeddingServiceUrl,
-  timeout: 5000,
+  timeout: 30000,
 });
 
 const normalizeAxiosError = (error, fallbackMessage) => {
@@ -20,6 +20,25 @@ const normalizeAxiosError = (error, fallbackMessage) => {
 };
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const getEmbeddingHealth = async () => {
+  const startedAt = Date.now();
+
+  try {
+    const { data } = await client.get('/health');
+    logMetric('embedding.health.completed', {
+      durationMs: getDurationMs(startedAt),
+      status: 'success',
+    });
+    return data;
+  } catch (error) {
+    logError('embedding.health.failed', {
+      durationMs: getDurationMs(startedAt),
+      error: error.message,
+    });
+    throw normalizeAxiosError(error, 'Failed to check embedding service health');
+  }
+};
 
 const waitForEmbeddingServiceReady = async ({ maxAttempts = 8, delayMs = 5000 } = {}) => {
   let lastError = null;
@@ -54,33 +73,14 @@ const waitForEmbeddingServiceReady = async ({ maxAttempts = 8, delayMs = 5000 } 
   throw lastError || new ApiError(503, 'Embedding service is not ready');
 };
 
-const getEmbeddingHealth = async () => {
-  const startedAt = Date.now();
-
-  try {
-    const { data } = await client.get('/health');
-    logMetric('embedding.health.completed', {
-      durationMs: getDurationMs(startedAt),
-      status: 'success',
-    });
-    return data;
-  } catch (error) {
-    logError('embedding.health.failed', {
-      durationMs: getDurationMs(startedAt),
-      error: error.message,
-    });
-    throw normalizeAxiosError(error, 'Failed to check embedding service health');
-  }
-};
-
 const indexVideoEmbeddings = async (payload, options = {}) => {
   const startedAt = Date.now();
 
   try {
     if (options.waitForReady) {
       await waitForEmbeddingServiceReady({
-        maxAttempts: options.maxAttempts || 8,
-        delayMs: options.delayMs || 5000,
+        maxAttempts: options.maxAttempts || 20,
+        delayMs: options.delayMs || 6000,
       });
     }
     const { data } = await client.post('/index-video', payload);

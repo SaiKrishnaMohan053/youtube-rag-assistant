@@ -173,7 +173,16 @@ def _load_video_index(video_id: str) -> tuple[faiss.Index, Dict[str, Any]]:
 
 @app.get("/health")
 def health() -> Dict[str, str]:
-    return {"status": "ok", "model": MODEL_NAME}
+    api_key = os.getenv("OPENAI_API_KEY")
+
+    if not api_key:
+        raise HTTPException(status_code=500, detail="OPENAI_API_KEY not set")
+
+    return {
+        "status": "ok",
+        "model": MODEL_NAME,
+        "vectorStore": "ready",
+    }
 
 
 @app.post("/embed")

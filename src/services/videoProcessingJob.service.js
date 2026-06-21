@@ -80,8 +80,8 @@ const runVideoPostChunkJobs = async ({ video, userId }) => {
 
     await indexVideoEmbeddings(payload, {
       waitForReady: true,
-      maxAttempts: 10,
-      delayMs: 5000,
+      maxAttempts: 20,
+      delayMs: 6000,
     });
 
     logMetric('video.embedding_job.completed', {

@@ -87,8 +87,8 @@ const indexVideo = asyncHandler(async (req, res) => {
 
     const serviceResponse = await indexVideoEmbeddings(payload, {
       waitForReady: true,
-      maxAttempts: 10,
-      delayMs: 5000,
+      maxAttempts: 20,
+      delayMs: 6000,
     });
 
     await setVideoAndChunksEmbeddingStatus(video._id, 'completed');
@@ -147,8 +147,8 @@ const adminIndexVideo = asyncHandler(async (req, res) => {
     await setVideoEmbeddingStatus(video._id, 'processing');
     const serviceResponse = await indexVideoEmbeddings(payload, {
       waitForReady: true,
-      maxAttempts: 10,
-      delayMs: 5000,
+      maxAttempts: 20,
+      delayMs: 6000,
     });
 
     await setVideoAndChunksEmbeddingStatus(video._id, 'completed');

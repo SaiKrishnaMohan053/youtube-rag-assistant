@@ -94,7 +94,7 @@ const DashboardPage = ({ view = 'dashboard' }) => {
   const reindexVideo = async (videoId) => {
     setReindexingId(videoId);
     setError('');
-    setMessage('');
+    setMessage('Indexing started. If the embedding service is waking up, this may take 1–3 minutes.');
 
     try {
       await indexVideoApi(videoId);
