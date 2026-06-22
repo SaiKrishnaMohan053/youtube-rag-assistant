@@ -132,11 +132,11 @@ const SidebarContent = ({ user, location, onLogout, onClose }) => (
           {user?.name?.[0]?.toUpperCase() || 'U'}
         </Avatar>
 
-        <Box sx={{ minWidth: 0 }}>
+        <Box sx={{ minWidth: 0, flex: 1, maxWidth: '100%' }}>
           <Typography fontWeight={850} noWrap>
             {user?.name || 'User'}
           </Typography>
-          <Typography variant="caption" sx={{ color: '#94a3b8' }} noWrap>
+          <Typography variant="caption" noWrap title={user?.email} sx={{ display: 'block', color: '#94a3b8', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {user?.email}
           </Typography>
         </Box>

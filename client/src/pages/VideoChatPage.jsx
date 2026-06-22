@@ -14,7 +14,9 @@ import {
   Stack,
   TextField,
   Typography,
+  useMediaQuery,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
 import AutoAwesomeOutlinedIcon from '@mui/icons-material/AutoAwesomeOutlined';
 import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
@@ -24,7 +26,7 @@ import HubOutlinedIcon from '@mui/icons-material/HubOutlined';
 import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
 import SourceOutlinedIcon from '@mui/icons-material/SourceOutlined';
 import VideoLibraryOutlinedIcon from '@mui/icons-material/VideoLibraryOutlined';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import { Link as RouterLink, useParams } from 'react-router-dom';
 
 import LoadingButton from '../components/LoadingButton';
@@ -53,6 +55,8 @@ const getVideoThumb = (video) =>
 const VideoChatPage = () => {
   const { id } = useParams();
 
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [video, setVideo] = useState(null);
   const [chats, setChats] = useState([]);
   const [query, setQuery] = useState('');
@@ -60,6 +64,7 @@ const VideoChatPage = () => {
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const chatContainerRef = useRef(null);
 
   const latestChunks = useMemo(() => {
     const lastChat = chats?.[chats.length - 1];
@@ -140,12 +145,14 @@ const VideoChatPage = () => {
         },
       ]);
 
-      setTimeout(() => {
-        window.scrollTo({
-          top: document.body.scrollHeight,
-          behavior: 'smooth',
-        });
-      }, 100);
+      if (isMobile && chatContainerRef.current) {
+        setTimeout(() => {
+          chatContainerRef.current.scrollTo({
+            top: chatContainerRef.current.scrollHeight,
+            behavior: 'smooth',
+          });
+        }, 100);
+      }
 
       setQuery('');
     } catch (apiError) {
@@ -365,6 +372,7 @@ const VideoChatPage = () => {
 
                 <Stack
                   spacing={2}
+                  ref={chatContainerRef}
                   sx={{
                     p: {
                       xs: 1.5,
