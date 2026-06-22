@@ -53,17 +53,13 @@ The system consists of three main services:
 
 ## Screenshots
 
-### Landing Page
+| Landing Page                   | Dashboard                   |
+| ------------------------------ | --------------------------- |
+| ![](./assets/landingpage.png) | ![](./assets/dashboard.png) |
 
-![Landing Page](./assets/landingpage.png)
+### Video Chat
 
-### User Dashboard
-
-![Dashboard](./assets/dashboard.png)
-
-### Video Chat Interface
-
-![Video Chat](./assets/chatpage.png)
+![](./assets/chatpage.png)
 
 ---
 
