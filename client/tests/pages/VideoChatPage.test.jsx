@@ -231,12 +231,12 @@ describe('VideoChatPage', () => {
 
     await user.click(
       screen.getByRole('button', {
-        name: /summarize this video in bullet points/i,
+        name: /give me a short summary of this video/i,
       })
     );
 
     expect(screen.getByLabelText(/ask a question/i)).toHaveValue(
-      'Summarize this video in bullet points'
+      'Give me a short summary of this video'
     );
   });
 });
