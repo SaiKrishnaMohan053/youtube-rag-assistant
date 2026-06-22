@@ -26,41 +26,45 @@ const processVideo = asyncHandler(async (req, res) => {
     throw new ApiError(409, 'This video has already been processed for your account');
   }
 
-  const video = await Video.create({
-    user: req.user._id,
-    videoId,
-    url: normalizedUrl,
-    title: title && typeof title === 'string' ? title.trim() : null,
-    transcriptStatus: 'pending',
-  });
+  let transcriptResult;
 
   try {
-    const { transcriptText, duration } = await fetchTranscriptByVideoId(videoId);
-
-    video.transcriptText = transcriptText;
-    video.transcriptStatus = 'completed';
-    video.transcriptError = null;
-    video.duration = duration;
-    await video.save();
-    logInfo('video.process.completed', {
-      userId: req.user._id.toString(),
-      videoMongoId: video._id.toString(),
-      youtubeVideoId: video.videoId,
-      durationMs: Date.now() - startedAt,
-      transcriptLength: video.transcriptText.length,
-    });
+    transcriptResult = await fetchTranscriptByVideoId(videoId);
   } catch (error) {
-    video.transcriptStatus = 'failed';
-    video.transcriptError = error.message;
-    await video.save();
-    logError('video.process.failed', {
+    logError('video.process.transcript_failed', {
       userId: req.user._id.toString(),
       youtubeVideoId: videoId,
       durationMs: Date.now() - startedAt,
       error: error.message,
     });
+
     throw error;
   }
+
+  const { transcriptText, duration } = transcriptResult;
+
+  if (!transcriptText || !transcriptText.trim()) {
+    throw new ApiError(422, 'No transcript available for this video');
+  }
+
+  const video = await Video.create({
+    user: req.user._id,
+    videoId,
+    url: normalizedUrl,
+    title: title && typeof title === 'string' ? title.trim() : null,
+    transcriptText,
+    transcriptStatus: 'completed',
+    transcriptError: null,
+    duration,
+  });
+
+  logInfo('video.process.completed', {
+    userId: req.user._id.toString(),
+    videoMongoId: video._id.toString(),
+    youtubeVideoId: video.videoId,
+    durationMs: Date.now() - startedAt,
+    transcriptLength: video.transcriptText.length,
+  });
 
   return res
     .status(201)
