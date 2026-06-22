@@ -51,6 +51,20 @@ The system consists of three main services:
 - Admin monitoring dashboard
 - Evaluation and metrics dashboard
 
+## Screenshots
+
+### Landing Page
+
+![Landing Page](./assets/landingpage.png)
+
+### User Dashboard
+
+![Dashboard](./assets/dashboard.png)
+
+### Video Chat Interface
+
+![Video Chat](./assets/chatpage.png)
+
 ---
 
 ## Documentation
