@@ -285,10 +285,10 @@ const VideoChatPage = () => {
                     </Typography>
 
                     {[
-                      'Summarize this video in bullet points',
-                      'What are the most important concepts?',
-                      'Explain this like I am a beginner',
-                      'Give me action items from this video',
+                      'Give me a short summary of this video',
+                      'What are the key takeaways from this video?',
+                      'Show relevant timestamps for the main topics',
+                      'What does the speaker say about a specific person, company, or topic?',
                     ].map((item) => (
                       <Button
                         key={item}
