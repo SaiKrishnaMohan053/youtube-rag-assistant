@@ -224,7 +224,7 @@ const AdminEvalPage = () => {
       });
 
       setSuccess(
-        `Eval completed. Pass rate: ${report.passRate}% (${report.passed}/${report.total})`
+        `Eval completed. Pass rate: ${report.passRate}% (${report.passed}/${report.evaluated}) | Skipped: ${report.skipped || 0}`
       );
 
       await fetchEvalData();
@@ -543,6 +543,7 @@ const AdminEvalPage = () => {
                 <TableCell sx={headerCellSx} align="right">Pass Rate</TableCell>
                 <TableCell sx={headerCellSx} align="right">Passed</TableCell>
                 <TableCell sx={headerCellSx} align="right">Failed</TableCell>
+                <TableCell sx={headerCellSx} align="right">Skipped</TableCell>
                 <TableCell sx={headerCellSx} align="right">View</TableCell>
               </TableRow>
             </TableHead>
@@ -573,6 +574,10 @@ const AdminEvalPage = () => {
                   </TableCell>
 
                   <TableCell sx={tableCellSx} align="right">
+                    {report.summary?.skipped ?? 0}
+                  </TableCell>
+
+                  <TableCell sx={tableCellSx} align="right">
                     <Button
                       size="small"
                       variant="outlined"
@@ -586,7 +591,7 @@ const AdminEvalPage = () => {
 
               {!reports.length && (
                 <TableRow>
-                  <TableCell sx={tableCellSx} colSpan={6}>
+                  <TableCell sx={tableCellSx} colSpan={7}>
                     No eval reports found.
                   </TableCell>
                 </TableRow>
@@ -635,7 +640,8 @@ const AdminEvalPage = () => {
                   display: 'grid',
                   gridTemplateColumns: {
                     xs: '1fr',
-                    md: 'repeat(4, 1fr)',
+                    md: 'repeat(3, 1fr)',
+                    lg: 'repeat(5, 1fr)',
                   },
                   gap: 2,
                   width: '100%',
@@ -644,9 +650,15 @@ const AdminEvalPage = () => {
                 <InfoCard
                   title="Pass Rate"
                   value={`${selectedReport.passRate}%`}
-                  subtitle={`${selectedReport.passed}/${selectedReport.total} passed`}
+                  subtitle={`${selectedReport.passed}/${selectedReport.evaluated || selectedReport.total} passed`}
                   icon={<FactCheckOutlinedIcon />}
                   accent="#22c55e"
+                />
+
+                <InfoCard
+                  title="Skipped"
+                  value={selectedReport.skipped || 0}
+                  subtitle="Skipped eval cases"
                 />
 
                 <InfoCard
@@ -763,8 +775,8 @@ const AdminEvalPage = () => {
                         <TableCell sx={tableCellSx}>
                           <Chip
                             size="small"
-                            label={item.passed ? 'PASS' : 'FAIL'}
-                            color={item.passed ? 'success' : 'error'}
+                            label={item.skipped ? 'Skipped' : item.passed ? 'Passed' : 'Failed'}
+                            color={item.skipped ? 'warning' : item.passed ? 'success' : 'error'}
                           />
                         </TableCell>
                       </TableRow>

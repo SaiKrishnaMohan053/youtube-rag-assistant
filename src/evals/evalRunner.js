@@ -127,6 +127,95 @@ const keywordScore = (answer = '', keywords = []) => {
   return matches.length / keywords.length;
 };
 
+const normalizeText = (value = '') =>
+  String(value || '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim();
+
+const getChunkText = (chunk = {}) => normalizeText(chunk.text || '');
+
+const calculateRetrievalMetrics = ({ supportingChunks = [], expectedEvidence = [] }) => {
+  const evidence = expectedEvidence.map((item) => normalizeText(item)).filter(Boolean);
+
+  const retrievedChunkIndexes = supportingChunks
+    .map((chunk) => chunk.chunkIndex)
+    .filter((value) => value !== undefined && value !== null);
+
+  const retrievedChunkScores = supportingChunks.map((chunk) => ({
+    chunkIndex: chunk.chunkIndex,
+    score: chunk.score ?? chunk.finalRetrievalScore ?? null,
+    retrievalSource: chunk.retrievalSource ?? null,
+    vectorRank: chunk.vectorRank ?? null,
+    keywordRank: chunk.keywordRank ?? null,
+  }));
+
+  if (!evidence.length) {
+    return {
+      retrievalEvaluated: false,
+      retrievalHitRate: null,
+      precisionAtK: null,
+      recallAtK: null,
+      mrr: null,
+      matchedEvidence: [],
+      missingEvidence: [],
+      retrievedChunkIndexes,
+      retrievedChunkScores,
+    };
+  }
+
+  const matchedEvidence = [];
+  const missingEvidence = [];
+  const matchingRanks = [];
+
+  for (const phrase of evidence) {
+    const foundIndex = supportingChunks.findIndex((chunk) => getChunkText(chunk).includes(phrase));
+
+    if (foundIndex >= 0) {
+      matchedEvidence.push(phrase);
+      matchingRanks.push(foundIndex + 1);
+    } else {
+      missingEvidence.push(phrase);
+    }
+  }
+
+  const uniqueMatchingChunkRanks = new Set();
+
+  supportingChunks.forEach((chunk, index) => {
+    const chunkText = getChunkText(chunk);
+    const hasMatch = evidence.some((phrase) => chunkText.includes(phrase));
+
+    if (hasMatch) {
+      uniqueMatchingChunkRanks.add(index + 1);
+    }
+  });
+
+  const retrievedCount = supportingChunks.length;
+  const matchedChunkCount = uniqueMatchingChunkRanks.size;
+
+  const precisionAtK =
+    retrievedCount > 0 ? Number((matchedChunkCount / retrievedCount).toFixed(2)) : 0;
+
+  const recallAtK = Number((matchedEvidence.length / evidence.length).toFixed(2));
+
+  const retrievalHitRate = matchedEvidence.length > 0 ? 1 : 0;
+
+  const bestRank = matchingRanks.length ? Math.min(...matchingRanks) : null;
+  const mrr = bestRank ? Number((1 / bestRank).toFixed(2)) : 0;
+
+  return {
+    retrievalEvaluated: true,
+    retrievalHitRate,
+    precisionAtK,
+    recallAtK,
+    mrr,
+    matchedEvidence,
+    missingEvidence,
+    retrievedChunkIndexes,
+    retrievedChunkScores,
+  };
+};
+
 const runAuthEval = async ({ caseItem, videoId, token }) => {
   const startedAt = now();
 
@@ -148,6 +237,10 @@ const runAuthEval = async ({ caseItem, videoId, token }) => {
 
   const answer = data.answer || '';
   const supportingChunks = Array.isArray(data.supportingChunks) ? data.supportingChunks : [];
+  const retrievalMetrics = calculateRetrievalMetrics({
+    supportingChunks,
+    expectedEvidence: caseItem.expectedEvidence || [],
+  });
 
   const relevanceScore = keywordScore(answer, caseItem.expectedKeywords);
 
@@ -179,14 +272,17 @@ const runAuthEval = async ({ caseItem, videoId, token }) => {
 
   const intentPass = data.intent === caseItem.expectedIntent;
   const modePass = data.mode === caseItem.expectedMode;
+  const retrievalPass =
+    !retrievalMetrics.retrievalEvaluated || retrievalMetrics.retrievalHitRate === 1;
 
   return {
     id: caseItem.id,
     category: caseItem.category,
-    passed: intentPass && modePass && timestampPass && weightedScore >= 0.7,
+    passed: intentPass && modePass && timestampPass && retrievalPass && weightedScore >= 0.7,
     intentPass,
     modePass,
     timestampPass,
+    retrievalPass,
     relevanceScore,
     groundednessJudge,
     groundednessScore,
@@ -203,6 +299,15 @@ const runAuthEval = async ({ caseItem, videoId, token }) => {
     supportingChunkCount: supportingChunks.length,
     intent: data.intent,
     mode: data.mode,
+    retrievalEvaluated: retrievalMetrics.retrievalEvaluated,
+    retrievalHitRate: retrievalMetrics.retrievalHitRate,
+    precisionAtK: retrievalMetrics.precisionAtK,
+    recallAtK: retrievalMetrics.recallAtK,
+    mrr: retrievalMetrics.mrr,
+    matchedEvidence: retrievalMetrics.matchedEvidence,
+    missingEvidence: retrievalMetrics.missingEvidence,
+    retrievedChunkIndexes: retrievalMetrics.retrievedChunkIndexes,
+    retrievedChunkScores: retrievalMetrics.retrievedChunkScores,
   };
 };
 
@@ -369,13 +474,21 @@ const runEvalSuite = async ({ videoId, token, guestUrl }) => {
     }
   }
 
-  const passCount = results.filter((r) => r.passed).length;
+  const evaluatedResults = results.filter((r) => !r.skipped);
+  const passCount = evaluatedResults.filter((r) => r.passed).length;
+  const failedCount = evaluatedResults.filter((r) => !r.passed).length;
+  const skippedCount = results.filter((r) => r.skipped).length;
 
   return {
     total: results.length,
+    evaluated: evaluatedResults.length,
     passed: passCount,
-    failed: results.length - passCount,
-    passRate: results.length > 0 ? Number(((passCount / results.length) * 100).toFixed(2)) : 0,
+    failed: failedCount,
+    skipped: skippedCount,
+    passRate:
+      evaluatedResults.length > 0
+        ? Number(((passCount / evaluatedResults.length) * 100).toFixed(2))
+        : 0,
     results,
   };
 };

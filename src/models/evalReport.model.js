@@ -21,8 +21,10 @@ const evalReportSchema = new mongoose.Schema(
       index: true,
     },
     total: { type: Number, default: 0 },
+    evaluated: { type: Number, default: 0 },
     passed: { type: Number, default: 0 },
     failed: { type: Number, default: 0 },
+    skipped: { type: Number, default: 0 },
     passRate: { type: Number, default: 0 },
     results: {
       type: [mongoose.Schema.Types.Mixed],

@@ -17,6 +17,7 @@ const EVAL_CASES = [
     expectedIntent: 'SPECIFIC_QA',
     expectedMode: 'qa',
     expectedKeywords: [],
+    expectedEvidence: [],
   },
 
   {

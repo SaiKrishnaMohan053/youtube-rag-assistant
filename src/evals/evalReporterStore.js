@@ -20,8 +20,10 @@ const saveEvalReport = async ({ report, videoId }) => {
     videoId,
     generatedAt,
     total: report.total || 0,
+    evaluated: report.evaluated || 0,
     passed: report.passed || 0,
     failed: report.failed || 0,
+    skipped: report.skipped || 0,
     passRate: report.passRate || 0,
     results: report.results || [],
     report: payload,
@@ -36,7 +38,9 @@ const saveEvalReport = async ({ report, videoId }) => {
 const listEvalReports = async () => {
   const reports = await EvalReport.find({})
     .sort({ generatedAt: -1 })
-    .select('fileName videoId generatedAt total passed failed passRate createdAt updatedAt')
+    .select(
+      'fileName videoId generatedAt total evaluated passed failed skipped passRate createdAt updatedAt'
+    )
     .lean();
 
   return reports.map((item) => ({
@@ -48,8 +52,10 @@ const listEvalReports = async () => {
       videoId: item.videoId,
       generatedAt: item.generatedAt,
       total: item.total,
+      evaluated: item.evaluated,
       passed: item.passed,
       failed: item.failed,
+      skipped: item.skipped,
       passRate: item.passRate,
     },
   }));
